@@ -1,0 +1,65 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.weather-search-location-control {
+
+	.weather-search-location-control__toggle {
+		justify-content: center;
+		width: 100%;
+	}
+
+	.weather-search-location-control__preview-button {
+		width: 100%;
+		padding: $grid-unit * 1.25 $grid-unit-20;
+		border: 1px solid $gray-300;
+		border-radius: $radius-small;
+		background-color: $white;
+
+		.weather-search-location-control__preview-content {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.weather-search-location-control__edit-button {
+			opacity: 0;
+			flex-shrink: 0;
+
+			@media not (prefers-reduced-motion) {
+				transition: opacity 0.1s ease-in-out;
+			}
+		}
+
+		&:hover .weather-search-location-control__edit-button,
+		.weather-search-location-control__edit-button:focus,
+		.weather-search-location-control__edit-button:hover {
+			opacity: 1;
+		}
+
+		@media (hover: none) {
+			// Show edit button on devices that do not support hover.
+			.weather-search-location-control__edit-button {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+// modal
+.weather-search-location-control-modal {
+
+	.weather-search-location-control-result__name {
+		font-weight: 500;
+		color: inherit;
+	}
+
+	.weather-search-location-control-modal__actions {
+		background-color: $white;
+		border-top: $border-width solid $gray-300;
+		bottom: -1 * $grid-unit-40;
+		left: 0;
+		margin: 0 (-1 * $grid-unit-40) (-1 * $grid-unit-40);
+		padding: $grid-unit-20 $grid-unit-40;
+		position: sticky;
+		z-index: 1;
+	}
+}

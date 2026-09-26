@@ -1,0 +1,38 @@
+name: Update WordPress plugin assets and readme
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'readme.txt'
+      - '.wordpress-org/**'
+
+permissions: {}
+
+concurrency:
+  group: assets-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-plugin-readme-assets:
+    name: New assets and readme update
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Holds the SVN secrets: main and release tags only, deployed on approval.
+    environment:
+      name: wordpress-org
+      url: https://wordpress.org/plugins/elio-blocks/
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Update WordPress plugin assets and readme
+        uses: 10up/action-wordpress-plugin-asset-update@2480306f6f693672726d08b5917ea114cb2825f7 # 2.2.0
+        env:
+          SLUG: elio-blocks
+          IGNORE_OTHER_FILES: true
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}

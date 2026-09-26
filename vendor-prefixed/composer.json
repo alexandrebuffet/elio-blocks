@@ -1,0 +1,20 @@
+{
+    "autoload": {
+        "psr-4": {
+            "ElioBlocks\\Vendor\\Psr\\Container\\": "psr/container/src/",
+            "ElioBlocks\\Vendor\\Symfony\\Component\\DependencyInjection\\": "symfony/dependency-injection/",
+            "ElioBlocks\\Vendor\\Symfony\\Contracts\\Service\\": "symfony/service-contracts/",
+            "ElioBlocks\\Vendor\\Symfony\\Component\\VarExporter\\": "symfony/var-exporter/"
+        },
+        "files": [
+            "symfony/deprecation-contracts/function.php"
+        ],
+        "exclude-from-classmap": [
+            "/Tests/",
+            "/Test/"
+        ]
+    },
+    "config": {
+        "vendor-dir": "."
+    }
+}

@@ -1,0 +1,67 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+// Same layout as the block styles panel (block-editor-block-styles).
+.elio-icon-collection-control__variants {
+	display: grid;
+	gap: $grid-unit-10;
+}
+
+.elio-icon-collection-control__row {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: $grid-unit-10;
+}
+
+.elio-icon-collection-control__item-text {
+	// Three lines at most, as the block styles buttons (Truncate).
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	// Without this, the ellipsis can be partly hidden by the button padding.
+	text-align: start;
+	text-align-last: center;
+}
+
+// Same popover as the block styles preview
+// (block-editor-block-switcher__popover-preview).
+.elio-icon-collection-control__popover-container {
+	position: absolute;
+	top: -$border-width;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	pointer-events: none;
+}
+
+.elio-icon-collection-control__popover {
+	// Same layer as the sidebar it comes from.
+	z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+	overflow: hidden;
+
+	.components-popover__content {
+		width: 300px;
+		border: $border-width solid $gray-900;
+		border-radius: $radius-medium;
+		background: $white;
+		outline: none;
+		box-shadow: none;
+		overflow: auto;
+	}
+}
+
+.elio-icon-collection-control__preview {
+	margin: $grid-unit-20 0;
+	padding: 0 $grid-unit-20;
+}
+
+.elio-icon-collection-control__iframe {
+	display: block;
+	width: 100%;
+	// The icons (48px) and the vertical padding of the preview document.
+	height: 96px;
+	border: 0;
+	pointer-events: none;
+}

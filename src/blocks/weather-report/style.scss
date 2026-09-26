@@ -1,0 +1,17 @@
+.wp-block-elio-weather-report {
+	box-sizing: border-box;
+}
+
+// Symbols of the condition icons (IconSprite, shared/icon-sprite.js): out of
+// the flow, so it takes no room nor gap. Not display:none: gradients inside a
+// hidden SVG stop rendering in <use>.
+.wp-block-elio-weather-report__condition-icons-sprite {
+	position: absolute;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+}
+
+.wp-block-elio-weather-report__condition-icons-sprite + * {
+	margin-block-start: 0;
+}

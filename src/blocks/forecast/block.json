@@ -1,0 +1,84 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "elio/forecast",
+	"version": "1.0.0",
+	"title": "Forecast",
+	"category": "elio-weather",
+	"icon": "cloud",
+	"description": "Displays a daily or hourly forecast.",
+	"ancestor": ["elio/weather-report"],
+	"attributes": {
+		"type": {
+			"type": "string",
+			"default": "daily",
+			"enum": ["daily", "hourly"]
+		},
+		"count": {
+			"type": "number",
+			"default": 7
+		}
+	},
+	"providesContext": {
+		"elio/forecastType": "type",
+		"elio/forecastCount": "count"
+	},
+	"supports": {
+		"html": false,
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"align": ["wide", "full"],
+		"anchor": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
+		"color": {
+			"background": true,
+			"text": true,
+			"gradients": true,
+			"heading": true,
+			"button": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"shadow": true,
+		"spacing": {
+			"padding": true,
+			"margin": ["top", "bottom"],
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true,
+				"padding": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"layout": true
+	},
+	"textdomain": "elio-blocks",
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php"
+}

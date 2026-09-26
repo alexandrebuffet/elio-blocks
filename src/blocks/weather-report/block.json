@@ -1,0 +1,178 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "elio/weather-report",
+	"version": "1.0.0",
+	"title": "Weather",
+	"category": "widgets",
+	"icon": "cloud",
+	"description": "Display weather from a location.",
+	"example": {
+		"attributes": {
+			"location": {
+				"name": "Paris",
+				"latitude": 48.8566,
+				"longitude": 2.3522
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "elio/location",
+				"attributes": {
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
+				}
+			},
+			{
+				"name": "core/group",
+				"attributes": {
+					"layout": {
+						"type": "flex",
+						"flexWrap": "nowrap",
+						"justifyContent": "center"
+					}
+				},
+				"innerBlocks": [
+					{
+						"name": "elio/condition-icon",
+						"attributes": {
+							"isDecorative": true,
+							"style": {
+								"dimensions": {
+									"width": "48px"
+								}
+							}
+						}
+					},
+					{
+						"name": "elio/temperature",
+						"attributes": {
+							"style": {
+								"typography": {
+									"fontStyle": "normal",
+									"fontWeight": "600",
+									"fontSize": "1.5em"
+								}
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "elio/condition-description",
+				"attributes": {
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
+				}
+			}
+		]
+	},
+	"attributes": {
+		"location": {
+			"type": "object"
+		},
+		"provider": {
+			"type": "string"
+		},
+		"units": {
+			"type": "string"
+		},
+		"iconCollection": {
+			"type": "string"
+		},
+		"tagName": {
+			"type": "string",
+			"default": "section",
+			"enum": ["div", "section", "article"]
+		}
+	},
+	"providesContext": {
+		"elio/reportLocation": "location",
+		"elio/reportProvider": "provider",
+		"elio/reportUnits": "units",
+		"elio/reportIconCollection": "iconCollection"
+	},
+	"supports": {
+		"html": false,
+		"align": true,
+		"anchor": true,
+		"ariaLabel": true,
+		"interactivity": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
+		"color": {
+			"background": true,
+			"text": true,
+			"gradients": true,
+			"heading": true,
+			"button": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"shadow": true,
+		"spacing": {
+			"padding": true,
+			"margin": ["top", "bottom"],
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true,
+				"padding": true
+			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"layout": {
+			"allowSizingOnChildren": true
+		},
+		"allowedBlocks": true
+	},
+	"textdomain": "elio-blocks",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}
