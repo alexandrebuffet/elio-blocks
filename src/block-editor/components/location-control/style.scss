@@ -1,0 +1,22 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.weather-location-control {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
+	.weather-location-control__header {
+		margin-bottom: $grid-unit-10;
+	}
+
+	.weather-location-control__label {
+		margin-bottom: 0;
+	}
+
+	.weather-location-control__search-control,
+	.weather-location-control__custom-coordinates {
+		flex: 1;
+		margin-bottom: 0; // Needed for some instances of the range control, such as the Spacer block.
+	}
+}

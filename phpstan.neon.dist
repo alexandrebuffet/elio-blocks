@@ -1,0 +1,18 @@
+# Static analysis. Run with `composer phpstan`.
+#
+# WordPress functions and classes come from php-stubs/wordpress-stubs, loaded by
+# szepeviktor/phpstan-wordpress through phpstan/extension-installer.
+parameters:
+    level: 6
+    paths:
+        - elio-blocks.php
+        - functions.php
+        - uninstall.php
+        - config
+        - includes
+    scanDirectories:
+        # Symfony DI, scoped under ElioBlocks\Vendor by PHP-Scoper.
+        - vendor-prefixed
+    bootstrapFiles:
+        - tests/phpstan-bootstrap.php
+    treatPhpDocTypesAsCertain: false

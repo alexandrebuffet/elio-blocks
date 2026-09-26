@@ -1,0 +1,94 @@
+@import "@wordpress/theme/prebuilt/css/design-tokens.css";
+@import "@wordpress/components/build-style/style.css";
+@import "@wordpress/dataviews/build-style/style.css";
+
+body.toplevel_page_elio-blocks-settings {
+
+	#wpcontent {
+		padding-left: 0;
+	}
+
+	#wpbody-content {
+		padding-bottom: 0;
+	}
+
+	#wpfooter {
+		display: none;
+	}
+
+	ul#adminmenu a.wp-has-current-submenu::after,
+	ul#adminmenu > li.current > a.current::after {
+		// Background of the admin-ui Page, under its header.
+		border-right-color: var(--wpds-color-background-surface-neutral);
+	}
+
+	#wpbody-content > .notice,
+	#wpbody-content > .notice-success,
+	#wpbody-content > .notice-error,
+	#wpbody-content > .notice-warning,
+	#wpbody-content > .notice-info,
+	#wpbody-content > .updated,
+	#wpbody-content > .error {
+		display: none;
+	}
+}
+
+.elio-blocks-settings {
+	display: grid;
+	min-height: calc(100vh - var(--wp-admin--admin-bar--height, 32px));
+}
+
+.elio-blocks-settings__snackbar {
+	position: fixed;
+	bottom: 0;
+	left: 160px;
+	right: 0;
+	padding: var(--wpds-dimension-padding-2xl);
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	pointer-events: none;
+
+	body.folded & {
+		left: 36px;
+	}
+
+	@media (max-width: 960px) {
+		left: 0;
+	}
+}
+
+.elio-blocks-settings-page__content {
+	box-sizing: border-box;
+	margin: 0 auto;
+	max-width: 680px;
+	padding: var(--wpds-dimension-padding-3xl) var(--wpds-dimension-padding-2xl);
+	width: 100%;
+}
+
+.elio-blocks-settings__help {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-sm);
+	margin: 0;
+}
+
+.elio-blocks-settings__icon-collections .dataviews-view-grid-items {
+	// The card has its own padding.
+	padding: 0;
+}
+
+.elio-blocks-settings__icon-collection-preview {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	// The card takes the clicks.
+	pointer-events: none;
+}
+
+.elio-blocks-settings__icon-collection-description,
+.elio-blocks-settings__icon-collection-coverage {
+	display: block;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-sm);
+}

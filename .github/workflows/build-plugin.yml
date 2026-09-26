@@ -1,0 +1,58 @@
+name: Build plugin package
+
+# The package deployed to WordPress.org: built once, checked by Plugin Check,
+# then deployed as is. Run it by hand for a zip to submit or test (artifact).
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build-plugin:
+    name: Build plugin package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # 8.2 is the minimum the plugin supports (see elio-blocks.php).
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+
+      - name: Build assets
+        run: |
+          npm ci
+          npm run build
+
+      # Symfony DI ships scoped in vendor-prefixed/: without the dev packages,
+      # vendor/ only holds the autoloader.
+      - name: Install production Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+
+      # rsync only creates the last directory of the destination.
+      - name: Copy the package files
+        run: |
+          mkdir -p "$RUNNER_TEMP/package/elio-blocks"
+          rsync -a --exclude-from=.distignore ./ "$RUNNER_TEMP/package/elio-blocks/"
+
+      - name: Upload the package
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: elio-blocks
+          path: ${{ runner.temp }}/package
+          if-no-files-found: error
+          retention-days: 14

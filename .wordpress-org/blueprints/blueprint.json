@@ -1,0 +1,24 @@
+{
+    "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+    "landingPage": "/wp-admin/post.php?post=1000&action=edit",
+    "login": true,
+    "features": {
+        "networking": true
+    },
+    "plugins": [
+        "elio-blocks"
+    ],
+    "preferredVersions": {
+        "php": "8.3",
+        "wp": "latest"
+    },
+    "siteOptions": {
+        "blogname": "My Site with Elio Blocks"
+    },
+    "steps": [
+        {
+            "step": "runPHP",
+            "code": "<?php\nrequire_once 'wordpress/wp-load.php';\n$content = <<<'HTML'\n<!-- wp:paragraph -->\n<p>Here is the weather in Paris. Select the Weather block to change its location or units.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:elio/weather-report {\"location\":{\"latitude\":48.8566,\"longitude\":2.3522,\"name\":\"Paris\"}} -->\n<!-- wp:elio/location {\"style\":{\"typography\":{\"textAlign\":\"center\"}}} /-->\n\n<!-- wp:group {\"layout\":{\"type\":\"flex\",\"flexWrap\":\"nowrap\",\"justifyContent\":\"center\"}} -->\n<div class=\"wp-block-group\"><!-- wp:elio/condition-icon {\"isDecorative\":true,\"style\":{\"dimensions\":{\"width\":\"48px\"}}} /-->\n\n<!-- wp:elio/temperature {\"style\":{\"typography\":{\"fontStyle\":\"normal\",\"fontWeight\":\"600\",\"fontSize\":\"1.5em\"}}} /--></div>\n<!-- /wp:group -->\n\n<!-- wp:elio/condition-description {\"style\":{\"typography\":{\"textAlign\":\"center\"}}} /-->\n<!-- /wp:elio/weather-report -->\nHTML;\nwp_insert_post(\n\tarray(\n\t\t'import_id'    => 1000,\n\t\t'post_title'   => 'Elio Blocks Sample Post',\n\t\t'post_status'  => 'publish',\n\t\t'post_content' => wp_slash( $content ),\n\t)\n);\n"
+        }
+    ]
+}

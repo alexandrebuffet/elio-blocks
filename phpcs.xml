@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         name="Elio Blocks Plugin"
+         xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+
+    <description>Coding standards: PSR-12 for all PHP; WordPress I18n for text domain.</description>
+
+    <file>includes</file>
+    <file>elio-blocks.php</file>
+
+    <exclude-pattern>vendor/*</exclude-pattern>
+    <exclude-pattern>vendor-prefixed/*</exclude-pattern>
+    <exclude-pattern>build/*</exclude-pattern>
+
+    <arg name="basepath" value="."/>
+    <arg name="extensions" value="php"/>
+    <arg value="p"/> <!-- Progress -->
+
+    <rule ref="PSR12"/>
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="280"/>
+        </properties>
+    </rule>
+
+    <!--
+        Every file starts with the "exit if called directly" ABSPATH guard required for
+        WordPress.org plugins, which PSR-1 reports as a side effect next to a declaration.
+    -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>*</exclude-pattern>
+    </rule>
+
+    <!-- REST controllers override WP_REST_Controller methods, which are snake_case. -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName">
+        <exclude-pattern>includes/RestApi/Endpoints/*</exclude-pattern>
+    </rule>
+
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="elio-blocks"/>
+            </property>
+        </properties>
+    </rule>
+</ruleset>

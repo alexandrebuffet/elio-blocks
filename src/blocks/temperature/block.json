@@ -1,0 +1,87 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "elio/temperature",
+	"version": "1.0.0",
+	"title": "Temperature",
+	"category": "elio-weather",
+	"icon": "thermometer",
+	"description": "Displays the weather temperature.",
+	"ancestor": ["elio/weather-report"],
+	"attributes": {
+		"displayType": {
+			"type": "string",
+			"default": "current",
+			"enum": ["current", "feels-like"]
+		},
+		"unitFormat": {
+			"type": "string"
+		},
+		"showUnit": {
+			"type": "boolean",
+			"default": true
+		},
+		"showPrefix": {
+			"type": "boolean",
+			"default": false
+		},
+		"prefix": {
+			"type": "string"
+		}
+	},
+	"usesContext": [
+		"elio/reportLocation",
+		"elio/reportProvider",
+		"elio/reportUnits"
+	],
+	"supports": {
+		"html": false,
+		"interactivity": true,
+		"align": ["wide", "full"],
+		"anchor": true,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
+		"color": {
+			"background": true,
+			"text": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"textAlign": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"fitText": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
+	},
+	"textdomain": "elio-blocks",
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php",
+	"style": ["elio-common-style"],
+	"viewScriptModule": "file:./view.js"
+}

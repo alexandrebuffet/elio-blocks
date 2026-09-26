@@ -1,0 +1,49 @@
+# Pull requests target develop, the default branch. A release waits 7 days
+# before it is proposed (cooldown), so a compromised version has time to be
+# pulled first; security updates skip the wait.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci
+    groups:
+      github-actions:
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      # The @wordpress packages are released together and move together.
+      wordpress:
+        patterns: ['@wordpress/*']
+      npm-minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+    ignore:
+      # Scoped into vendor-prefixed/ by `composer scope-deps`: a bump of the
+      # lock file alone would leave the shipped copy behind.
+      - dependency-name: 'symfony/*'
+    groups:
+      composer-minor-and-patch:
+        update-types: [minor, patch]

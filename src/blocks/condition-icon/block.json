@@ -1,0 +1,89 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "elio/condition-icon",
+	"version": "1.0.0",
+	"title": "Condition Icon",
+	"category": "elio-weather",
+	"icon": "star-fill",
+	"description": "Displays the weather condition.",
+	"ancestor": ["elio/weather-report"],
+	"attributes": {
+		"isDecorative": {
+			"type": "boolean",
+			"default": false
+		},
+		"strokeWidth": {
+			"type": "number",
+			"default": 1.5
+		},
+		"iconCollection": {
+			"type": "string"
+		}
+	},
+	"usesContext": [
+		"elio/reportLocation",
+		"elio/reportProvider",
+		"elio/reportUnits",
+		"elio/reportIconCollection",
+		"elio/forecastType",
+		"elio/forecastCount",
+		"elio/forecastItem"
+	],
+	"supports": {
+		"align": ["left", "center", "right"],
+		"html": false,
+		"anchor": true,
+		"interactivity": true,
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"color": false,
+				"radius": false,
+				"style": false,
+				"width": false
+			}
+		},
+		"spacing": {
+			"padding": true,
+			"margin": true,
+			"__experimentalSkipSerialization": ["padding"],
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"dimensions": {
+			"width": true,
+			"__experimentalSkipSerialization": ["width"],
+			"__experimentalDefaultControls": {
+				"width": true
+			}
+		}
+	},
+	"selectors": {
+		"root": ".wp-block-elio-condition-icon svg",
+		"css": ".wp-block-elio-condition-icon",
+		"spacing": {
+			"margin": ".wp-block-elio-condition-icon"
+		}
+	},
+	"textdomain": "elio-blocks",
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php",
+	"viewScriptModule": "file:./view.js",
+	"style": "file:./style-index.css"
+}

@@ -1,0 +1,26 @@
+.wp-block-elio-condition-icon {
+	line-height: 0;
+}
+
+.wp-block-elio-condition-icon__symbol {
+	box-sizing: border-box;
+	width: 24px;
+	height: auto;
+
+	&:is(svg) {
+		fill: currentcolor;
+	}
+}
+
+// No icon for the item (no weather forecast yet): the <svg><use> takes no room.
+.wp-block-elio-condition-icon:not(.has-svg-symbol) > .wp-block-elio-condition-icon__symbol {
+	display: none;
+}
+
+.wp-block-elio-condition-icon.has-svg-symbol.has-stroke-svg-symbol {
+
+	.wp-block-elio-condition-icon__symbol:is(svg) {
+		fill: none;
+		stroke: currentcolor;
+	}
+}

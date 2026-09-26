@@ -1,0 +1,41 @@
+/**
+ * The following styles get applied inside the editor only.
+ */
+
+/*
+ * The weather forecast loads over the inner blocks, which stay mounted and
+ * editable: the spinner floats in a corner instead of taking their place.
+ */
+.wp-block-elio-weather-report[aria-busy="true"] {
+	position: relative;
+
+	> .components-spinner {
+		position: absolute;
+		top: 0.5em;
+		right: 0.5em;
+		margin: 0;
+		z-index: 1;
+	}
+}
+
+.wp-block-elio-weather-report > .components-notice {
+	margin: 0 0 1em;
+}
+
+.wp-block-elio-report-placeholder {
+
+	&__location {
+		margin-bottom: 1em;
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5em;
+		margin-top: 1em;
+	}
+
+	&__back {
+		margin-bottom: 1em;
+	}
+}

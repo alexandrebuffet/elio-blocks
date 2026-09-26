@@ -1,0 +1,149 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+Elio Blocks is a WordPress plugin that provides Gutenberg blocks for displaying weather data (current conditions, hourly/daily weather forecasts). Requires WordPress 6.7+ and PHP 8.2+. Block Editor only — no shortcode or Classic Editor support.
+
+### Vocabulary: weather forecast, forecast list, provider
+
+The data is a **weather forecast**: other forecasts (marine, seasonal, historical) may come next to it, each its own domain. What holds or carries it says so, in code, keys and texts: `ElioBlocks\WeatherForecast\`, `/elio/v1/weather-forecast`, `getWeatherForecast()`, `weatherForecastUrl`, "Unable to fetch weather forecast data.". Only these stay generic:
+
+- the **forecast list**, rows of whatever forecast the report holds: blocks `elio/forecast` / `elio/forecast-template` (titles "Forecast", "Forecast Template"), block context `elio/forecastType|Count|Item|ItemIndex`, Interactivity context `forecastType|Count|Items`, `state.forecastItems`, `callbacks.syncForecastItems`, `ForecastWindow` / `selectForecastItems()`, `elio_blocks_get_forecast_items()`;
+- the **report** context its inner blocks read: `elio/reportLocation|Provider|Units`;
+- **providers**, which may serve several domains: `ProviderNotFound`, `ProviderUnavailable`, `InvalidProviderResponse`, `ProviderNotConfigured`, `elio_blocks_provider_credentials`, `/providers`.
+
+Behind the data, three levels, each with its word:
+
+- a **provider** is the organization the data comes from (Open-Meteo, OpenWeatherMap): its slug, label and the **credentials** it identifies the site with, whatever it serves: fields it declares when registered once with `elio_blocks_register_provider()` (`ProviderRegistry`, `ProviderCredential`: label, plain-text description, `required`, `secret`; an API key, an account and its password, a contact address), stored in `elio_blocks_provider_credentials` (slug → name → value) or set with the constant `ELIO_BLOCKS_{SLUG}_{NAME}`, drawn as one card per provider on the settings page, given to its adapters in `fetch()` as `$args['credentials']`; a missing `required` one means the provider is not asked (`ProviderNotConfigured`, 503). Open-Meteo declares an optional `api_key`: with it, the customer API. Every request names the plugin and the site in its User-Agent (`WpHttpClient`): some providers ask for no key but refuse an anonymous application. The industry says *weather data provider*, and WordPress says provider in the same sense (oEmbed providers). Never "source": a WordPress block bindings source is something else, and Elio may register one.
+- a **domain** is what is asked for: the weather forecast, one day a marine forecast, tides, weather history, air quality, astronomy. It is named by its content everywhere (`WeatherForecast\`, `/weather-forecast`, `elio_blocks_weather_forecast_provider`, "Weather Report"); a provider serves it through one adapter (`OpenMeteoWeatherForecastProvider`, which only fetches) registered under the provider's slug in the registry of that domain (`elio_blocks_register_weather_forecast_provider( 'open-meteo', … )`, refused for a provider not registered), which has its own default provider (`getDefaultWeatherForecastProvider()`) and its own list (`/weather-forecast/providers`, where `/providers` lists every provider). "Domain" is a word of this file: in weather it is the area a model covers, so it never reaches the code, the API or a text. Not "forecast type" either: `elio/forecastType` is hourly/daily.
+- a **model** (ECMWF, GFS, AROME) is how a provider computes a domain: an option of that provider (Open-Meteo `models`), never a provider nor a domain.
+
+Mountain weather is the weather forecast at an elevation, a property of the location; moon phases are computed, an astronomy domain Elio itself would provide.
+
+## Commands
+
+Run all plugin commands from `web/app/plugins/elio-blocks/` (or `ddev ssh` then `cd` there), with Node.js 22 (`.nvmrc`).
+
+| Command                        | Description                                          |
+| ------------------------------ | ---------------------------------------------------- |
+| `npm start`                    | Dev mode with file watching and blocks manifest      |
+| `npm run build`                | Production build (includes icon pre-build steps)     |
+| `npm run lint:js`              | ESLint via `@wordpress/scripts`                      |
+| `npm run lint:css`             | Stylelint via `@wordpress/scripts`                   |
+| `npm run format`               | Auto-format JS/CSS                                   |
+| `composer phpcs`               | PHP CodeSniffer (PSR-12 + WordPress I18n)            |
+| `composer phpcbf`              | Auto-fix PHP coding standard violations              |
+| `composer test`                | Run PHPUnit unit tests                               |
+| `composer test:unit`           | Same as above (explicit testsuite)                   |
+| `composer phpstan`             | PHPStan level 6 (`phpstan.neon.dist`), no baseline   |
+| `npm run test:js`              | Vitest unit tests (`src/**/test/*.test.js`)          |
+| `composer scope-deps`          | Re-run PHP-Scoper to rebuild `vendor-prefixed/`      |
+| `npm run plugin-zip`           | ZIP of `package.json` `files` (not the WordPress.org package: see Release) |
+
+## Architecture
+
+### PHP — Service Container & Hooks
+
+Entry point: `elio-blocks.php` → `Plugin::instance()->run()`.
+
+`Plugin` (singleton) builds a Symfony DI `ContainerBuilder` using `config/services.php`, compiles it, then calls `initHooks()` on every service tagged `elio_blocks.hookable`.
+
+- **`ElioBlocks\Contracts\HookInterface`** — `initHooks(): void`. All hookable services implement this.
+- **`config/services.php`** — Manual DI wiring (no autowire); explicit `addTag('elio_blocks.hookable')` on each hookable. This is intentional — autowire conflicts with PHP-Scoper's serialization of `ResolveInstanceofConditionalsPass`.
+- **`vendor-prefixed/`** — Symfony DI scoped under `ElioBlocks\Vendor\` by PHP-Scoper to avoid conflicts with other plugins.
+
+Key PHP namespaces under `includes/` (PSR-4, root `ElioBlocks\`):
+
+| Namespace                           | Responsibility                                             |
+| ----------------------------------- | ---------------------------------------------------------- |
+| `ElioBlocks\Plugin`                 | Uninstaller                                                |
+| `ElioBlocks\Contracts`              | `HookInterface`, `CacheInterface`, `HttpClientInterface`   |
+| `ElioBlocks\Blocks\Hooks`           | Block registration, block categories, common style asset   |
+| `ElioBlocks\BlockEditor\Hooks`      | Block editor asset enqueueing                              |
+| `ElioBlocks\Provider`               | `Provider` (slug, label, credentials), `ProviderCredential`, `ProviderRegistry` (an invalid registration: `_doing_it_wrong` + `false`), hook `RegisterProviders` (built-in Open-Meteo, before the domains register what it serves) |
+| `ElioBlocks\Settings`               | `PluginSettings`, options page, global settings hooks      |
+| `ElioBlocks\Weather`                | `Coordinates` value object (bounds, rounded to 2 decimals)  |
+| `ElioBlocks\WeatherForecast`       | `WeatherForecastProviderRegistry` (the weather forecast provider of each provider; an invalid registration: `_doing_it_wrong` + `false`), `WeatherForecastService` (provider lookup + cache), `WeatherForecast` (validated provider output), `WeatherForecastPresenter` (icons dictionary, unit overrides, translated descriptions — nothing of it is cached), `WeatherForecastRequestSigner`, typed exceptions in `Exception\`, OpenMeteo provider + normalizer |
+| `ElioBlocks\Weather\Geocoding`      | `GeocodingService`, OpenMeteo geocoding provider           |
+| `ElioBlocks\Weather\Condition`      | Condition icon registry (collections and icons, as the WP 7.1 Icons API: `registerCollection()` / `registerIcon()`, `_doing_it_wrong` + `false`), `ConditionIconCollectionResolver` (block → report → site → `elio`), registration hook |
+| `ElioBlocks\WordPress\Cache`        | `TransientCache` (implements `CacheInterface`)             |
+| `ElioBlocks\WordPress\Http`         | `WpHttpClient` (implements `HttpClientInterface`)          |
+| `ElioBlocks\RestApi`                | Endpoints: WeatherForecast, WeatherForecastProviders, Geocoding, ConditionIconCollections, Providers |
+| `ElioBlocks\Interactivity\Blocks\Report` | `DirectivesHelper` (state + block context), `DerivedState` (PHP twin of the view.js getters), `ReportContext` (weather forecast shared with inner blocks), `IconSprite` (condition icons printed once per page as SVG symbols), `DateSettings` (WP_Locale names and site date settings for the view scripts), hooks `PreloadWeatherForecast` and `LinkConditionIcons` |
+| `ElioBlocks\Interactivity\Blocks\Forecast` | `ForecastWindow` (rows of a forecast list) |
+
+### Block Hierarchy
+
+All blocks are under the `elio/` namespace:
+
+- **`elio/weather-report`** — Top-level container. Fetches weather via REST and provides context to children. Block dir: `src/blocks/weather-report/`.
+- **`elio/forecast`** — Forecast container (ancestor: `elio/weather-report`). Variations: Daily Weather Forecast, Hourly Weather Forecast (`elio/weather-forecast-daily`, `elio/weather-forecast-hourly`). Contains a single `elio/forecast-template`.
+- **`elio/forecast-template`** — Repeats inner blocks per forecast item.
+- **Leaf display blocks** — `temperature`, `daily-temperature`, `hourly-temperature`, `humidity`, `wind-speed`, `wind-direction`, `pressure`, `precipitation`, `precipitation-probability`, `cloud-cover`, `uv-index`, `condition-icon`, `condition-description`, `datetime`, `sun-event`, `location`. Parents: `elio/weather-report` or `elio/forecast-template`.
+
+### Source Layout
+
+- `src/blocks/` — One directory per block: `block.json`, `index.js`, `edit.js`, `save.js`, optional `render.php`, `view.js`, `inspector.js`, SCSS.
+- `src/block-editor/` — Shared editor code:
+  - `components/` — Reusable editor UI (location search, geolocation toggle, coordinate inputs), `icon-collection-control/` (collection buttons of the inspectors)
+  - `hooks/` — `useWeatherForecastQuery` / `useWeatherReport` (weather forecast from the `elio/data` store resolver, never fetched in components), `useLocationSearch` (debounced, cancellable), `use-condition-icon-collections.js` (registered collections, same store)
+  - `components/weather-value-edit/` — generic edit component of the leaf blocks (prefix, value, unit)
+  - `utils/` — Helpers, `condition-icon-collection.js` (JS twin of `ConditionIconCollectionResolver`)
+  - `block-collection.js` — Registers the "Elio" collection, with the plugin logo as its icon
+- `src/shared/` — Logic shared by the front (view scripts) and the editor: `weather-values.js` (value text, unit labels), `weather-dates.js` (dates in the location timezone), `date-format.js` (PHP `date()` formats with Intl, replaces `@wordpress/date` on the front), `forecast-window.js` (rows of a list), `icon-sprite.js` (symbols of the icons a refresh brings). Mirrored in PHP by `DerivedState`, `ForecastWindow` and `IconSprite`.
+- `src/stores/elio-data/` — `@wordpress/data` store: `getWeatherForecast( latitude, longitude, provider, units )`, `getWeatherForecastProviders()` (the `/weather-forecast/providers` list) and `getConditionIconCollections()` selectors, each with a resolver.
+- `src/test-utils/` — Vitest helpers: Interactivity API test double, `renderHook` / `renderWithRegistry`, and `setup.js` (browser APIs jsdom lacks; a test fails when it writes to the console). Tests import the Vitest APIs (no globals); `vitest.config.mjs` has Oxc parse the `.js` sources as JSX.
+- `src/icons/` — SVG source icons; built to `src/icons/components/` via SVGR (`npm run build:icons`). `src/icons/brand/` holds the plugin logo, built with its colors and gradient by `svgr.brand-icons.config.js`
+- `build/` — Compiled output (gitignored); auto-generates `blocks-manifest.php` and `weather-condition-icons/`
+
+### Frontend / Interactivity
+
+`elio/weather-report` uses the WordPress Interactivity API (`@wordpress/interactivity`); every block extends the one `elio/weather-report` store from its `view.js`.
+
+- **Server-side rendering.** `PreloadWeatherForecast` (on `render_block_context`) fetches the weather forecast once and stores it in `ReportContext`. `DirectivesHelper::getState()` registers `DerivedState` closures, so `data-wp-text="state.xxx"` prints values in the HTML; `forecast-template/render.php` fills `context.forecastItems`, so WordPress renders the `data-wp-each` rows server-side. **A getter added to a `view.js` must be added to `DerivedState` too** — `DerivedStateTest` fails otherwise.
+- **`render.php` and `functions.php`.** Dynamic blocks render from the `render.php` their `block.json` declares. A `render.php` reads what it prints through the functions of `functions.php`, as core blocks call `get_the_title()`, never through the container: `elio_blocks_get_weather_report_interactivity_state()` / `elio_blocks_get_weather_report_interactivity_context()` for the report, `elio_blocks_get_current_conditions()` / `elio_blocks_get_forecast_items()` / `elio_blocks_get_condition_icon()` for the blocks inside it (the weather forecast `PreloadWeatherForecast` stored in `ReportContext`), `elio_blocks_add_icon_to_sprite()` in `condition-icon` / `elio_blocks_render_icon_sprite()` in the report for the icons of the page (`IconSprite`). They take and return data, never services. Each function there is public API, and `PublicApiTest` pins the list.
+- **Page weight.** The report context only carries `meta`, `current` and the `icons` dictionary reduced to each icon's `style` (items reference icons by qualified name in `condition_icons`). Hourly/daily sections arrive with the first client fetch; until then the server rows stay in place (`syncForecastItems`).
+- **Condition icons.** Icons are named `collection/icon` (as WordPress 7.1's Icons API names its own); each forecast item carries `condition_icons: { collection: name|null }`, one entry per collection its report block uses. A `condition-icon` block is an `<svg><use href="#elio-condition-icon-{collection}--{icon}">` in a wrapper that carries `role`/`aria-label`; it reads the name of its collection from `context.iconCollection`, resolved by `elio_blocks_get_condition_icon_collection()` from its own attribute, the `elio/reportIconCollection` context, then the site setting (`ConditionIconCollectionResolver::resolve()` on the PHP side). `IconSprite` prints each icon once per page as a `<symbol>`, in a `wp-block-elio-weather-report__condition-icons-sprite` at the start of the report block (its inner blocks are rendered already, so the symbols reach the browser before the icons using them), hidden by the block's `style.scss` (not `display:none`: gradients in a hidden SVG stop rendering in `<use>`); the symbols a refresh brings go in that sprite of the block, created there if the server printed none. **WordPress rejects directives on or inside an `<svg>` server-side** (`_doing_it_wrong`, and a 500 on this DDEV site): never put a `data-wp-*` attribute there. The server prints the href on the wrapper (`data-wp-bind--data-elio-icon-href`), `LinkConditionIcons` moves it into the `<use>` once directives are processed: in the `render_block` filter of the blocks around a nested interactive block, and for an interactive block at the top level (template, widget, post content), where no filter runs after it, by rendering it itself on `pre_render_block` (`render_block()` under a re-entry guard, only for blocks a report may be in: the report, or interactive blocks holding one or holding post content, synced patterns, template parts); in the browser `callbacks.linkConditionIcon` keeps it up to date and `actions.fetch` defines the symbols of new icons before showing the data. The report context lists `iconCollections` (the collections its blocks actually use, `ConditionIconCollectionResolver::usedBy()`), which `actions.fetch` sends back as `icon_collections[]` so the refreshed data covers them too.
+- **Refresh.** `actions.fetch` calls the REST endpoint with the per-block `signature` from the context (no nonce: it would go stale in cached pages). The weather forecast carries `meta.fetched_at` (when the provider was asked); the server copy expires `dataTtl` later (+5 s margin: transients count in whole seconds). `callbacks.startAutoRefresh` schedules one timeout, at the expiry plus up to 30 s of random spread (`REFRESH_SPREAD`: the pages open on a location would otherwise all miss the cache at once and each ask the provider) while the server copy is valid, else at `query.requestedAt + refreshInterval` (cache off, failed request), and is re-run by the runtime after each request; with the cache on, the cache duration is the one pace setting (the settings page shows the interval only with the cache off); `init` and the visibility handler only fetch once the server copy has expired.
+- **Dates.** Timestamps are ISO 8601 with the UTC offset of the location; dates are formatted in `meta.timezone`, on the server, the front and in the editor alike. No `wp-date` script on the front: `datetime` and `sun-event` put `dateSettings` (from `DateSettings`, the names `wp_date()` uses) in the state, and `createDateApi()` formats with Intl. The editor gets the same `DateSettings` (`window.elioBlocksDateSettings`, `getEditorDateSettings()`). What the browser cannot know comes from the server: month declension (`wp_maybe_decline_date()` ported in `date-format.js`, from `l10n.declineMonths`/`monthsGenitive`/`locale`) and timezone names for `T` (`meta.timezone_abbreviations`, read by `WeatherForecastPresenter` in PHP's timezone database over the weather forecast period, merged by `withWeatherForecastTimezone()`; Intl says "GMT+2" where PHP says "CEST").
+- **Units.** Values are converted server-side only (`WeatherForecastPresenter`); JS never converts, it labels. `meta.units` and `meta.unit_settings` tell the editor which units the values are in. A unit label carries its own separator (a non-breaking space before `km/h`, `hPa`, `mm`; nothing before `°C` and `%`): the value and unit spans touch, in `render.php` as in `WeatherValueEdit`, and a prefix is followed by a space. The numeric blocks carry `elio-tabular-nums` on both sides (`ValueBlocksRenderTest`, `leaf-edits.test.js`).
+- **Extension point.** Third parties register collections on `elio_blocks_init` (fires on `init` once the built-in provider, its weather forecast provider and the "elio" icon collection are registered, the registries locked right after) with `elio_blocks_register_condition_icon_collection()` then `elio_blocks_register_condition_icon()` — see the docblock of the `do_action( 'elio_blocks_init' )` in `RegisterWeatherForecastProviders`. The `elio_blocks/condition_icons` filter is gone.
+- **Settings.** The site's default collection is `PluginSettings::OPTION_CONDITION_ICON_COLLECTION` (`elio_blocks_condition_icon_collection`), set from the "Weather" section of the settings page (`src/settings/condition-icons-section.js`: a `DataViewsPicker` grid, each collection previewed by its four preview icons in a sandboxed iframe). In the block inspectors, `IconCollectionControl` (`src/block-editor/components/icon-collection-control/`) names the collections as the block styles panel names styles, and previews the one hovered in a popover beside the sidebar, in the theme styles of the editor (`getSettings().styles`); it has its own ToolsPanel in the Styles tab ("Collection" in the condition icon, "Icons Collection" in the report), and choosing the inherited one (report, then site) saves no attribute. Both previews are sandboxed `srcdoc` iframes built by `getIconCollectionPreviewDocument()` (`block-editor/utils`), so no `__unstable` iframe API.
+
+### REST API Endpoints
+
+All under `/wp-json/elio/v1/`:
+
+- `GET /weather-forecast` — Weather forecast data. `icon_collections[]` names the collections whose icons the items name (not signed: a signed request can still ask for a different set on refresh).
+- `GET /geocoding` — Location name → coordinates
+- `GET /condition-icon-collections` — Registered collections with a preview (four icons: clear day, clouds, rain, snow) and their coverage, for the pickers (`edit_posts`)
+- `GET /weather-forecast/providers` — Providers that serve the weather forecast
+- `GET /providers` — Registered providers, whatever they serve
+
+`/weather-forecast` is open to editors (`edit_posts`), and to anonymous visitors only with the HMAC signature issued at render time for the weather forecast of that exact location/provider/units (`WeatherForecastRequestSigner`; the signed text starts with `weather-forecast`, like the action of a nonce, so an endpoint of other data signing with the same secret cannot unlock this one; filter `elio_blocks/weather_forecast_public_access` opens it). `/geocoding`, `/condition-icon-collections` and `/weather-forecast/providers` (slug, label, `isDefault`: the Provider select of the report block, the default one on the settings page) require `edit_posts`; `/providers` (slug, label, `credentials`: the provider cards of the settings page; a secret value never leaves the server, only `isSet`), `/providers/{slug}/credentials` (only the declared ones, saved one provider after the other: each request rewrites the option of them all) and `/cache/purge` require `manage_options`. Errors: 400 invalid coordinates, 404 `elio_blocks_provider_not_found`, 502 upstream failure (the upstream message is never exposed), 503 `elio_blocks_provider_not_configured` (a required credential is not set).
+
+### PHP-Scoper
+
+Symfony DI is bundled and prefixed under `ElioBlocks\Vendor\` to avoid conflicts. After updating Symfony dependencies, run `composer scope-deps` to rebuild `vendor-prefixed/`. The `scoper.inc.php` includes two patchers that fix hardcoded byte offsets in `ResolveInstanceofConditionalsPass` which break under prefixing.
+
+## Release
+
+GitHub Actions build and deploy the WordPress.org package; nothing is packaged by hand.
+
+- **`build-plugin.yml`** builds it: `npm run build`, then `composer install --no-dev` (`symfony/dependency-injection` is a dev dependency, only PHP-Scoper's input, so `vendor/` holds the autoloader alone), then copies the plugin minus `.distignore` into the `elio-blocks` artifact. Run it by hand for a zip to test or submit. A file added at the plugin root that must not ship goes in `.distignore`.
+- **`plugin-check.yml`** runs Plugin Check (`WordPress/plugin-check-action`) on that package on each push to `develop`/`main` and each PR: an error fails the job, a warning is an annotation.
+- **`deploy-release-plugin.yml`**: a tag on `main` (merged with a merge commit, not squashed) deploys the checked package to WordPress.org SVN (`10up/action-wordpress-plugin-deploy`, secrets `SVN_USERNAME` / `SVN_PASSWORD`) and creates the GitHub release with its zip. **`deploy-plugin-readme-assets.yml`** updates the readme and the `.wordpress-org/` assets on pushes to `main`.
+- The deploy jobs run in the **`wordpress-org` environment**, which holds the SVN secrets and only deploys `main` and `*.*.*` tags, on the maintainer's approval.
+- **Repository protections** are versioned: the rulesets in `.github/rulesets/` (`develop`: PRs with the CI checks, the admin pushes directly; `main`: PRs merged with a merge commit only; tags: created by the admin only) and the environment, Actions and security settings are applied by `scripts/apply-github-settings.sh`, run by hand once the repository is public. A job renamed in `ci.yml` or `plugin-check.yml` is renamed in the rulesets too: a required check that never reports blocks every PR.
+- `build/` ships without its sources: the readme links the GitHub repository for them (WordPress.org guideline 4), so it stays public.
+
+## Coding Standards
+
+- **PHP**: PSR-12 everywhere; WordPress I18n rules for text domain `elio-blocks`. Lint with `composer phpcs`. The `elio-blocks.php` bootstrap is excluded from PSR-1 side-effects rule.
+- **JS/CSS**: WordPress coding standards via `@wordpress/scripts` (ESLint + Stylelint).
+- **Class names**: written in full where they are used (`'wp-block-elio-humidity__value'`), never built from a slug or through a `className` variable holding a base class: `className` is already a block prop and a block attribute (ESLint `no-restricted-syntax`). The value blocks pass theirs to `WeatherValueEdit` (`prefixClassName`, `valueClassName`, `unitClassName`), and `leaf-edits.test.js` checks they are the ones their `render.php` prints.
+- **Indentation**: Tabs everywhere (spaces only in YAML). See `.editorconfig`.
+- **Namespace**: `ElioBlocks\` (PSR-4). Do not use `WeatherBlock\`.
+- **i18n**: text domain `elio-blocks`, always literal (PHPCS `WordPress.WP.I18n`, ESLint `@wordpress/i18n-text-domain`). Translations come from the translate.wordpress.org language packs in `WP_LANG_DIR/plugins`: no `languages/` folder, no `load_plugin_textdomain()`, no `Domain Path`. A script enqueued by hand calls `wp_set_script_translations( $handle, 'elio-blocks' )` without a path (`elio-blocks-settings`, `elio-blocks-block-editor`); block scripts get theirs from `"textdomain"` in `block.json`. View script modules never call `@wordpress/i18n` (`wp_set_script_translations()` does not apply to modules): translated text reaches them from PHP, through the state or the context. WordPress.org extracts strings from `build/`: a `/* translators: */` comment goes right before the call, and one msgid with several meanings takes `_x()`.

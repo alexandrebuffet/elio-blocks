@@ -1,0 +1,67 @@
+{
+	"name": "alexandrebuffet/elio-blocks",
+	"type": "wordpress-plugin",
+	"keywords": [
+		"weather",
+		"forecast",
+		"block"
+	],
+	"authors": [
+		{
+			"name": "Alexandre Buffet",
+			"email": "dev@alexandrebuffet.fr",
+			"homepage": "https://alexandrebuffet.fr"
+		}
+	],
+	"homepage": "https://github.com/alexandrebuffet/elio-blocks",
+	"support": {
+		"issues": "https://github.com/alexandrebuffet/elio-blocks/issues",
+		"source": "https://github.com/alexandrebuffet/elio-blocks"
+	},
+	"prefer-stable": true,
+	"require": {
+		"php": ">=8.2"
+	},
+	"require-dev": {
+		"brain/monkey": "^2.6",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"humbug/php-scoper": "^0.18",
+		"phpunit/phpunit": "^11.0",
+		"squizlabs/php_codesniffer": "^3.13",
+		"wp-coding-standards/wpcs": "^3.1",
+		"phpstan/phpstan": "^2.1",
+		"szepeviktor/phpstan-wordpress": "^2.0",
+		"phpstan/extension-installer": "^1.4",
+		"symfony/dependency-injection": "^7.2"
+	},
+	"autoload": {
+		"psr-4": {
+			"ElioBlocks\\": "includes/"
+		},
+		"files": [
+			"vendor-prefixed/autoload.php"
+		]
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"ElioBlocks\\Tests\\": "tests/"
+		}
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"phpstan/extension-installer": true
+		},
+		"platform": {
+			"php": "8.2.0"
+		}
+	},
+	"scripts": {
+		"scope-deps": "@php scripts/scope-deps.php",
+		"phpcs": "phpcs --standard=./phpcs.xml",
+		"phpcbf": "phpcbf --standard=./phpcs.xml",
+		"phpstan": "phpstan analyse --memory-limit=1G",
+		"test": "@test:unit",
+		"test:unit": "phpunit --testsuite unit"
+	}
+}

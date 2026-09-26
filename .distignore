@@ -1,0 +1,39 @@
+# Files left out of the WordPress.org package. The Build plugin package workflow
+# copies the plugin with `rsync --exclude-from=.distignore`, after `npm run build`
+# and `composer install --no-dev` (vendor/ then only holds the Composer autoloader).
+# composer.json ships: Plugin Check expects it next to a Composer vendor/.
+
+# Development files
+/node_modules
+/src
+/.git
+/.github
+/.wordpress-org
+/.claude
+/.worktrees
+/docs
+/scripts
+/tests
+
+# Build and config files
+/package.json
+/package-lock.json
+/composer.lock
+/webpack.config.js
+/svgr.*.js
+/eslint.config.cjs
+/vitest.config.mjs
+/phpcs.xml
+/phpstan.neon.dist
+/phpunit.xml
+/scoper.inc.php
+/.phpunit.result.cache
+/.distignore
+/.editorconfig
+/.gitignore
+/.npmignore
+/.nvmrc
+
+# Documentation
+/CLAUDE.md
+/README.md

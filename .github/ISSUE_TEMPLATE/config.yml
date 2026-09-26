@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Support
+    url: https://wordpress.org/support/plugin/elio-blocks/
+    about: Questions about using the plugin go to the WordPress.org support forum.
+  - name: Security vulnerability
+    url: https://github.com/alexandrebuffet/elio-blocks/security/advisories/new
+    about: Report it privately, never in a public issue.
