@@ -51,6 +51,9 @@ updates:
       # Scoped into vendor-prefixed/ by `composer scope-deps`: a bump of the
       # lock file alone would leave the shipped copy behind.
       - dependency-name: 'symfony/*'
+      # WPCS 3 requires PHP_CodeSniffer 3.
+      - dependency-name: 'squizlabs/php_codesniffer'
+        update-types: ['version-update:semver-major']
     groups:
       composer-minor-and-patch:
         update-types: [minor, patch]
