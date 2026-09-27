@@ -24,20 +24,12 @@ const MANIFEST_PHP = resolve(
 	'build/weather-condition-icons-manifest.php'
 );
 
-/** SVGO base configuration — strip editor metadata, keep viewBox. */
+/**
+ * SVGO base configuration — strip editor metadata. The viewBox stays: SVGO 4
+ * no longer removes it in preset-default.
+ */
 const SVGO_CONFIG_BASE = {
-	plugins: [
-		{
-			name: 'preset-default',
-			params: {
-				overrides: {
-					// Keep viewBox so SVGs scale correctly.
-					removeViewBox: false,
-				},
-			},
-		},
-		'removeDimensions',
-	],
+	plugins: [ 'preset-default', 'removeDimensions' ],
 };
 
 /**
