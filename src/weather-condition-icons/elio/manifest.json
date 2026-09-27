@@ -1,4 +1,7 @@
 {
+	"slug": "elio",
+	"label": "Elio",
+	"description": "The icons of the Elio Blocks plugin, from Tabler Icons.",
 	"icons": [
 		{ "slug": "sun",                     "label": "Sun",                              "filePath": "sun.svg",                      "style": "stroke" },
 		{ "slug": "sun-high",                "label": "Sun (high)",                       "filePath": "sun-high.svg",                 "style": "stroke" },
