@@ -113,7 +113,7 @@ The icons of the plugin come from [Tabler Icons](https://tabler.io/icons), Copyr
 2. A daily forecast on the front end.
 3. Start blank and choose a layout for the Weather block.
 4. Search for a location by name.
-5. The settings page: weather forecast provider, units and data refresh.
+5. The General section of the settings page: units and data refresh.
 
 == Changelog ==
 
