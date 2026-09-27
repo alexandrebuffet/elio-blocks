@@ -1,4 +1,4 @@
-=== Elio Blocks — Live weather for the Block Editor ===
+=== Elio Blocks ===
 Contributors: alexandrebuffet
 Tags: weather, forecast, block-editor, blocks, location
 Requires at least: 6.7
