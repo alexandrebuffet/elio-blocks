@@ -31,10 +31,14 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
     protected function processValue(mixed $value, bool $isRoot = \false): mixed
     {
         if ($value instanceof ServiceLocatorArgument) {
-            if ($value->getTaggedIteratorArgument()) {
-                $value->setValues($this->findAndSortTaggedServices($value->getTaggedIteratorArgument(), $this->container));
+            if ($taggedIterator = $value->getTaggedIteratorArgument()) {
+                $exclude = $taggedIterator->getExclude();
+                if ($taggedIterator->excludeSelf()) {
+                    $exclude[] = $this->currentId;
+                }
+                $value->setValues($this->findAndSortTaggedServices($taggedIterator, $this->container, $exclude));
             }
-            return self::register($this->container, $value->getValues());
+            return self::register($this->container, $this->processValue($value->getValues()));
         }
         if ($value instanceof Definition) {
             $value->setBindings(parent::processValue($value->getBindings()));
@@ -57,7 +61,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             $i = 0;
             foreach ($values as $k => $v) {
                 if ($v instanceof ServiceClosureArgument) {
-                    $services[$k] = $v;
+                    $services[$k] = $this->processValue($v);
                     continue;
                 }
                 if ($i === $k) {
@@ -68,7 +72,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
                 } elseif (\is_int($k)) {
                     $i = null;
                 }
-                $services[$k] = new ServiceClosureArgument($v);
+                $services[$k] = new ServiceClosureArgument($this->processValue($v));
             }
             if (\count($services) === $i) {
                 ksort($services);
