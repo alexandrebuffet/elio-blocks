@@ -20,7 +20,7 @@ No coding required. No widgets, no shortcodes, no iframe either.
 
 = Feels native, because it is =
 
-* **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
+* **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon, time of the last update and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
 * **Forecasts that work like the Query Loop.** The hourly and daily forecast lists repeat a template you design once, just like the Post Template of the Query Loop block.
 * **Start from a layout.** Pick one of the ready-made variations (Default, Minimal, Hourly Forecast, Daily Forecast), or start blank and build your own.
 * **Every design tool you expect.** Colors, typography, spacing, borders and layout come from the standard block supports, so they appear in the same panels as those of core blocks, follow your theme's presets, and can be set for the whole site in `theme.json` or the Styles of the Site Editor.

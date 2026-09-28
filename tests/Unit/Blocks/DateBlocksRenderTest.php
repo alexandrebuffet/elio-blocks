@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The datetime and sun-event blocks format dates in the browser without the
+ * The datetime, sun-event and last-updated blocks format dates in the browser without the
  * wp-date script: they put the date settings of the site in the page.
  */
 class DateBlocksRenderTest extends TestCase
@@ -48,8 +48,9 @@ class DateBlocksRenderTest extends TestCase
     public static function dateBlocks(): array
     {
         return [
-            'datetime'  => ['datetime'],
-            'sun-event' => ['sun-event'],
+            'datetime'     => ['datetime'],
+            'sun-event'    => ['sun-event'],
+            'last-updated' => ['last-updated'],
         ];
     }
 
