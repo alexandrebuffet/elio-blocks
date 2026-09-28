@@ -50,9 +50,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  *                               is not set),
  *                               'secret' (bool, default false: typed hidden, never sent back to the
  *                               browser). Default none.
- *     @type array  $attribution The credit its license asks for, an array of:
- *                               'text' (string, plain text, required),
- *                               'url' (string, http(s) URL the text links to),
+ *     @type array  $attribution The credit its license asks for: its label linked to its site, in the
+ *                               sentence of the provider-attribution block. An array of:
+ *                               'url' (string, http(s) URL of its site, required),
  *                               'license' (string, name of the license of the data),
  *                               'license_url' (string, http(s) URL of that license). Default none.
  * }
@@ -254,7 +254,8 @@ function elio_blocks_get_condition_icon_collection( ?string $block_collection, ?
  * Null when the provider asks for none, or serves no weather forecast.
  *
  * @param string $provider Provider slug (the elio/reportProvider block context), empty for the site default.
- * @return array{text: string, url: string, license: string, license_url: string}|null Plain text and URLs, to escape.
+ * @return array{name: string, url: string, license: string, license_url: string}|null Label of the provider, its site,
+ *                                                                                  the license of its data and its page; to escape.
  */
 function elio_blocks_get_weather_forecast_attribution( string $provider ): ?array {
 	$container = Plugin::instance()->container();
@@ -262,13 +263,14 @@ function elio_blocks_get_weather_forecast_attribution( string $provider ): ?arra
 		$provider = $container->get( PluginSettings::class )->getDefaultWeatherForecastProvider();
 	}
 
-	$attribution = $container->get( WeatherForecastProviderRegistry::class )->getProvider( $provider )?->attribution;
+	$provider    = $container->get( WeatherForecastProviderRegistry::class )->getProvider( $provider );
+	$attribution = $provider?->attribution;
 	if ( null === $attribution ) {
 		return null;
 	}
 
 	return array(
-		'text'        => $attribution->text,
+		'name'        => $provider->label,
 		'url'         => $attribution->url,
 		'license'     => $attribution->license,
 		'license_url' => $attribution->licenseUrl,

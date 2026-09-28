@@ -56,9 +56,8 @@ class RegisterProviders implements HookInterface
                     ),
                 ),
                 // Its data is licensed under CC BY 4.0, free access and subscriptions alike:
-                // https://open-meteo.com/en/licence asks for this credit and a link to the license.
+                // https://open-meteo.com/en/licence asks for a credit, a link to it and to the license.
                 'attribution' => array(
-                    'text'        => __('Weather data by Open-Meteo.com', 'elio-blocks'),
                     'url'         => 'https://open-meteo.com/',
                     'license'     => 'CC BY 4.0',
                     'license_url' => 'https://creativecommons.org/licenses/by/4.0/',

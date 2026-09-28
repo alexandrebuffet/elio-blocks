@@ -267,7 +267,7 @@ class PublicApiTest extends TestCase
         $container->get(WeatherForecastProviderRegistry::class)->register('silent', new StubWeatherForecastProvider());
 
         $openMeteo = [
-            'text'        => 'Weather data by Open-Meteo.com',
+            'name'        => 'Open-Meteo',
             'url'         => 'https://open-meteo.com/',
             'license'     => 'CC BY 4.0',
             'license_url' => 'https://creativecommons.org/licenses/by/4.0/',

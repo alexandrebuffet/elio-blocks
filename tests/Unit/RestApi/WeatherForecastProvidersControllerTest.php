@@ -35,7 +35,7 @@ class WeatherForecastProvidersControllerTest extends TestCase
         // The built-in provider, one a third party registered on elio_blocks_init,
         // and one that serves something else than the weather forecast.
         $providers = new ProviderRegistry();
-        $providers->register('open-meteo', ['label' => 'Open-Meteo', 'attribution' => ['text' => 'Weather data by Open-Meteo.com', 'url' => 'https://open-meteo.com/', 'license' => 'CC BY 4.0', 'license_url' => 'https://creativecommons.org/licenses/by/4.0/']]);
+        $providers->register('open-meteo', ['label' => 'Open-Meteo', 'attribution' => ['url' => 'https://open-meteo.com/', 'license' => 'CC BY 4.0', 'license_url' => 'https://creativecommons.org/licenses/by/4.0/']]);
         $providers->register('air-only', ['label' => 'Air Only']);
         $providers->register('third-party', ['label' => 'Third Party', 'credentials' => ['api_key' => ['label' => 'API Key', 'required' => true]]]);
 
@@ -77,7 +77,7 @@ class WeatherForecastProvidersControllerTest extends TestCase
                     'slug'        => 'open-meteo',
                     'label'       => 'Open-Meteo',
                     'isDefault'   => false,
-                    'attribution' => ['text' => 'Weather data by Open-Meteo.com', 'url' => 'https://open-meteo.com/', 'license' => 'CC BY 4.0', 'licenseUrl' => 'https://creativecommons.org/licenses/by/4.0/'],
+                    'attribution' => ['url' => 'https://open-meteo.com/', 'license' => 'CC BY 4.0', 'licenseUrl' => 'https://creativecommons.org/licenses/by/4.0/'],
                 ],
                 ['slug' => 'third-party', 'label' => 'Third Party', 'isDefault' => true, 'attribution' => null],
             ],

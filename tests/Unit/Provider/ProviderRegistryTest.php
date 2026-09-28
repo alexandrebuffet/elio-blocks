@@ -111,7 +111,6 @@ class ProviderRegistryTest extends TestCase
                 [
                     'label'       => 'Acme Weather',
                     'attribution' => [
-                        'text'        => 'Weather data by Acme',
                         'url'         => 'https://acme.test/',
                         'license'     => 'CC BY 4.0',
                         'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
@@ -119,14 +118,14 @@ class ProviderRegistryTest extends TestCase
                 ]
             )
         );
-        $this->registry->register('plain-weather', ['label' => 'Plain Weather', 'attribution' => ['text' => 'Data by Plain']]);
+        $this->registry->register('plain-weather', ['label' => 'Plain Weather', 'attribution' => ['url' => 'https://plain.test/']]);
         $this->registry->register('open-weather', ['label' => 'Open Weather']);
 
         $this->assertEquals(
-            new ProviderAttribution('Weather data by Acme', 'https://acme.test/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/'),
+            new ProviderAttribution('https://acme.test/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/'),
             $this->registry->getBySlug('acme-weather')->attribution
         );
-        $this->assertEquals(new ProviderAttribution('Data by Plain'), $this->registry->getBySlug('plain-weather')->attribution);
+        $this->assertEquals(new ProviderAttribution('https://plain.test/'), $this->registry->getBySlug('plain-weather')->attribution);
         $this->assertNull($this->registry->getBySlug('open-weather')->attribution, 'It asks for no credit.');
     }
 
@@ -144,14 +143,13 @@ class ProviderRegistryTest extends TestCase
     public static function invalidAttributions(): array
     {
         return [
-            'not an array'       => ['Data by Acme', '/attribution of provider &quot;acme-weather&quot; must be an array/'],
-            'no text'            => [['url' => 'https://acme.test/'], '/needs a text/'],
-            'blank text'         => [['text' => ' '], '/needs a text/'],
-            'text markup array'  => [['text' => ['<b>Acme</b>']], '/needs a string text/'],
-            'unknown argument'   => [['text' => 'Acme', 'html' => '<a>'], '/unknown arguments: html/'],
-            'script URL'         => [['text' => 'Acme', 'url' => 'javascript:alert(1)'], '/url of the attribution .* must be an http\(s\) URL/'],
-            'relative URL'       => [['text' => 'Acme', 'url' => '/credits'], '/url of the attribution/'],
-            'license URL no URL' => [['text' => 'Acme', 'license_url' => 'CC BY 4.0'], '/license_url of the attribution/'],
+            'not an array'        => ['https://acme.test/', '/attribution of provider &quot;acme-weather&quot; must be an array/'],
+            'no site'             => [['license' => 'CC BY 4.0'], '/needs the url of its site/'],
+            'license markup'      => [['url' => 'https://acme.test/', 'license' => ['<b>CC</b>']], '/needs a string license/'],
+            'sentence of its own' => [['url' => 'https://acme.test/', 'text' => 'Data by Acme'], '/unknown arguments: text/'],
+            'script URL'          => [['url' => 'javascript:alert(1)'], '/url of the attribution .* must be an http\(s\) URL/'],
+            'relative URL'        => [['url' => '/credits'], '/url of the attribution/'],
+            'license URL no URL'  => [['url' => 'https://acme.test/', 'license_url' => 'CC BY 4.0'], '/license_url of the attribution/'],
         ];
     }
 
