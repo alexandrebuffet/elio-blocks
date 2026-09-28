@@ -53,6 +53,7 @@ export default function ReportEdit( props ) {
 			[ 'elio/location' ],
 			[ 'elio/condition-icon' ],
 			[ 'elio/temperature' ],
+			[ 'elio/provider-attribution' ],
 		],
 		templateLock: false,
 	} );
