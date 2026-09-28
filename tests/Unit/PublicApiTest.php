@@ -77,6 +77,7 @@ class PublicApiTest extends TestCase
                 'elio_blocks_get_condition_icon_collection',
                 'elio_blocks_get_current_conditions',
                 'elio_blocks_get_forecast_items',
+                'elio_blocks_get_weather_forecast_attribution',
                 'elio_blocks_get_weather_report_interactivity_context',
                 'elio_blocks_get_weather_report_interactivity_state',
                 'elio_blocks_register_condition_icon',
@@ -248,6 +249,33 @@ class PublicApiTest extends TestCase
 
         $this->assertSame('theme', elio_blocks_get_condition_icon_collection(null, 'theme'));
         $this->assertSame('elio', elio_blocks_get_condition_icon_collection('uninstalled', null));
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function test_a_report_credits_its_provider_else_the_site_default_one_as_its_license_asks(): void
+    {
+        require_once dirname(__DIR__, 2) . '/functions.php';
+        Functions\stubTranslationFunctions();
+        Functions\when('get_option')->alias(static fn(string $name, mixed $default = false): mixed => $default);
+
+        $container = Plugin::instance()->container();
+        // What the plugin does on 'init', priorities 15 and 20.
+        $container->get(RegisterProviders::class)->registerBuiltInProviders();
+        $container->get(RegisterWeatherForecastProviders::class)->registerBuiltInProviders();
+        $container->get(ProviderRegistry::class)->register('silent', ['label' => 'Silent']);
+        $container->get(WeatherForecastProviderRegistry::class)->register('silent', new StubWeatherForecastProvider());
+
+        $openMeteo = [
+            'text'        => 'Weather data by Open-Meteo.com',
+            'url'         => 'https://open-meteo.com/',
+            'license'     => 'CC BY 4.0',
+            'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
+        ];
+        $this->assertSame($openMeteo, elio_blocks_get_weather_forecast_attribution('open-meteo'));
+        $this->assertSame($openMeteo, elio_blocks_get_weather_forecast_attribution(''), 'Open-Meteo is the default provider.');
+        $this->assertNull(elio_blocks_get_weather_forecast_attribution('silent'), 'It asks for no credit.');
+        $this->assertNull(elio_blocks_get_weather_forecast_attribution('uninstalled'));
     }
 
     /** Leaves the settings at their defaults. */
