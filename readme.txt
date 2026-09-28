@@ -20,7 +20,7 @@ No coding required. No widgets, no shortcodes, no iframe either.
 
 = Feels native, because it is =
 
-* **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
+* **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon, time of the last update and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
 * **Icons for the rest of your page.** The icons of Elio, weather conditions included, are an icon collection of WordPress 7.1: pick one in the Icon block, anywhere on your site.
 * **Forecasts that work like the Query Loop.** The hourly and daily forecast lists repeat a template you design once, just like the Post Template of the Query Loop block.
 * **Start from a layout.** Pick one of the ready-made variations (Default, Minimal, Hourly Forecast, Daily Forecast), or start blank and build your own.

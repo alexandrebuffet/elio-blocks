@@ -29,6 +29,7 @@ import { toText } from '../../../shared/weather-values';
  *
  * @param {Object}                                                                       props                   Component props.
  * @param {string}                                                                       [props.prefixClassName] Class of the prefix ('wp-block-elio-humidity__prefix'). Omit for a block without prefix.
+ * @param {string}                                                                       [props.defaultPrefix]   Prefix while the block has none of its own (no prefix attribute). An empty prefix stays empty.
  * @param {string}                                                                       props.valueClassName    Class of the value ('wp-block-elio-humidity__value').
  * @param {string}                                                                       [props.unitClassName]   Class of the unit ('wp-block-elio-humidity__unit'). Goes with getUnit.
  * @param {Object}                                                                       props.context           Block context.
@@ -48,6 +49,7 @@ import { toText } from '../../../shared/weather-values';
  */
 export default function WeatherValueEdit( {
 	prefixClassName,
+	defaultPrefix = '',
 	valueClassName,
 	unitClassName,
 	context,
@@ -70,7 +72,7 @@ export default function WeatherValueEdit( {
 	const value = getValue( item, attributes, data ) ?? null;
 	const hasValue = value !== null;
 
-	const { showPrefix = false, prefix = '' } = attributes;
+	const { showPrefix = false, prefix = defaultPrefix } = attributes;
 	const blockProps = useBlockProps( {
 		className: tabularNums ? 'elio-tabular-nums' : undefined,
 	} );

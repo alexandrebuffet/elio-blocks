@@ -112,6 +112,12 @@ final class DerivedState
                 $this->toDate($this->sunEvent()),
                 'time'
             ),
+            // last-updated: when the provider was asked, which each refresh changes.
+            'lastUpdatedDatetime'          => fn(): string => $this->text($this->fetchedAt()),
+            'formattedLastUpdated'         => fn(): string => $this->formatDate(
+                $this->toDate($this->fetchedAt()),
+                'time'
+            ),
 
             // condition-icon: an <svg><use> pointing at the symbol of the icon (IconSprite), in a wrapper that names it.
             'hasConditionIcon'             => fn(): bool => null !== $this->iconName(),
@@ -309,6 +315,14 @@ final class DerivedState
         $event   = 'sunset' === ( $context['displayType'] ?? 'sunrise' ) ? 'sunset' : 'sunrise';
 
         return $this->item($event) ?? $context['query']['data']['current'][ $event ] ?? null;
+    }
+
+    /**
+     * Returns when the provider was asked for the weather forecast of the report.
+     */
+    private function fetchedAt(): mixed
+    {
+        return $this->context()['query']['data']['meta']['fetched_at'] ?? null;
     }
 
     private function formattedDateTime(): string

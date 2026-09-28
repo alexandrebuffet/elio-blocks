@@ -21,7 +21,7 @@ class ValueBlocksRenderTest extends TestCase
         Monkey\setUp();
 
         $this->stubRenderFunctions();
-        // datetime and sun-event put the date settings of the site in the page.
+        // datetime, sun-event and last-updated put the date settings of the site in the page.
         Functions\when('get_option')->justReturn('');
         Functions\when('wp_interactivity_state')->justReturn([]);
     }
@@ -73,6 +73,7 @@ class ValueBlocksRenderTest extends TestCase
             'condition-description',
             'datetime',
             'sun-event',
+            'last-updated',
         ]);
     }
 

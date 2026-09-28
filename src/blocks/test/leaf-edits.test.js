@@ -29,6 +29,7 @@ import DailyTemperatureEdit from '../daily-temperature/edit';
 import HourlyTemperatureEdit from '../hourly-temperature/edit';
 import DatetimeEdit from '../datetime/edit';
 import SunEventEdit from '../sun-event/edit';
+import LastUpdatedEdit from '../last-updated/edit';
 
 vi.mock( '@wordpress/block-editor', () => ( {
 	useBlockProps: ( props ) => props ?? {},
@@ -51,6 +52,7 @@ vi.mock( '../hourly-temperature/inspector', () => ( { default: () => null } ) );
 vi.mock( '../wind-direction/inspector', () => ( { default: () => null } ) );
 vi.mock( '../datetime/inspector', () => ( { default: () => null } ) );
 vi.mock( '../sun-event/inspector', () => ( { default: () => null } ) );
+vi.mock( '../last-updated/inspector', () => ( { default: () => null } ) );
 
 const NBSP = ' ';
 
@@ -108,6 +110,7 @@ const EDITS = {
 	'hourly-temperature': HourlyTemperatureEdit,
 	datetime: DatetimeEdit,
 	'sun-event': SunEventEdit,
+	'last-updated': LastUpdatedEdit,
 };
 
 /**
@@ -316,7 +319,10 @@ describe( 'leaf blocks in the editor', () => {
 
 	describe( 'dates', () => {
 		const TOKYO = {
-			meta: { timezone: 'Asia/Tokyo' },
+			meta: {
+				timezone: 'Asia/Tokyo',
+				fetched_at: '2026-07-01T05:32:10+00:00',
+			},
 			current: {
 				timestamp: '2026-07-01T14:15:00+09:00',
 				sunrise: '2026-07-01T04:29:00+09:00',
@@ -346,6 +352,26 @@ describe( 'leaf blocks in the editor', () => {
 					attributes: { displayType: 'sunset', format: 'H:i' },
 				} )
 			).toBe( '19:01' );
+			expect(
+				shown( LastUpdatedEdit, { attributes: { format: 'H:i' } } )
+			).toBe( '14:32' );
+		} );
+
+		it( 'say when the weather data was last updated, unless told otherwise', () => {
+			const lastUpdated = ( attributes ) =>
+				shown( LastUpdatedEdit, {
+					attributes: {
+						showPrefix: true,
+						format: 'H:i',
+						...attributes,
+					},
+				} );
+
+			expect( lastUpdated() ).toBe( 'Updated 14:32' );
+			expect( lastUpdated( { prefix: 'Refreshed at' } ) ).toBe(
+				'Refreshed at 14:32'
+			);
+			expect( lastUpdated( { showPrefix: false } ) ).toBe( '14:32' );
 		} );
 
 		it( 'label the current day and hour where the weather forecast is', () => {
