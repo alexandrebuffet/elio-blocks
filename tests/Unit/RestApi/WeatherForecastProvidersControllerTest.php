@@ -35,7 +35,7 @@ class WeatherForecastProvidersControllerTest extends TestCase
         // The built-in provider, one a third party registered on elio_blocks_init,
         // and one that serves something else than the weather forecast.
         $providers = new ProviderRegistry();
-        $providers->register('open-meteo', ['label' => 'Open-Meteo']);
+        $providers->register('open-meteo', ['label' => 'Open-Meteo', 'attribution' => ['text' => 'Weather data by Open-Meteo.com', 'url' => 'https://open-meteo.com/', 'license' => 'CC BY 4.0', 'license_url' => 'https://creativecommons.org/licenses/by/4.0/']]);
         $providers->register('air-only', ['label' => 'Air Only']);
         $providers->register('third-party', ['label' => 'Third Party', 'credentials' => ['api_key' => ['label' => 'API Key', 'required' => true]]]);
 
@@ -67,14 +67,19 @@ class WeatherForecastProvidersControllerTest extends TestCase
         $this->makeController()->register_routes();
     }
 
-    public function test_lists_the_providers_that_serve_the_weather_forecast_and_the_site_default_one(): void
+    public function test_lists_the_providers_that_serve_the_weather_forecast_their_credit_and_the_site_default_one(): void
     {
         $response = $this->makeController('third-party')->get_items(new WP_REST_Request());
 
         $this->assertSame(
             [
-                ['slug' => 'open-meteo', 'label' => 'Open-Meteo', 'isDefault' => false],
-                ['slug' => 'third-party', 'label' => 'Third Party', 'isDefault' => true],
+                [
+                    'slug'        => 'open-meteo',
+                    'label'       => 'Open-Meteo',
+                    'isDefault'   => false,
+                    'attribution' => ['text' => 'Weather data by Open-Meteo.com', 'url' => 'https://open-meteo.com/', 'license' => 'CC BY 4.0', 'licenseUrl' => 'https://creativecommons.org/licenses/by/4.0/'],
+                ],
+                ['slug' => 'third-party', 'label' => 'Third Party', 'isDefault' => true, 'attribution' => null],
             ],
             $response->get_data()
         );
