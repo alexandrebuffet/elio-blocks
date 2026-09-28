@@ -1,0 +1,5 @@
+// A credit, not content: smaller than the text around it, unless the block
+// sets its own size (zero specificity).
+:where(.wp-block-elio-provider-attribution) {
+	font-size: 0.75em;
+}
