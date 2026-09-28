@@ -15,6 +15,14 @@ import {
 } from '../forecast/variations';
 
 /**
+ * Credit of the provider, last in every variation. Block Hooks add it to the
+ * reports of templates, patterns and posts saved before it existed, but a
+ * report saved without it counts as one it was removed from (its metadata
+ * ignores it from then on): a report made in the editor gets it here.
+ */
+const PROVIDER_ATTRIBUTION_BLOCK = [ 'elio/provider-attribution' ];
+
+/**
  * Current weather inner blocks.
  */
 const CURRENT_WEATHER_INNER_BLOCKS = [
@@ -119,7 +127,10 @@ const variations = [
 		),
 		icon: variationWeatherDefault,
 		attributes: {},
-		innerBlocks: CURRENT_WEATHER_INNER_BLOCKS,
+		innerBlocks: [
+			...CURRENT_WEATHER_INNER_BLOCKS,
+			PROVIDER_ATTRIBUTION_BLOCK,
+		],
 		scope: [ 'block' ],
 	},
 	{
@@ -137,7 +148,10 @@ const variations = [
 				justifyContent: 'center',
 			},
 		},
-		innerBlocks: CURRENT_WEATHER_MINIMAL_INNER_BLOCKS,
+		innerBlocks: [
+			...CURRENT_WEATHER_MINIMAL_INNER_BLOCKS,
+			PROVIDER_ATTRIBUTION_BLOCK,
+		],
 		scope: [ 'block' ],
 	},
 	{
@@ -149,7 +163,10 @@ const variations = [
 		),
 		icon: variationWeatherForecast,
 		attributes: FORECAST_ATTRIBUTES,
-		innerBlocks: CURRENT_WEATHER_HOURLY_FORECAST_INNER_BLOCKS,
+		innerBlocks: [
+			...CURRENT_WEATHER_HOURLY_FORECAST_INNER_BLOCKS,
+			PROVIDER_ATTRIBUTION_BLOCK,
+		],
 		scope: [ 'block' ],
 	},
 	{
@@ -161,7 +178,10 @@ const variations = [
 		),
 		icon: variationWeatherForecast,
 		attributes: FORECAST_ATTRIBUTES,
-		innerBlocks: CURRENT_WEATHER_DAILY_FORECAST_INNER_BLOCKS,
+		innerBlocks: [
+			...CURRENT_WEATHER_DAILY_FORECAST_INNER_BLOCKS,
+			PROVIDER_ATTRIBUTION_BLOCK,
+		],
 		scope: [ 'block' ],
 	},
 ];

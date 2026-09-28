@@ -95,7 +95,7 @@ All requests are sent by your WordPress server, through the plugin's REST API. V
 
 = Terms, privacy and licence =
 
-The free Open-Meteo API, which this plugin uses, is for non-commercial use only and has daily request limits. Commercial use requires a paid Open-Meteo subscription. Open-Meteo weather data is licensed under CC BY 4.0: credit Open-Meteo where its data is shown, for example with a "Weather data by Open-Meteo.com" link.
+The free Open-Meteo API, which this plugin uses, is for non-commercial use only and has daily request limits. Commercial use requires a paid Open-Meteo subscription. Open-Meteo weather data is licensed under CC BY 4.0: credit Open-Meteo where its data is shown. The Provider Attribution block does it at the bottom of every Weather block, with a "Weather data by Open-Meteo.com" link and a link to the licence: keep it, or credit Open-Meteo elsewhere on the page if you remove it.
 
 * Open-Meteo website: [https://open-meteo.com/](https://open-meteo.com/)
 * Terms of use: [https://open-meteo.com/en/terms#terms](https://open-meteo.com/en/terms#terms)
