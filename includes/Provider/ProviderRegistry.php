@@ -30,7 +30,6 @@ final class ProviderRegistry
      * Arguments an attribution is declared with, and their defaults.
      */
     private const DEFAULT_ATTRIBUTION_ARGS = array(
-        'text'        => '',
         'url'         => '',
         'license'     => '',
         'license_url' => '',
@@ -70,7 +69,8 @@ final class ProviderRegistry
      *
      * A credential is only described: plain text, no markup nor callback. The
      * settings page draws its field, escaped, and saves only what is declared.
-     * So is an attribution: plain text and http(s) URLs, printed escaped.
+     * So is an attribution: http(s) URLs and a license name, printed escaped in
+     * a sentence of the provider-attribution block.
      *
      * @param string               $slug Unique identifier: lowercase letters, digits and hyphens. It
      *                                   names the constants of its credentials (ELIO_BLOCKS_{SLUG}_{NAME}).
@@ -82,11 +82,10 @@ final class ProviderRegistry
      *                               'required' (bool, default false: the provider answers without it),
      *                               'secret' (bool, default false: typed hidden, never sent back to the
      *                               browser). Default none.
-     *     @type array  $attribution The credit its license asks for wherever its data is shown, an array
-     *                               of: 'text' (string, plain text, required), 'url' (string, http(s) URL
-     *                               the text links to), 'license' (string, name of the license of the
-     *                               data), 'license_url' (string, http(s) URL of that license). Default
-     *                               none.
+     *     @type array  $attribution The credit its license asks for wherever its data is shown: its label
+     *                               linked to its site. An array of: 'url' (string, http(s) URL of its
+     *                               site, required), 'license' (string, name of the license of its data),
+     *                               'license_url' (string, http(s) URL of that license). Default none.
      * }
      * @return bool True if the provider was registered, false otherwise.
      */
@@ -226,8 +225,8 @@ final class ProviderRegistry
             }
         }
 
-        if ('' === trim($args['text'])) {
-            return sprintf('The attribution of provider "%s" needs a text.', $slug);
+        if ('' === $args['url']) {
+            return sprintf('The attribution of provider "%s" needs the url of its site.', $slug);
         }
 
         foreach (array( 'url', 'license_url' ) as $name) {
@@ -236,7 +235,7 @@ final class ProviderRegistry
             }
         }
 
-        return new ProviderAttribution($args['text'], $args['url'], $args['license'], $args['license_url']);
+        return new ProviderAttribution($args['url'], $args['license'], $args['license_url']);
     }
 
     /**

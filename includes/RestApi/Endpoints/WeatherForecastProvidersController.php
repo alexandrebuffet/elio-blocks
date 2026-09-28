@@ -75,7 +75,6 @@ class WeatherForecastProvidersController extends WP_REST_Controller
                     'label'       => $provider->label,
                     'isDefault'   => $provider->slug === $defaultProvider,
                     'attribution' => null !== $provider->attribution ? [
-                        'text'       => $provider->attribution->text,
                         'url'        => $provider->attribution->url,
                         'license'    => $provider->attribution->license,
                         'licenseUrl' => $provider->attribution->licenseUrl,

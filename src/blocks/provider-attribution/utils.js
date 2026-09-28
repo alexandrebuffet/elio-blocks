@@ -1,14 +1,14 @@
 /**
- * Returns the credit a report shows for the provider of its weather forecast.
+ * Returns the provider of a report's weather forecast.
  *
  * @param {Object[]|null} providers Providers from getWeatherForecastProviders(), null while they load.
  * @param {string}        provider  Provider slug of the report, empty for the site default.
- * @return {Object|null} Attribution (text, url, license, licenseUrl), null when the provider asks for none or is unknown.
+ * @return {Object|null} Provider (slug, label, isDefault, attribution), null when unknown.
  */
-export function getProviderAttribution( providers, provider ) {
-	const match = ( providers ?? [] ).find( ( { slug, isDefault } ) =>
-		provider ? slug === provider : isDefault
+export function getProvider( providers, provider ) {
+	return (
+		( providers ?? [] ).find( ( { slug, isDefault } ) =>
+			provider ? slug === provider : isDefault
+		) ?? null
 	);
-
-	return match?.attribution ?? null;
 }
