@@ -27,7 +27,6 @@ const OPEN_METEO = {
 	label: 'Open-Meteo',
 	isDefault: true,
 	attribution: {
-		text: 'Weather data by Open-Meteo.com',
 		url: 'https://open-meteo.com/',
 		license: 'CC BY 4.0',
 		licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
@@ -58,48 +57,49 @@ function renderEdit( providers, provider = '' ) {
 }
 
 describe( 'provider-attribution edit', () => {
-	it( 'shows the credit of the site default provider as render.php prints it', () => {
+	it( 'links the name of the site default provider and its license in one sentence, as render.php prints it', () => {
 		const container = renderEdit( [ OPEN_METEO, SILENT ] );
 
+		const paragraph = container.querySelector( 'p' );
 		const credit = container.querySelector(
 			'.wp-block-elio-provider-attribution__provider-link'
 		);
 		const license = container.querySelector(
 			'.wp-block-elio-provider-attribution__license-link'
 		);
-		expect( credit.textContent ).toBe( 'Weather data by Open-Meteo.com' );
+		expect( paragraph.textContent ).toBe(
+			'Weather data by Open-Meteo, licensed under CC BY 4.0'
+		);
+		expect( credit.textContent ).toBe( 'Open-Meteo' );
 		expect( credit.getAttribute( 'href' ) ).toBe(
 			'https://open-meteo.com/'
 		);
+		expect( credit.hasAttribute( 'target' ) ).toBe( false );
+		expect( license.textContent ).toBe( 'CC BY 4.0' );
 		expect( license.getAttribute( 'rel' ) ).toBe( 'license' );
-		expect(
-			container.querySelector(
-				'.wp-block-elio-provider-attribution__license'
-			).textContent
-		).toBe( '(CC BY 4.0)' );
 	} );
 
-	it( 'shows the credit of the provider its report picked', () => {
+	it( 'credits the provider its report picked', () => {
 		const container = renderEdit(
 			[
 				{ ...OPEN_METEO, isDefault: false },
 				{
 					...SILENT,
 					slug: 'acme',
+					label: 'Acme <Weather>',
 					isDefault: true,
 					attribution: {
-						text: 'Data by Acme',
-						url: '',
+						url: 'https://acme.test/',
 						license: '',
 						licenseUrl: '',
 					},
 				},
 			],
-			'open-meteo'
+			''
 		);
 
-		expect( container.textContent ).toContain(
-			'Weather data by Open-Meteo.com'
+		expect( container.textContent ).toBe(
+			'Weather data by Acme <Weather>'
 		);
 	} );
 

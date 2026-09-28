@@ -4,6 +4,7 @@ namespace ElioBlocks\Tests\Unit\Blocks;
 
 use Brain\Monkey;
 use Brain\Monkey\Functions;
+use ElioBlocks\Tests\Support\WordPressCore;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,7 +16,7 @@ class ProviderAttributionRenderTest extends TestCase
     use RendersBlocks;
 
     private const OPEN_METEO = [
-        'text'        => 'Weather data by Open-Meteo.com',
+        'name'        => 'Open-Meteo',
         'url'         => 'https://open-meteo.com/',
         'license'     => 'CC BY 4.0',
         'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
@@ -30,6 +31,8 @@ class ProviderAttributionRenderTest extends TestCase
         Monkey\setUp();
 
         $this->stubRenderFunctions();
+        WordPressCore::stubKses();
+        Functions\when('get_block_wrapper_attributes')->justReturn('class="wp-block-elio-provider-attribution"');
     }
 
     protected function tearDown(): void
@@ -41,7 +44,7 @@ class ProviderAttributionRenderTest extends TestCase
     /**
      * Stubs the credit of every provider.
      *
-     * @param array{text: string, url: string, license: string, license_url: string}|null $attribution Credit.
+     * @param array{name: string, url: string, license: string, license_url: string}|null $attribution Credit.
      */
     private function stubAttribution(?array $attribution): void
     {
@@ -54,22 +57,21 @@ class ProviderAttributionRenderTest extends TestCase
         );
     }
 
-    public function test_links_the_credit_to_the_provider_and_its_license(): void
+    public function test_links_the_name_of_the_provider_and_its_license_in_one_sentence(): void
     {
         $this->stubAttribution(self::OPEN_METEO);
 
         $html = $this->renderBlock('provider-attribution', [], ['elio/reportProvider' => 'open-meteo']);
 
         $this->assertSame(['open-meteo'], $this->askedProviders);
-        $this->assertStringContainsString(
-            '<a class="wp-block-elio-provider-attribution__provider-link" href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>',
-            $html
+        // Each link names where it leads; the sentence says what it is. No new tab.
+        $this->assertSame(
+            '<p class="wp-block-elio-provider-attribution">Weather data by '
+            . '<a class="wp-block-elio-provider-attribution__provider-link" href="https://open-meteo.com/">Open-Meteo</a>'
+            . ', licensed under '
+            . '<a class="wp-block-elio-provider-attribution__license-link" href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a></p>',
+            trim($html)
         );
-        $this->assertStringContainsString(
-            '<span class="wp-block-elio-provider-attribution__license">(<a class="wp-block-elio-provider-attribution__license-link" href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>)</span>',
-            $html
-        );
-        $this->assertMatchesRegularExpression('#^\s*<p [^>]*>.*</p>\s*$#s', $html);
     }
 
     public function test_a_report_without_provider_credits_the_site_default_one(): void
@@ -81,15 +83,27 @@ class ProviderAttributionRenderTest extends TestCase
         $this->assertSame([''], $this->askedProviders);
     }
 
-    public function test_prints_the_credit_alone_when_the_provider_gives_no_link_nor_license(): void
+    public function test_names_a_license_without_page_unlinked(): void
     {
-        $this->stubAttribution(['text' => 'Data by <Acme>', 'url' => '', 'license' => '', 'license_url' => '']);
+        $this->stubAttribution(['license_url' => ''] + self::OPEN_METEO);
+
+        $html = $this->renderBlock('provider-attribution');
+
+        $this->assertStringContainsString('</a>, licensed under CC BY 4.0</p>', $html);
+        $this->assertStringNotContainsString('__license-link', $html);
+    }
+
+    public function test_credits_a_provider_without_license_by_its_name_alone(): void
+    {
+        $this->stubAttribution(['name' => 'Acme <Weather>', 'url' => 'https://acme.test/', 'license' => '', 'license_url' => '']);
 
         $html = $this->renderBlock('provider-attribution', [], ['elio/reportProvider' => 'acme']);
 
-        $this->assertStringContainsString('Data by &lt;Acme&gt;', $html);
-        $this->assertStringNotContainsString('<a ', $html);
-        $this->assertStringNotContainsString('__license', $html);
+        $this->assertStringContainsString(
+            'Weather data by <a class="wp-block-elio-provider-attribution__provider-link" href="https://acme.test/">Acme &lt;Weather&gt;</a></p>',
+            $html
+        );
+        $this->assertStringNotContainsString('licensed', $html);
     }
 
     public function test_prints_nothing_for_a_provider_that_asks_for_no_credit(): void
