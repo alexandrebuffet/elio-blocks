@@ -80,12 +80,9 @@ export const HOURLY_WEATHER_FORECAST_INNER_BLOCKS = [
 
 const variations = [
 	{
-		name: 'elio/weather-forecast-daily',
-		title: __( 'Daily Weather Forecast', 'elio-blocks' ),
-		description: __(
-			'Display the weather forecast for each day.',
-			'elio-blocks'
-		),
+		name: 'elio/forecast-daily',
+		title: __( 'Daily Forecast', 'elio-blocks' ),
+		description: __( 'Display the forecast for each day.', 'elio-blocks' ),
 		icon: cloudSunCalendar,
 		attributes: {
 			type: 'daily',
@@ -97,12 +94,9 @@ const variations = [
 		isDefault: true,
 	},
 	{
-		name: 'elio/weather-forecast-hourly',
-		title: __( 'Hourly Weather Forecast', 'elio-blocks' ),
-		description: __(
-			'Display the weather forecast for each hour.',
-			'elio-blocks'
-		),
+		name: 'elio/forecast-hourly',
+		title: __( 'Hourly Forecast', 'elio-blocks' ),
+		description: __( 'Display the forecast for each hour.', 'elio-blocks' ),
 		icon: cloudSunClock,
 		attributes: {
 			type: 'hourly',
