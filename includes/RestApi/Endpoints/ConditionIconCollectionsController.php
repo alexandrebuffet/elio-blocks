@@ -18,18 +18,21 @@ if (! defined('ABSPATH')) {
 /**
  * Handles GET /elio/v1/condition-icon-collections: the registered collections,
  * as /wp/v2/icon-collections lists the core ones, plus what a picker shows of
- * each one: a preview of four conditions and how many conditions it covers.
+ * each one: a preview of six conditions and how many conditions it covers.
  */
 class ConditionIconCollectionsController extends WP_REST_Controller
 {
     /**
-     * Conditions of the preview, the ones a weather report shows most: a clear day, clouds, rain, snow.
+     * Conditions of the preview, the ones a weather report shows most, in two rows of three: a
+     * clear day, clouds, a clear night, rain, snow, a thunderstorm.
      */
     private const PREVIEW = array(
         array( 'clear-sky', 'day' ),
         array( 'partly-cloudy', 'day' ),
+        array( 'clear-sky', 'night' ),
         array( 'moderate-rain', 'day' ),
         array( 'moderate-snowfall', 'day' ),
+        array( 'thunderstorm', 'day' ),
     );
 
     /**
@@ -178,7 +181,7 @@ class ConditionIconCollectionsController extends WP_REST_Controller
                 'preview'     => array(
                     'type'        => 'array',
                     'readonly'    => true,
-                    'description' => __('Icons of four conditions (clear day, clouds, rain, snow); null where the collection has none.', 'elio-blocks'),
+                    'description' => __('Icons of six conditions (clear day, clouds, clear night, rain, snow, thunderstorm); null where the collection has none.', 'elio-blocks'),
                     'items'       => array(
                         'type'       => array( 'object', 'null' ),
                         'properties' => array(

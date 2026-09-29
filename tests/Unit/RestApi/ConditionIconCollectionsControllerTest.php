@@ -100,18 +100,18 @@ class ConditionIconCollectionsControllerTest extends TestCase
         $this->assertSame(['covered' => 2, 'total' => $total], $sparse['coverage']);
     }
 
-    public function test_previews_four_conditions_with_a_hole_where_the_collection_has_no_icon(): void
+    public function test_previews_six_conditions_with_a_hole_where_the_collection_has_no_icon(): void
     {
         $this->registry->build();
 
         [$elio, $sparse] = $this->get()->get_data();
 
         $this->assertSame(
-            ['elio/clear-sky', 'elio/partly-cloudy', 'elio/moderate-rain', 'elio/moderate-snowfall'],
+            ['elio/clear-sky', 'elio/partly-cloudy', 'elio/clear-sky', 'elio/moderate-rain', 'elio/moderate-snowfall', 'elio/thunderstorm'],
             array_column($elio['preview'], 'name')
         );
         $this->assertSame(['content' => self::SUN, 'style' => 'stroke'], array_intersect_key($elio['preview'][0], ['content' => 1, 'style' => 1]));
-        $this->assertSame(['sparse/sun', 'sparse/sun', null, null], array_map(static fn(?array $icon): ?string => $icon['name'] ?? null, $sparse['preview']));
+        $this->assertSame(['sparse/sun', 'sparse/sun', 'sparse/moon', null, null, null], array_map(static fn(?array $icon): ?string => $icon['name'] ?? null, $sparse['preview']));
     }
 
     public function test_describes_its_items(): void
