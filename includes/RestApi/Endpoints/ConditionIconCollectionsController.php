@@ -165,6 +165,7 @@ class ConditionIconCollectionsController extends WP_REST_Controller
                 'label'       => array( 'type' => 'string', 'readonly' => true, 'description' => __('Human-readable label.', 'elio-blocks') ),
                 'description' => array( 'type' => 'string', 'readonly' => true, 'description' => __('Human-readable description.', 'elio-blocks') ),
                 'is_default'  => array( 'type' => 'boolean', 'readonly' => true, 'description' => __('Whether it is the collection of the site.', 'elio-blocks') ),
+                'stroke_width' => array( 'type' => 'number', 'readonly' => true, 'description' => __('Stroke width the stroke icons are drawn with, what the condition icon block applies unless set on the block.', 'elio-blocks') ),
                 'coverage'    => array(
                     'type'        => 'object',
                     'readonly'    => true,

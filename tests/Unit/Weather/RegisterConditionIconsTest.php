@@ -57,6 +57,7 @@ class RegisterConditionIconsTest extends TestCase
                     "elio" => array(
                         "label"       => "Elio",
                         "description" => "The icons of the plugin.",
+                        "strokeWidth" => 1.5,
                         "icons" => array(
                             "sun"  => array("label" => "Sun", "filePath" => "sun.svg", "style" => "stroke"),
                             "moon" => array("label" => "Moon", "filePath" => "moon.svg", "style" => "stroke"),
@@ -99,6 +100,8 @@ class RegisterConditionIconsTest extends TestCase
         );
         $this->assertSame('Elio', $this->registry->getRegisteredCollection('elio')['label'] ?? null);
         $this->assertSame('Soft, rounded silhouettes.', $this->registry->getRegisteredCollection('cumulus-solid')['description'] ?? null);
+        $this->assertSame(1.5, $this->registry->getRegisteredCollection('elio')['stroke_width'] ?? null, 'The stroke width of the manifest.');
+        $this->assertSame(2.0, $this->registry->getRegisteredCollection('cumulus-solid')['stroke_width'] ?? null, 'Two when the manifest says nothing.');
 
         $sun = $this->registry->getRegisteredIcon('elio/sun');
         $this->assertSame('Sun', $sun['label']);

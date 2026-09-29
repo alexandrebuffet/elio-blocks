@@ -43,7 +43,12 @@ final class ConditionIconsRegistry
 
     private const STYLES = array( 'fill', 'stroke' );
 
-    private const COLLECTION_KEYS = array( 'label', 'description' );
+    private const COLLECTION_KEYS = array( 'label', 'description', 'stroke_width' );
+
+    /**
+     * Stroke width of a collection that declares none: the one Tabler, Lucide and Feather draw with.
+     */
+    public const DEFAULT_STROKE_WIDTH = 2.0;
 
     private const ICON_KEYS = array( 'label', 'content', 'file_path', 'style', 'conditions' );
 
@@ -69,7 +74,7 @@ final class ConditionIconsRegistry
     );
 
     /**
-     * @var array<string, array{slug: string, label: string, description: string}>
+     * @var array<string, array{slug: string, label: string, description: string, stroke_width: float}>
      */
     private array $collections = array();
 
@@ -103,6 +108,8 @@ final class ConditionIconsRegistry
      * @param array<string, mixed> $args {
      *     @type string $label       Required. Human-readable label.
      *     @type string $description Optional. Human-readable description.
+     *     @type float  $stroke_width Optional. Stroke width the stroke icons are drawn with, what the condition icon block
+     *                                 applies unless set on the block. Default 2.
      * }
      * @return bool True if the collection was registered, false otherwise.
      */
@@ -137,10 +144,15 @@ final class ConditionIconsRegistry
             return $this->refuse(__METHOD__, sprintf('Icon collection "%s" description must be a string.', $slug));
         }
 
+        if (isset($args['stroke_width']) && ( ! is_numeric($args['stroke_width']) || (float) $args['stroke_width'] <= 0 )) {
+            return $this->refuse(__METHOD__, sprintf('Icon collection "%s" stroke width must be a positive number.', $slug));
+        }
+
         $this->collections[ $slug ] = array(
             'slug'        => $slug,
             'label'       => $args['label'],
             'description' => $args['description'] ?? '',
+            'stroke_width' => isset($args['stroke_width']) ? (float) $args['stroke_width'] : self::DEFAULT_STROKE_WIDTH,
         );
 
         return true;
@@ -181,7 +193,7 @@ final class ConditionIconsRegistry
     /**
      * Retrieves a registered collection.
      *
-     * @return array{slug: string, label: string, description: string}|null
+     * @return array{slug: string, label: string, description: string, stroke_width: float}|null
      */
     public function getRegisteredCollection(string $slug): ?array
     {
@@ -191,7 +203,7 @@ final class ConditionIconsRegistry
     /**
      * Retrieves every registered collection.
      *
-     * @return list<array{slug: string, label: string, description: string}>
+     * @return list<array{slug: string, label: string, description: string, stroke_width: float}>
      */
     public function getAllRegisteredCollections(): array
     {
