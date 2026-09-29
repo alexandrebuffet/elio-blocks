@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { registerBlockType } from '@wordpress/blocks';
-import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -12,6 +11,7 @@ import edit from './edit';
 import save from './save';
 import variations from './variations';
 import metadata from './block.json';
+import cloudSunLayout from '../../icons/components/cloud-sun-layout';
 
 /**
  * Registers the block type.
@@ -19,7 +19,7 @@ import metadata from './block.json';
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
 registerBlockType( metadata.name, {
-	icon: layout,
+	icon: cloudSunLayout,
 	/**
 	 * @see ./edit.js
 	 */

@@ -20,7 +20,7 @@ import { useResizeObserver } from '@wordpress/compose';
  * Internal dependencies
  */
 import { useReportBlockVariations, REPORT_BLOCK_NAME } from '../utils';
-import weather from '../../../icons/components/weather';
+import sunCloud from '../../../icons/components/sun-cloud';
 import SearchLocationModal from '../../../block-editor/components/search-location-modal';
 
 /**
@@ -104,7 +104,7 @@ export default function ReportPlaceholder( {
 		activeBlockVariation?.icon?.src ||
 		activeBlockVariation?.icon ||
 		blockType?.icon?.src ||
-		weather;
+		sunCloud;
 	const label = activeBlockVariation?.title || blockType?.title;
 	const blockProps = useBlockProps( { ref: resizeObserverRef } );
 	const { location = {} } = attributes;
