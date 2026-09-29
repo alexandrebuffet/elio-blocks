@@ -12,6 +12,22 @@
 	"blockHooks": {
 		"elio/weather-report": "lastChild"
 	},
+	"variations": [
+		{
+			"name": "default",
+			"title": "Provider Attribution",
+			"isDefault": true,
+			"scope": ["inserter"],
+			"attributes": {
+				"style": {
+					"typography": {
+						"fontSize": "0.875em",
+						"textAlign": "center"
+					}
+				}
+			}
+		}
+	],
 	"supports": {
 		"html": false,
 		"interactivity": {
@@ -50,6 +66,5 @@
 	},
 	"textdomain": "elio-blocks",
 	"editorScript": "file:./index.js",
-	"style": "file:./style-index.css",
 	"render": "file:./render.php"
 }
