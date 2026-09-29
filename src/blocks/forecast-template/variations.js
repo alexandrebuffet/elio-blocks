@@ -2,7 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { group, row, stack, grid } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import cloudSunGroup from '../../icons/components/cloud-sun-group';
+import cloudSunRow from '../../icons/components/cloud-sun-row';
+import cloudSunStack from '../../icons/components/cloud-sun-stack';
+import cloudSunGrid from '../../icons/components/cloud-sun-grid';
 
 /**
  * Block variations for elio/forecast-template.
@@ -25,7 +32,7 @@ const variations = [
 		attributes: { layout: { type: 'default' } },
 		isDefault: true,
 		scope: [ 'block', 'transform' ],
-		icon: group,
+		icon: cloudSunGroup,
 	},
 	{
 		name: 'elio/forecast-template-row',
@@ -37,7 +44,7 @@ const variations = [
 		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
 		isActive: [ 'layout.type' ],
 		scope: [ 'block', 'transform' ],
-		icon: row,
+		icon: cloudSunRow,
 	},
 	{
 		name: 'elio/forecast-template-stack',
@@ -49,7 +56,7 @@ const variations = [
 		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
 		isActive: [ 'layout.type', 'layout.orientation' ],
 		scope: [ 'block', 'transform' ],
-		icon: stack,
+		icon: cloudSunStack,
 	},
 	{
 		name: 'elio/forecast-template-grid',
@@ -58,7 +65,7 @@ const variations = [
 		attributes: { layout: { type: 'grid' } },
 		isActive: [ 'layout.type' ],
 		scope: [ 'block', 'transform' ],
-		icon: grid,
+		icon: cloudSunGrid,
 	},
 ];
 

@@ -10,7 +10,7 @@ import edit from './edit';
 import save from './save';
 import variations from './variations';
 import metadata from './block.json';
-import cloudSunGrid from '../../icons/components/cloud-sun-grid';
+import cloudSunItemRow from '../../icons/components/cloud-sun-item-row';
 
 /**
  * Registers the block type.
@@ -18,7 +18,7 @@ import cloudSunGrid from '../../icons/components/cloud-sun-grid';
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
 registerBlockType( metadata.name, {
-	icon: cloudSunGrid,
+	icon: cloudSunItemRow,
 	/**
 	 * @see ./edit.js
 	 */
