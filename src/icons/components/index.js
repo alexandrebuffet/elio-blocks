@@ -2,6 +2,8 @@ export { default as BarometerLeft } from "./barometer-left";
 export { default as BarometerRight } from "./barometer-right";
 export { default as Barometer } from "./barometer";
 export { default as Bolt } from "./bolt";
+export { default as Calendar } from "./calendar";
+export { default as Clock } from "./clock";
 export { default as CloudBoltHeavyHail } from "./cloud-bolt-heavy-hail";
 export { default as CloudBolt } from "./cloud-bolt";
 export { default as CloudDenseDrizzle } from "./cloud-dense-drizzle";

@@ -1,0 +1,3 @@
+import { SVG, Path, Rect, Circle, G } from "@wordpress/primitives";
+const clock = <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><Path fill="currentColor" fillRule="evenodd" d="M6.52 6.52Q4.25 8.79 4.25 12t2.27 5.48T12 19.75t5.48-2.27T19.75 12t-2.27-5.48T12 4.25 6.52 6.52m1.06 9.9Q5.75 14.588 5.75 12t1.83-4.42Q9.412 5.75 12 5.75t4.42 1.83T18.25 12t-1.83 4.42q-1.831 1.83-4.42 1.83t-4.42-1.83m5.17-4.73V8.617h-1.5V12q0 .15.057.287.057.138.163.243l2.28 2.28 1.06-1.06z" /></SVG>;
+export default clock;

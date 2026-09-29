@@ -79,6 +79,8 @@
 		{ "slug": "eye",                          "label": "Eye" },
 		{ "slug": "sunrise",                      "label": "Sunrise" },
 		{ "slug": "sunset",                       "label": "Sunset" },
+		{ "slug": "calendar",                     "label": "Calendar" },
+		{ "slug": "clock",                        "label": "Clock" },
 		{ "slug": "weather-conditions",           "label": "Weather conditions" },
 		{ "slug": "cloud-sun-calendar",           "label": "Sun and cloud with calendar" },
 		{ "slug": "cloud-sun-clock",              "label": "Sun and cloud with clock" },
