@@ -79,6 +79,8 @@ export { default as UvIndex } from "./uv-index";
 export { default as Volcano } from "./volcano";
 export { default as WaveArrowDown } from "./wave-arrow-down";
 export { default as WaveArrowUp } from "./wave-arrow-up";
+export { default as WeatherConditionDescription } from "./weather-condition-description";
+export { default as WeatherCondition } from "./weather-condition";
 export { default as WeatherConditions } from "./weather-conditions";
 export { default as Wind } from "./wind";
 export { default as WindsockDirectionCardinal } from "./windsock-direction-cardinal";
