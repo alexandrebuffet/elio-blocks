@@ -13,6 +13,7 @@ import { useWeatherForecastQuery } from '../../block-editor/hooks';
 import Inspector from './inspector';
 import ReportPlaceholder from './edit/report-placeholder';
 import LocationToolbar from './edit/location-toolbar';
+import { PROVIDER_ATTRIBUTION_BLOCK } from './variations';
 
 /**
  * Renders the Weather Report block in the editor.
@@ -53,7 +54,7 @@ export default function ReportEdit( props ) {
 			[ 'elio/location' ],
 			[ 'elio/condition-icon' ],
 			[ 'elio/temperature' ],
-			[ 'elio/provider-attribution' ],
+			PROVIDER_ATTRIBUTION_BLOCK,
 		],
 		templateLock: false,
 	} );
