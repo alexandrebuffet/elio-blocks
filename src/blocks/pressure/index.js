@@ -3,10 +3,10 @@ import { registerBlockType } from '@wordpress/blocks';
 import edit from './edit';
 import save from './save';
 import metadata from './block.json';
-import pressure from '../../icons/components/pressure';
+import barometer from '../../icons/components/barometer';
 
 registerBlockType( metadata.name, {
-	icon: pressure,
+	icon: barometer,
 	edit,
 	save,
 } );

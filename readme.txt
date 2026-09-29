@@ -105,7 +105,7 @@ The free Open-Meteo API, which this plugin uses, is for non-commercial use only 
 
 == Credits ==
 
-The icons of the plugin come from [Tabler Icons](https://tabler.io/icons), Copyright (c) 2020-2026 Paweł Kuna, released under the [MIT License](https://github.com/tabler/tabler-icons/blob/main/LICENSE), which is compatible with the GPL. Some icons were made for this plugin in the same style.
+The icons of the plugin were drawn for it. The layout illustrations of the Weather block variations include a sun from [Tabler Icons](https://tabler.io/icons), Copyright (c) 2020-2026 Paweł Kuna, released under the [MIT License](https://github.com/tabler/tabler-icons/blob/main/LICENSE), which is compatible with the GPL.
 
 == Screenshots ==
 

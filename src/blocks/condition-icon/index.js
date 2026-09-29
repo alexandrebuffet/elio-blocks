@@ -7,7 +7,7 @@ import './style.scss';
 import edit from './edit';
 import save from './save';
 import metadata from './block.json';
-import weatherCondition from '../../icons/components/weather-condition';
+import sunCloud from '../../icons/components/sun-cloud';
 
 /**
  * Registers the block type.
@@ -15,7 +15,7 @@ import weatherCondition from '../../icons/components/weather-condition';
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
 registerBlockType( metadata.name, {
-	icon: weatherCondition,
+	icon: sunCloud,
 	/**
 	 * @see ./edit.js
 	 */

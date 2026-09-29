@@ -16,11 +16,10 @@ if (! defined('ABSPATH')) {
  * third parties register theirs with elio_blocks_register_condition_icon_collection()
  * and elio_blocks_register_condition_icon() (see functions.php).
  *
- * The collections come from the manifest the build writes next to the icons
- * (scripts/build-weather-condition-icons.mjs): "elio", the Tabler-based
- * default, and the plugin's own families (cirrus, cumulus, nimbus, each in an
- * outline and a solid style). Each icon is registered by file path and read
- * the first time it is served.
+ * The collection comes from the manifest the build writes next to the icons
+ * (scripts/build-icons.mjs): "elio", the icons drawn for the plugin, those its
+ * condition mappings name. Each icon is registered by file path and read the
+ * first time it is served.
  */
 class RegisterConditionIcons implements HookInterface
 {

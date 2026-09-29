@@ -1,0 +1,3 @@
+import { SVG, Path, Rect, Circle, G } from "@wordpress/primitives";
+const eye = <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><Path fill="currentColor" fillRule="evenodd" d="M12.065 6.25q6.044 0 8.736 5.416.038.078.058.163.02.084.02.171t-.02.171-.058.163q-2.692 5.416-8.736 5.416t-8.737-5.416q-.038-.078-.058-.163-.02-.084-.02-.171t.02-.171.058-.163Q6.02 6.25 12.065 6.25m0 1.5q-4.926 0-7.22 4.25 2.294 4.25 7.22 4.25 4.924 0 7.22-4.25-2.296-4.25-7.22-4.25M9.5 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0" /></SVG>;
+export default eye;

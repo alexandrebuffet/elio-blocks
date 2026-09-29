@@ -6,8 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import weatherCalendar from '../../icons/components/weather-calendar';
-import weatherTime from '../../icons/components/weather-time';
+import cloudSunCalendar from '../../icons/components/cloud-sun-calendar';
+import cloudSunTime from '../../icons/components/cloud-sun-time';
 
 /**
  * Inner blocks of the forecast template in the weather forecast variations
@@ -86,7 +86,7 @@ const variations = [
 			'Display the weather forecast for each day.',
 			'elio-blocks'
 		),
-		icon: weatherCalendar,
+		icon: cloudSunCalendar,
 		attributes: {
 			type: 'daily',
 			count: 7,
@@ -103,7 +103,7 @@ const variations = [
 			'Display the weather forecast for each hour.',
 			'elio-blocks'
 		),
-		icon: weatherTime,
+		icon: cloudSunTime,
 		attributes: {
 			type: 'hourly',
 			count: 7,
