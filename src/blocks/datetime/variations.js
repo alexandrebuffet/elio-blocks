@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import cloudSunCalendar from '../../icons/components/cloud-sun-calendar';
-import cloudSunTime from '../../icons/components/cloud-sun-time';
+import cloudSunClock from '../../icons/components/cloud-sun-clock';
 
 const variations = [
 	{
@@ -27,7 +27,7 @@ const variations = [
 		name: 'elio/time',
 		title: __( 'Time', 'elio-blocks' ),
 		description: __( 'Display the time for the period.', 'elio-blocks' ),
-		icon: cloudSunTime,
+		icon: cloudSunClock,
 		attributes: { displayType: 'time' },
 		isActive: [ 'displayType' ],
 		scope: [ 'inserter', 'transform' ],
