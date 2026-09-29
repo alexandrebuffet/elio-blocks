@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import cloudSunCalendar from '../../icons/components/cloud-sun-calendar';
-import cloudSunTime from '../../icons/components/cloud-sun-time';
+import cloudSunClock from '../../icons/components/cloud-sun-clock';
 
 /**
  * Inner blocks of the forecast template in the weather forecast variations
@@ -103,7 +103,7 @@ const variations = [
 			'Display the weather forecast for each hour.',
 			'elio-blocks'
 		),
-		icon: cloudSunTime,
+		icon: cloudSunClock,
 		attributes: {
 			type: 'hourly',
 			count: 7,
