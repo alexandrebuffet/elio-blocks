@@ -6,6 +6,7 @@ use ElioBlocks\BlockEditor\Hooks\EnqueueBlockEditorAssets;
 use ElioBlocks\Blocks\Hooks\RegisterCommonStyleAsset;
 use ElioBlocks\Blocks\Hooks\RegisterBlockCategories;
 use ElioBlocks\Blocks\Hooks\RegisterBlockTypes;
+use ElioBlocks\Blocks\Hooks\StyleHookedProviderAttribution;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconCollectionResolver;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 use ElioBlocks\Weather\Condition\Icons\Hooks\RegisterConditionIcons;
@@ -279,6 +280,10 @@ return static function ( ContainerBuilder $container ): void {
 		->setPublic( true );
 
 	$container->register( RegisterBlockTypes::class )
+		->addTag( 'elio_blocks.hookable' )
+		->setPublic( true );
+
+	$container->register( StyleHookedProviderAttribution::class )
 		->addTag( 'elio_blocks.hookable' )
 		->setPublic( true );
 };

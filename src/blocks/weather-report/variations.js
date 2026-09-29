@@ -9,10 +9,20 @@ import { __ } from '@wordpress/i18n';
 import variationWeatherDefault from './icons/components/variation-weather-default';
 import variationWeatherMinimal from './icons/components/variation-weather-minimal';
 import variationWeatherForecast from './icons/components/variation-weather-forecast';
+import providerAttributionMetadata from '../provider-attribution/block.json';
 import {
 	DAILY_WEATHER_FORECAST_INNER_BLOCKS,
 	HOURLY_WEATHER_FORECAST_INNER_BLOCKS,
 } from '../forecast/variations';
+
+/**
+ * Attributes of the credit of the provider: those of its default variation,
+ * which Block Hooks and the inserter give it too (StyleHookedProviderAttribution).
+ */
+const PROVIDER_ATTRIBUTION_ATTRIBUTES =
+	providerAttributionMetadata.variations.find(
+		( { isDefault } ) => isDefault
+	).attributes;
 
 /**
  * Credit of the provider, last in every variation. Block Hooks add it to the
@@ -20,7 +30,25 @@ import {
  * report saved without it counts as one it was removed from (its metadata
  * ignores it from then on): a report made in the editor gets it here.
  */
-const PROVIDER_ATTRIBUTION_BLOCK = [ 'elio/provider-attribution' ];
+export const PROVIDER_ATTRIBUTION_BLOCK = [
+	'elio/provider-attribution',
+	PROVIDER_ATTRIBUTION_ATTRIBUTES,
+];
+
+/**
+ * Credit of the provider in a report laid out as a flex row: on a line of its
+ * own, as StyleHookedProviderAttribution places it in such a report.
+ */
+const PROVIDER_ATTRIBUTION_ROW_BLOCK = [
+	'elio/provider-attribution',
+	{
+		...PROVIDER_ATTRIBUTION_ATTRIBUTES,
+		style: {
+			...PROVIDER_ATTRIBUTION_ATTRIBUTES.style,
+			layout: { selfStretch: 'fixed', flexSize: '100%' },
+		},
+	},
+];
 
 /**
  * Current weather inner blocks.
@@ -144,13 +172,13 @@ const variations = [
 		attributes: {
 			layout: {
 				type: 'flex',
-				flexWrap: 'nowrap',
+				flexWrap: 'wrap',
 				justifyContent: 'center',
 			},
 		},
 		innerBlocks: [
 			...CURRENT_WEATHER_MINIMAL_INNER_BLOCKS,
-			PROVIDER_ATTRIBUTION_BLOCK,
+			PROVIDER_ATTRIBUTION_ROW_BLOCK,
 		],
 		scope: [ 'block' ],
 	},
