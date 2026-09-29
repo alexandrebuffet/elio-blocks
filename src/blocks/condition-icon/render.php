@@ -24,6 +24,8 @@
  * @var WP_Block $block      Block instance.
  */
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- render.php runs inside a function (register_block_type_from_metadata): its variables are local.
+
 // Exit if called directly.
 if (! defined('ABSPATH')) {
     die;
