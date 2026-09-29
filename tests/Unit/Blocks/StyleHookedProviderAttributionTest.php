@@ -75,7 +75,7 @@ class StyleHookedProviderAttributionTest extends TestCase
     public function test_the_credit_is_smaller_than_the_report_and_centered(): void
     {
         $this->assertSame(
-            ['style' => ['typography' => ['fontSize' => '0.875em', 'textAlign' => 'center']]],
+            ['style' => ['typography' => ['fontSize' => '0.75em', 'textAlign' => 'center']]],
             $this->insertIn([])['attrs']
         );
     }
@@ -92,7 +92,7 @@ class StyleHookedProviderAttributionTest extends TestCase
     {
         $attributes = $this->insertIn([], ['attrs' => ['style' => ['typography' => ['textAlign' => 'left']]]] + self::HOOKED_BLOCK)['attrs'];
 
-        $this->assertSame(['fontSize' => '0.875em', 'textAlign' => 'left'], $attributes['style']['typography']);
+        $this->assertSame(['fontSize' => '0.75em', 'textAlign' => 'left'], $attributes['style']['typography']);
     }
 
     public function test_a_block_another_filter_removed_stays_removed(): void
