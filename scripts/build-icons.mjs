@@ -250,6 +250,15 @@ function readPaths( svg, file ) {
 								}
 								return;
 							}
+							if ( name === 'mask' ) {
+								problem(
+									`${ file }: <mask>: a stroke aligned inside or outside in Figma, which SVG can only express with a mask; center it, or outline it`
+								);
+								return;
+							}
+							if ( parentNode.name === 'mask' ) {
+								return;
+							}
 							if ( name !== 'path' ) {
 								problem(
 									`${ file }: <${ name }> is not supported, only <path>`
