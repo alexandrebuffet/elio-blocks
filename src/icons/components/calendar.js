@@ -1,0 +1,3 @@
+import { SVG, Path, Rect, Circle, G } from "@wordpress/primitives";
+const calendar = <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><Path fill="currentColor" fillRule="evenodd" d="M10.179 5.806V4.25h-1.5v1.556H7.5q-.94 0-1.6.685-.65.673-.65 1.62v9.333q0 .948.65 1.621.66.685 1.6.685h9q.94 0 1.6-.685.65-.673.65-1.62V8.11q0-.947-.65-1.62-.66-.685-1.6-.685h-1.179V4.25h-1.5v1.556zm0 1.5H7.5q-.303 0-.52.226-.23.237-.23.58v2.36h10.5v-2.36q0-.343-.23-.58-.217-.226-.52-.226zm7.071 4.666H6.75v5.472q0 .342.23.58.217.226.52.226h9q.303 0 .52-.226.23-.238.23-.58z" /></SVG>;
+export default calendar;
