@@ -75,6 +75,7 @@ class PublicApiTest extends TestCase
                 'elio_blocks_add_icon_to_sprite',
                 'elio_blocks_get_condition_icon',
                 'elio_blocks_get_condition_icon_collection',
+                'elio_blocks_get_condition_icon_stroke_width',
                 'elio_blocks_get_current_conditions',
                 'elio_blocks_get_forecast_items',
                 'elio_blocks_get_weather_forecast_attribution',

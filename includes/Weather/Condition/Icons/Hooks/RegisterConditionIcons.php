@@ -62,13 +62,17 @@ class RegisterConditionIcons implements HookInterface
                 continue;
             }
 
-            $this->registry->registerCollection(
-                $slug,
-                array(
-                    'label'       => (string) ( $collection['label'] ?? $slug ),
-                    'description' => (string) ( $collection['description'] ?? '' ),
-                )
+            $args = array(
+                'label'       => (string) ( $collection['label'] ?? $slug ),
+                'description' => (string) ( $collection['description'] ?? '' ),
             );
+
+            // The stroke width the icons are drawn with, what the condition icon block applies by default.
+            if (isset($collection['strokeWidth']) && is_numeric($collection['strokeWidth'])) {
+                $args['stroke_width'] = (float) $collection['strokeWidth'];
+            }
+
+            $this->registry->registerCollection($slug, $args);
 
             // The manifest maps conditions to icons; an icon is registered with the conditions it represents.
             $conditions = array();

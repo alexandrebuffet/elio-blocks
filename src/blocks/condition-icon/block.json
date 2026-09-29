@@ -14,8 +14,7 @@
 			"default": false
 		},
 		"strokeWidth": {
-			"type": "number",
-			"default": 1.5
+			"type": "number"
 		},
 		"iconCollection": {
 			"type": "string"

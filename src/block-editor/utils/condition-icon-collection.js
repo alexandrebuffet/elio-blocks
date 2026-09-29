@@ -31,3 +31,24 @@ export function resolveConditionIconCollection(
 		DEFAULT_CONDITION_ICON_COLLECTION
 	);
 }
+
+/**
+ * Stroke width of a collection that declares none. Same as ConditionIconsRegistry::DEFAULT_STROKE_WIDTH.
+ */
+export const DEFAULT_CONDITION_ICON_STROKE_WIDTH = 2;
+
+/**
+ * Returns the stroke width the stroke icons of a collection are drawn with,
+ * what a condition-icon block applies unless its strokeWidth attribute says
+ * otherwise. Twin of elio_blocks_get_condition_icon_stroke_width() in PHP.
+ *
+ * @param {Array<{slug: string, stroke_width?: number}>|null} collections Registered collections; null while not listed yet.
+ * @param {string}                                            collection  Collection slug.
+ * @return {number} Stroke width, in the units of the 24×24 viewBox.
+ */
+export function getConditionIconStrokeWidth( collections, collection ) {
+	return (
+		collections?.find( ( entry ) => entry.slug === collection )
+			?.stroke_width ?? DEFAULT_CONDITION_ICON_STROKE_WIDTH
+	);
+}

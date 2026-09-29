@@ -113,6 +113,13 @@ class ConditionIconRenderTest extends TestCase
         $this->assertMatchesRegularExpression('/<svg[^>]*stroke-width="2"/', $html);
     }
 
+    public function test_without_a_stroke_width_of_its_own_the_block_draws_with_the_one_of_its_collection(): void
+    {
+        $html = $this->renderBlock('condition-icon');
+
+        $this->assertMatchesRegularExpression('/<svg[^>]*stroke-width="1.5"/', $html);
+    }
+
     public function test_the_icon_of_the_current_conditions_goes_into_the_sprite_of_the_page(): void
     {
         $this->renderBlock('condition-icon');

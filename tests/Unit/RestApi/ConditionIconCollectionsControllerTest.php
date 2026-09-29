@@ -35,7 +35,7 @@ class ConditionIconCollectionsControllerTest extends TestCase
         WordPressCore::stubKses();
 
         $this->registry = new ConditionIconsRegistry();
-        $this->registry->registerCollection('elio', ['label' => 'Elio', 'description' => 'Shipped.']);
+        $this->registry->registerCollection('elio', ['label' => 'Elio', 'description' => 'Shipped.', 'stroke_width' => 1.5]);
         foreach (WmoConditionCodes::getSlugs() as $condition) {
             $this->registry->registerIcon('elio/' . $condition, ['content' => self::SUN, 'style' => 'stroke', 'conditions' => [[$condition, 'all']]]);
         }
@@ -76,6 +76,7 @@ class ConditionIconCollectionsControllerTest extends TestCase
         $this->assertSame(['elio', 'sparse'], array_column($data, 'slug'));
         $this->assertSame(['Elio', 'Sparse'], array_column($data, 'label'));
         $this->assertSame(['Shipped.', ''], array_column($data, 'description'));
+        $this->assertSame([1.5, 2.0], array_column($data, 'stroke_width'), 'The stroke width the icons are drawn with, two when the collection says nothing.');
     }
 
     public function test_flags_the_collection_of_the_site(): void
@@ -118,6 +119,6 @@ class ConditionIconCollectionsControllerTest extends TestCase
         $schema = (new ConditionIconCollectionsController($this->registry, $this->createMock(PluginSettings::class)))->get_item_schema();
 
         $this->assertSame('condition-icon-collection', $schema['title']);
-        $this->assertSame(['slug', 'label', 'description', 'is_default', 'coverage', 'preview'], array_keys($schema['properties']));
+        $this->assertSame(['slug', 'label', 'description', 'is_default', 'stroke_width', 'coverage', 'preview'], array_keys($schema['properties']));
     }
 }

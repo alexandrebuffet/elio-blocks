@@ -6,7 +6,10 @@ import { describe, expect, it } from 'vitest';
 /**
  * Internal dependencies
  */
-import { resolveConditionIconCollection } from '../condition-icon-collection';
+import {
+	getConditionIconStrokeWidth,
+	resolveConditionIconCollection,
+} from '../condition-icon-collection';
 
 const COLLECTIONS = [ { slug: 'elio' }, { slug: 'theme' } ];
 
@@ -57,5 +60,21 @@ describe( 'resolveConditionIconCollection', () => {
 			resolveConditionIconCollection( [ undefined, 'theme' ], null )
 		).toBe( 'theme' );
 		expect( resolveConditionIconCollection( [], null ) ).toBe( 'elio' );
+	} );
+} );
+
+describe( 'getConditionIconStrokeWidth', () => {
+	it( 'is the stroke width the collection declares, two when it declares none or is not listed yet', () => {
+		const collections = [
+			{ slug: 'elio', stroke_width: 1.5 },
+			{ slug: 'theme' },
+		];
+
+		expect( getConditionIconStrokeWidth( collections, 'elio' ) ).toBe(
+			1.5
+		);
+		expect( getConditionIconStrokeWidth( collections, 'theme' ) ).toBe( 2 );
+		expect( getConditionIconStrokeWidth( collections, 'nope' ) ).toBe( 2 );
+		expect( getConditionIconStrokeWidth( null, 'elio' ) ).toBe( 2 );
 	} );
 } );

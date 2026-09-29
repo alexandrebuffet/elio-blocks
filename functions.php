@@ -248,6 +248,22 @@ function elio_blocks_get_condition_icon_collection( ?string $block_collection, ?
 }
 
 /**
+ * Returns the stroke width the stroke icons of a collection are drawn with.
+ *
+ * What a condition-icon block applies to its symbol unless its strokeWidth
+ * attribute says otherwise: 2 for a collection that declares none, or that is
+ * not registered.
+ *
+ * @param string $collection Collection slug.
+ * @return float Stroke width, in the units of the 24×24 viewBox.
+ */
+function elio_blocks_get_condition_icon_stroke_width( string $collection ): float {
+	$registered = Plugin::instance()->container()->get( ConditionIconsRegistry::class )->getRegisteredCollection( $collection );
+
+	return $registered['stroke_width'] ?? ConditionIconsRegistry::DEFAULT_STROKE_WIDTH;
+}
+
+/**
  * Returns the credit the weather forecast of a provider is shown with, as the
  * license of the provider asks.
  *
