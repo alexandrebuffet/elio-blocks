@@ -65,7 +65,7 @@
 	--text-xs: 0.8125rem;
 	--text-s: 0.9375rem;
 	--text-m: 1.0625rem;
-	--text-l: clamp(1.1875rem, 0.5vw + 1.05rem, 1.375rem);
+	--text-l: clamp(1.0625rem, 0.3vw + 1rem, 1.25rem);
 	--text-xl: clamp(1.625rem, 1vw + 1.3rem, 2.125rem);
 	--text-2xl: clamp(2.75rem, 5.5vw, 5rem);
 	--text-3xl: clamp(3.75rem, 9.5vw, 9.5rem);
@@ -471,7 +471,7 @@ a.brand:hover .brand__logo {
 	display: grid;
 	grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
 	gap: var(--space-xl) var(--space-3xl);
-	align-items: end;
+	align-items: start;
 	padding-block: var(--space-3xl);
 }
 
@@ -485,10 +485,11 @@ a.brand:hover .brand__logo {
 	padding-bottom: 0.08em;
 }
 
+/* The intro starts at the cap height of the title. */
 .hero__intro {
 	display: grid;
 	gap: var(--space-l);
-	padding-bottom: 0.6em;
+	padding-top: 0.5em;
 }
 
 .hero__meta {
@@ -869,8 +870,9 @@ a.brand:hover .brand__logo {
 	padding-block: var(--space-section);
 }
 
-.section--flush {
-	padding-top: 0;
+/* The features lead straight into the night section. */
+.section--features {
+	padding-bottom: var(--space-3xl);
 }
 
 .section__header {
@@ -958,7 +960,9 @@ a.brand:hover .brand__logo {
 .feature {
 	display: grid;
 	align-content: start;
+	justify-items: start;
 	gap: var(--space-s);
+	padding-top: var(--space-l);
 	border-top: 1px solid var(--line-strong);
 }
 
@@ -975,8 +979,16 @@ a.brand:hover .brand__logo {
 	--reveal-delay: 0.3s;
 }
 
+/* As large as a button of the block toolbar. */
 .feature .tool-icon {
-	margin: -20px 0 var(--space-s);
+	width: 48px;
+	height: 48px;
+	margin-bottom: var(--space-xs);
+}
+
+.feature .tool-icon svg {
+	width: 32px;
+	height: 32px;
 }
 
 .feature__title {
