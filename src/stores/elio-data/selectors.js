@@ -55,7 +55,7 @@ export function getWeatherForecastProviders( state ) {
  * not there. Has a resolver: selecting it fetches them once.
  *
  * @param {Object} state Store state.
- * @return {Array|null} Collections: slug, label, description, is_default, coverage, preview.
+ * @return {Array|null} Collections: slug, label, description, stroke_width, is_default, coverage, preview.
  */
 export function getConditionIconCollections( state ) {
 	return state.conditionIconCollections;

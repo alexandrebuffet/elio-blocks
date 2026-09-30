@@ -36,6 +36,8 @@ gh api -X PUT "repos/$repo/private-vulnerability-reporting" --silent
 
 echo "Actions permissions"
 # Only GitHub's actions and the ones the workflows use, pinned by commit SHA.
+# A composite action runs the actions it uses under the same policy:
+# WordPress/plugin-check-action calls nick-fields/retry (since v1.1.9).
 gh api -X PUT "repos/$repo/actions/permissions" --silent \
 	-F enabled=true -f allowed_actions=selected -F sha_pinning_required=true
 gh api -X PUT "repos/$repo/actions/permissions/selected-actions" --silent --input - <<'JSON'
@@ -45,6 +47,7 @@ gh api -X PUT "repos/$repo/actions/permissions/selected-actions" --silent --inpu
 	"patterns_allowed": [
 		"shivammathur/setup-php@*",
 		"WordPress/plugin-check-action@*",
+		"nick-fields/retry@*",
 		"10up/action-wordpress-plugin-deploy@*",
 		"10up/action-wordpress-plugin-asset-update@*",
 		"softprops/action-gh-release@*"

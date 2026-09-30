@@ -10,8 +10,9 @@ use ElioBlocks\Weather\Condition\Icons\Hooks\RegisterConditionIcons;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The plugin registers its own collection, "elio", from the manifest the
- * build writes next to the icons (build/weather-condition-icons-manifest.php).
+ * The plugin registers its own collections ("elio" and its own families) from
+ * the manifest the build writes next to the icons
+ * (build/weather-condition-icons-manifest.php), one folder per collection.
  */
 class RegisterConditionIconsTest extends TestCase
 {
@@ -34,7 +35,8 @@ class RegisterConditionIconsTest extends TestCase
 
     protected function tearDown(): void
     {
-        array_map('unlink', glob($this->iconsPath . '/*') ?: []);
+        array_map('unlink', glob($this->iconsPath . '/*/*') ?: []);
+        array_map('rmdir', glob($this->iconsPath . '/*') ?: []);
         @unlink($this->iconsPath . '-manifest.php');
         rmdir($this->iconsPath);
         Monkey\tearDown();
@@ -43,19 +45,39 @@ class RegisterConditionIconsTest extends TestCase
 
     private function writeManifest(): void
     {
-        file_put_contents($this->iconsPath . '/sun.svg', '<svg viewBox="0 0 24 24"><path d="M1 1"></path></svg>');
-        file_put_contents($this->iconsPath . '/moon.svg', '<svg viewBox="0 0 24 24"><path d="M2 2"></path></svg>');
+        mkdir($this->iconsPath . '/elio');
+        mkdir($this->iconsPath . '/cumulus-solid');
+        file_put_contents($this->iconsPath . '/elio/sun.svg', '<svg viewBox="0 0 24 24"><path d="M1 1"></path></svg>');
+        file_put_contents($this->iconsPath . '/elio/moon.svg', '<svg viewBox="0 0 24 24"><path d="M2 2"></path></svg>');
+        file_put_contents($this->iconsPath . '/cumulus-solid/sun.svg', '<svg viewBox="0 0 24 24"><path d="M3 3"></path></svg>');
         file_put_contents(
             $this->iconsPath . '-manifest.php',
             '<?php return array(
-                "icons" => array(
-                    "sun"  => array("label" => "Sun", "filePath" => "sun.svg", "style" => "stroke"),
-                    "moon" => array("label" => "Moon", "filePath" => "moon.svg", "style" => "stroke"),
-                ),
-                "conditionMappings" => array(
-                    array("condition" => "clear-sky", "dayOrNight" => "day", "iconSlug" => "sun"),
-                    array("condition" => "mainly-clear", "dayOrNight" => "day", "iconSlug" => "sun"),
-                    array("condition" => "clear-sky", "dayOrNight" => "night", "iconSlug" => "moon"),
+                "collections" => array(
+                    "elio" => array(
+                        "label"       => "Elio",
+                        "description" => "The icons of the plugin.",
+                        "strokeWidth" => 1.5,
+                        "icons" => array(
+                            "sun"  => array("label" => "Sun", "filePath" => "sun.svg", "style" => "stroke"),
+                            "moon" => array("label" => "Moon", "filePath" => "moon.svg", "style" => "stroke"),
+                        ),
+                        "conditionMappings" => array(
+                            array("condition" => "clear-sky", "dayOrNight" => "day", "iconSlug" => "sun"),
+                            array("condition" => "mainly-clear", "dayOrNight" => "day", "iconSlug" => "sun"),
+                            array("condition" => "clear-sky", "dayOrNight" => "night", "iconSlug" => "moon"),
+                        ),
+                    ),
+                    "cumulus-solid" => array(
+                        "label"       => "Cumulus Solid",
+                        "description" => "Soft, rounded silhouettes.",
+                        "icons" => array(
+                            "sun" => array("label" => "Sun", "filePath" => "sun.svg", "style" => "fill"),
+                        ),
+                        "conditionMappings" => array(
+                            array("condition" => "clear-sky", "dayOrNight" => "day", "iconSlug" => "sun"),
+                        ),
+                    ),
                 ),
             );'
         );
@@ -66,19 +88,34 @@ class RegisterConditionIconsTest extends TestCase
         return new RegisterConditionIcons($this->registry, $this->iconsPath . '/');
     }
 
-    public function test_registers_the_elio_collection_with_the_icons_and_conditions_of_the_manifest(): void
+    public function test_registers_every_collection_of_the_manifest_with_its_icons_and_conditions(): void
     {
         $this->writeManifest();
 
         $this->hook()->registerDefaultCollection();
 
+        $this->assertSame(
+            ['elio', 'cumulus-solid'],
+            array_column($this->registry->getAllRegisteredCollections(), 'slug')
+        );
         $this->assertSame('Elio', $this->registry->getRegisteredCollection('elio')['label'] ?? null);
+        $this->assertSame('Soft, rounded silhouettes.', $this->registry->getRegisteredCollection('cumulus-solid')['description'] ?? null);
+        $this->assertSame(1.5, $this->registry->getRegisteredCollection('elio')['stroke_width'] ?? null, 'The stroke width of the manifest.');
+        $this->assertSame(2.0, $this->registry->getRegisteredCollection('cumulus-solid')['stroke_width'] ?? null, 'Two when the manifest says nothing.');
+
         $sun = $this->registry->getRegisteredIcon('elio/sun');
         $this->assertSame('Sun', $sun['label']);
         $this->assertSame('stroke', $sun['style']);
         $this->assertSame([['clear-sky', 'day'], ['mainly-clear', 'day']], $sun['conditions']);
         $this->assertStringContainsString('d="M1 1"', $sun['content']);
         $this->assertSame('elio/moon', $this->registry->getIconForCondition('elio', 'clear-sky', 'night')['name']);
+
+        // Each collection reads its icons from its own folder.
+        $solidSun = $this->registry->getRegisteredIcon('cumulus-solid/sun');
+        $this->assertSame('fill', $solidSun['style']);
+        $this->assertStringContainsString('d="M3 3"', $solidSun['content']);
+        $this->assertSame('cumulus-solid/sun', $this->registry->getIconForCondition('cumulus-solid', 'clear-sky', 'day')['name']);
+        $this->assertNull($this->registry->getIconForCondition('cumulus-solid', 'clear-sky', 'night'));
     }
 
     public function test_registers_nothing_without_a_manifest(): void

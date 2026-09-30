@@ -1,0 +1,3 @@
+import { SVG, Path, Rect, Circle, G } from "@wordpress/primitives";
+const cloudDenseMist = <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><Path fill="currentColor" fillRule="evenodd" d="M4.51 8.41q-1.625 1.874-1.159 4.207l.147.736 1.471-.294-.147-.735q-.322-1.612.821-2.93 1.154-1.33 2.836-1.201l.588.045.183-.56q.955-2.928 4.049-2.928 1.88 0 3.163 1.443 1.28 1.44 1.063 3.294l-.07.603.574.195q1.598.541 1.67 2.218l.033.75 1.499-.066-.033-.749q-.104-2.4-2.142-3.356.053-2.169-1.473-3.885Q15.853 3.25 13.3 3.25q-3.892 0-5.282 3.432-2.058.058-3.507 1.729M21 15.486H3.25v1.5h18.5v-1.5zM8.722 19.25H5.14v1.5h4.333v-1.5zm10.39 0H11.75v1.5h8.111v-1.5z" /></SVG>;
+export default cloudDenseMist;

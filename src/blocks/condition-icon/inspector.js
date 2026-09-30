@@ -14,7 +14,10 @@ import {
  * Internal dependencies
  */
 import { useConditionIconCollections } from '../../block-editor/hooks';
-import { resolveConditionIconCollection } from '../../block-editor/utils';
+import {
+	getConditionIconStrokeWidth,
+	resolveConditionIconCollection,
+} from '../../block-editor/utils';
 import IconCollectionControl from '../../block-editor/components/icon-collection-control';
 
 /**
@@ -33,11 +36,7 @@ export default function Inspector( {
 	context,
 	isStroke,
 } ) {
-	const {
-		isDecorative = false,
-		strokeWidth = 2,
-		iconCollection,
-	} = attributes;
+	const { isDecorative = false, iconCollection } = attributes;
 	const { collections, defaultCollection, isResolving } =
 		useConditionIconCollections();
 	// What the block shows without a choice of its own: the collection of its report, else the site one.
@@ -51,6 +50,10 @@ export default function Inspector( {
 		isResolving ? null : collections,
 		inherited
 	);
+	// Stroke width of the symbol: the one of the block, else the one the icons of the collection are drawn with.
+	const strokeWidth =
+		attributes.strokeWidth ??
+		getConditionIconStrokeWidth( collections, collection );
 
 	return (
 		<>
@@ -125,7 +128,9 @@ export default function Inspector( {
 					{ isStroke && (
 						<ToolsPanelItem
 							label={ __( 'Stroke Width', 'elio-blocks' ) }
-							hasValue={ () => strokeWidth !== 2 }
+							hasValue={ () =>
+								attributes.strokeWidth !== undefined
+							}
 							onDeselect={ () =>
 								setAttributes( { strokeWidth: undefined } )
 							}

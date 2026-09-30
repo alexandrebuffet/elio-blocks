@@ -22,7 +22,10 @@ import {
 	useConditionIconCollections,
 	useWeatherReport,
 } from '../../block-editor/hooks';
-import { resolveConditionIconCollection } from '../../block-editor/utils';
+import {
+	getConditionIconStrokeWidth,
+	resolveConditionIconCollection,
+} from '../../block-editor/utils';
 import HtmlRenderer from '../../block-editor/components/html-renderer';
 import Inspector from './inspector';
 
@@ -83,11 +86,7 @@ export default function ConditionIconEdit( {
 	setAttributes,
 	isSelected,
 } ) {
-	const {
-		strokeWidth = 2,
-		strokeLinecap = 'round',
-		strokeLinejoin = 'round',
-	} = attributes;
+	const { strokeLinecap = 'round', strokeLinejoin = 'round' } = attributes;
 	const { data } = useWeatherReport( context );
 	const { collections, defaultCollection, isResolving } =
 		useConditionIconCollections();
@@ -100,6 +99,10 @@ export default function ConditionIconEdit( {
 		isResolving ? null : collections,
 		defaultCollection
 	);
+	// Stroke width of the symbol: the one of the block, else the one the icons of the collection are drawn with.
+	const strokeWidth =
+		attributes.strokeWidth ??
+		getConditionIconStrokeWidth( collections, collection );
 	const iconName = item?.condition_icons?.[ collection ] ?? null;
 	const iconEntry = ( iconName && data?.icons?.[ iconName ] ) ?? null;
 	const isStroke = iconEntry?.style === 'stroke';

@@ -17,9 +17,9 @@ if (!defined('ABSPATH')) {
  * Handles /elio/v1/weather-forecast/providers requests: the providers that
  * serve the weather forecast, and which one is the site default.
  *
- * The block editor offers them in the Provider select of the report block,
- * the settings page in the select of the default one: anyone who can edit
- * content may list them.
+ * The block editor offers them in the Provider select of the report block and
+ * shows their credit in the provider-attribution block, the settings page in
+ * the select of the default one: anyone who can edit content may list them.
  */
 class WeatherForecastProvidersController extends WP_REST_Controller
 {
@@ -71,9 +71,14 @@ class WeatherForecastProvidersController extends WP_REST_Controller
         return rest_ensure_response(
             array_map(
                 static fn(Provider $provider): array => [
-                    'slug'      => $provider->slug,
-                    'label'     => $provider->label,
-                    'isDefault' => $provider->slug === $defaultProvider,
+                    'slug'        => $provider->slug,
+                    'label'       => $provider->label,
+                    'isDefault'   => $provider->slug === $defaultProvider,
+                    'attribution' => null !== $provider->attribution ? [
+                        'url'        => $provider->attribution->url,
+                        'license'    => $provider->attribution->license,
+                        'licenseUrl' => $provider->attribution->licenseUrl,
+                    ] : null,
                 ],
                 $this->weatherForecastProviders->getProviders()
             )

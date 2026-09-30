@@ -12,6 +12,7 @@ use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Interactivity\Blocks\Report\DirectivesHelper;
 use ElioBlocks\Interactivity\Blocks\Report\IconSprite;
 use ElioBlocks\Interactivity\Blocks\Report\ReportContext;
+use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\WeatherForecast\WeatherForecastProviderInterface;
 use ElioBlocks\WeatherForecast\WeatherForecastProviderRegistry;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconCollectionResolver;
@@ -32,7 +33,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * A provider that needs to identify the site (an API key, an account, a
  * contact address) declares its credentials: the settings page gives it a card
- * with their fields, and its providers get their values in fetch().
+ * with their fields, and its providers get their values in fetch(). One whose
+ * license asks for a credit wherever its data is shown declares its
+ * attribution: the provider-attribution block prints it in the reports.
  *
  * @param string               $slug Unique identifier: lowercase letters, digits and hyphens.
  * @param array<string, mixed> $args {
@@ -47,6 +50,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *                               is not set),
  *                               'secret' (bool, default false: typed hidden, never sent back to the
  *                               browser). Default none.
+ *     @type array  $attribution The credit its license asks for: its label linked to its site, in the
+ *                               sentence of the provider-attribution block. An array of:
+ *                               'url' (string, http(s) URL of its site, required),
+ *                               'license' (string, name of the license of the data),
+ *                               'license_url' (string, http(s) URL of that license). Default none.
  * }
  * @return bool True if the provider was registered, false otherwise.
  */
@@ -237,4 +245,50 @@ function elio_blocks_get_condition_icon( string $name ): ?array {
  */
 function elio_blocks_get_condition_icon_collection( ?string $block_collection, ?string $report_collection ): string {
 	return Plugin::instance()->container()->get( ConditionIconCollectionResolver::class )->resolve( $block_collection, $report_collection );
+}
+
+/**
+ * Returns the stroke width the stroke icons of a collection are drawn with.
+ *
+ * What a condition-icon block applies to its symbol unless its strokeWidth
+ * attribute says otherwise: 2 for a collection that declares none, or that is
+ * not registered.
+ *
+ * @param string $collection Collection slug.
+ * @return float Stroke width, in the units of the 24×24 viewBox.
+ */
+function elio_blocks_get_condition_icon_stroke_width( string $collection ): float {
+	$registered = Plugin::instance()->container()->get( ConditionIconsRegistry::class )->getRegisteredCollection( $collection );
+
+	return $registered['stroke_width'] ?? ConditionIconsRegistry::DEFAULT_STROKE_WIDTH;
+}
+
+/**
+ * Returns the credit the weather forecast of a provider is shown with, as the
+ * license of the provider asks.
+ *
+ * Null when the provider asks for none, or serves no weather forecast.
+ *
+ * @param string $provider Provider slug (the elio/reportProvider block context), empty for the site default.
+ * @return array{name: string, url: string, license: string, license_url: string}|null Label of the provider, its site,
+ *                                                                                  the license of its data and its page; to escape.
+ */
+function elio_blocks_get_weather_forecast_attribution( string $provider ): ?array {
+	$container = Plugin::instance()->container();
+	if ( '' === $provider ) {
+		$provider = $container->get( PluginSettings::class )->getDefaultWeatherForecastProvider();
+	}
+
+	$provider    = $container->get( WeatherForecastProviderRegistry::class )->getProvider( $provider );
+	$attribution = $provider?->attribution;
+	if ( null === $attribution ) {
+		return null;
+	}
+
+	return array(
+		'name'        => $provider->label,
+		'url'         => $attribution->url,
+		'license'     => $attribution->license,
+		'license_url' => $attribution->licenseUrl,
+	);
 }

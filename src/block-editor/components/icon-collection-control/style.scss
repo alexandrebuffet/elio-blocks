@@ -60,8 +60,9 @@
 .elio-icon-collection-control__iframe {
 	display: block;
 	width: 100%;
-	// The icons (48px) and the vertical padding of the preview document.
-	height: 96px;
+	// Two rows of icons (48px) with their gap, and the vertical padding of the
+	// preview document.
+	height: 160px;
 	border: 0;
 	pointer-events: none;
 }

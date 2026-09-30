@@ -5,6 +5,7 @@ namespace ElioBlocks\Tests\Unit\Provider;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use ElioBlocks\Provider\Provider;
+use ElioBlocks\Provider\ProviderAttribution;
 use ElioBlocks\Provider\ProviderCredential;
 use ElioBlocks\Provider\ProviderRegistry;
 use Mockery;
@@ -99,6 +100,56 @@ class ProviderRegistryTest extends TestCase
             'unknown argument'   => [['api_key' => ['label' => 'Key', 'render_callback' => 'x']], '/unknown arguments: render_callback/'],
             'required not bool'  => [['api_key' => ['label' => 'Key', 'required' => 'yes']], '/boolean required and secret/'],
             'description markup' => [['api_key' => ['label' => 'Key', 'description' => ['<b>']]], '/string description/'],
+        ];
+    }
+
+    public function test_a_provider_declares_the_credit_its_license_asks_for(): void
+    {
+        $this->assertTrue(
+            $this->registry->register(
+                'acme-weather',
+                [
+                    'label'       => 'Acme Weather',
+                    'attribution' => [
+                        'url'         => 'https://acme.test/',
+                        'license'     => 'CC BY 4.0',
+                        'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
+                    ],
+                ]
+            )
+        );
+        $this->registry->register('plain-weather', ['label' => 'Plain Weather', 'attribution' => ['url' => 'https://plain.test/']]);
+        $this->registry->register('open-weather', ['label' => 'Open Weather']);
+
+        $this->assertEquals(
+            new ProviderAttribution('https://acme.test/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/'),
+            $this->registry->getBySlug('acme-weather')->attribution
+        );
+        $this->assertEquals(new ProviderAttribution('https://plain.test/'), $this->registry->getBySlug('plain-weather')->attribution);
+        $this->assertNull($this->registry->getBySlug('open-weather')->attribution, 'It asks for no credit.');
+    }
+
+    #[DataProvider('invalidAttributions')]
+    public function test_an_invalid_attribution_refuses_the_provider(mixed $attribution, string $pattern): void
+    {
+        $this->expectDoingItWrong($pattern);
+
+        $this->assertFalse(
+            $this->registry->register('acme-weather', ['label' => 'Acme Weather', 'attribution' => $attribution])
+        );
+        $this->assertNull($this->registry->getBySlug('acme-weather'));
+    }
+
+    public static function invalidAttributions(): array
+    {
+        return [
+            'not an array'        => ['https://acme.test/', '/attribution of provider &quot;acme-weather&quot; must be an array/'],
+            'no site'             => [['license' => 'CC BY 4.0'], '/needs the url of its site/'],
+            'license markup'      => [['url' => 'https://acme.test/', 'license' => ['<b>CC</b>']], '/needs a string license/'],
+            'sentence of its own' => [['url' => 'https://acme.test/', 'text' => 'Data by Acme'], '/unknown arguments: text/'],
+            'script URL'          => [['url' => 'javascript:alert(1)'], '/url of the attribution .* must be an http\(s\) URL/'],
+            'relative URL'        => [['url' => '/credits'], '/url of the attribution/'],
+            'license URL no URL'  => [['url' => 'https://acme.test/', 'license_url' => 'CC BY 4.0'], '/license_url of the attribution/'],
         ];
     }
 

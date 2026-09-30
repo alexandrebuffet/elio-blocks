@@ -75,7 +75,7 @@ class ConditionIconsRegistryTest extends TestCase
 
         $this->assertTrue($this->registry->isCollectionRegistered('pixel-art'));
         $this->assertSame(
-            ['slug' => 'pixel-art', 'label' => 'Pixel art', 'description' => 'Tiny icons.'],
+            ['slug' => 'pixel-art', 'label' => 'Pixel art', 'description' => 'Tiny icons.', 'stroke_width' => 2.0],
             $this->registry->getRegisteredCollection('pixel-art')
         );
         $this->assertNull($this->registry->getRegisteredCollection('nope'));
@@ -103,6 +103,22 @@ class ConditionIconsRegistryTest extends TestCase
         $this->expectNotice('/Invalid icon collection property: "icons"/');
 
         $this->assertFalse($this->registry->registerCollection('pixel-art', ['label' => 'Pixel art', 'icons' => []]));
+    }
+
+    public function test_a_collection_declares_the_stroke_width_its_icons_are_drawn_with(): void
+    {
+        $this->registry->registerCollection('thin', ['label' => 'Thin', 'stroke_width' => 1.5]);
+        $this->registry->registerCollection('plain', ['label' => 'Plain']);
+
+        $this->assertSame(1.5, $this->registry->getRegisteredCollection('thin')['stroke_width']);
+        $this->assertSame(2.0, $this->registry->getRegisteredCollection('plain')['stroke_width'], 'Two, as Tabler and Lucide draw, when it says nothing.');
+    }
+
+    public function test_a_stroke_width_that_is_not_a_positive_number_is_refused(): void
+    {
+        $this->expectNotice('/stroke width must be a positive number/');
+
+        $this->assertFalse($this->registry->registerCollection('thin', ['label' => 'Thin', 'stroke_width' => 0]));
     }
 
     public function test_a_collection_slug_already_registered_is_refused_and_the_first_one_kept(): void
