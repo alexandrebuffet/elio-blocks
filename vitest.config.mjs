@@ -15,5 +15,12 @@ export default defineConfig( {
 		environment: 'jsdom',
 		include: [ 'src/**/test/*.test.js' ],
 		setupFiles: [ './src/test-utils/setup.js' ],
+		server: {
+			deps: {
+				// Its modules import JSON without an import attribute, which
+				// Node refuses: Vite transforms them.
+				inline: [ '@wordpress/blocks' ],
+			},
+		},
 	},
 } );
