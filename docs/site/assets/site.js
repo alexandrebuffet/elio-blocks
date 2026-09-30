@@ -140,7 +140,6 @@ let reportRequest = null;
 
 async function showWeather( button ) {
 	const report = document.querySelector( '.report' );
-	const sky = document.querySelector( '.sky' );
 	const field = ( name ) =>
 		document.querySelector( `[data-weather="${ name }"]` );
 	const { city, lat, lon } = button.dataset;
@@ -192,7 +191,7 @@ async function showWeather( button ) {
 			`icons.svg#${ conditionIcon( mappings, condition, current.is_day ) }`
 		);
 		field( 'description' ).textContent = describe( condition );
-		sky.dataset.sky = current.is_day ? 'day' : 'night';
+		report.dataset.sky = current.is_day ? 'day' : 'night';
 
 		const rows = [
 			{
