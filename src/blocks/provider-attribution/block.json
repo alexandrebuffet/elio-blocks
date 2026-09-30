@@ -12,22 +12,17 @@
 	"blockHooks": {
 		"elio/weather-report": "lastChild"
 	},
-	"variations": [
-		{
-			"name": "default",
-			"title": "Provider Attribution",
-			"isDefault": true,
-			"scope": ["inserter"],
-			"attributes": {
-				"style": {
-					"typography": {
-						"fontSize": "0.75em",
-						"textAlign": "center"
-					}
+	"attributes": {
+		"style": {
+			"type": "object",
+			"default": {
+				"typography": {
+					"fontSize": "0.75em",
+					"textAlign": "center"
 				}
 			}
 		}
-	],
+	},
 	"supports": {
 		"html": false,
 		"interactivity": {
