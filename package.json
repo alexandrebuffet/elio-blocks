@@ -29,6 +29,7 @@
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip --root-folder=elio-blocks",
 		"start": "wp-scripts start --blocks-manifest --experimental-modules",
+		"build:site": "node scripts/build-site.mjs",
 		"build:icons": "node scripts/build-icons.mjs && svgr build/icons/block-editor --out-dir src/icons/components && svgr src/blocks/weather-report/icons/svg --out-dir src/blocks/weather-report/icons/components --config-file svgr.weather-report-variation-icons.config.js && svgr src/icons/brand/svg --out-dir src/icons/brand/components --config-file svgr.brand-icons.config.js"
 	},
 	"dependencies": {
