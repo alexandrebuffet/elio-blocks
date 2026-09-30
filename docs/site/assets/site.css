@@ -26,9 +26,9 @@
  * Warm tones from the photo of the plugin (ember, amber, cream), and a blue
  * so desaturated it reads as black; the sky of the photo (--sky, --sky-2)
  * only as touches of light in the front end band. Contrast (WCAG 2.2 AA):
- * --ink-2 on --paper 6.9:1, --accent on --paper 5.1:1, --ink on --ember
- * 4.9:1, on --clay 5.7:1, --on-night-2 on --night 6.9:1; the light shimmer
- * stays above 3.1:1 (large text).
+ * --ink-2 on --paper 6.9:1, --accent on --paper 5.1:1 (and --paper on the
+ * count, --accent to --accent-2), --ink on --ember 4.9:1, --on-night-2 on
+ * --night 6.9:1; the light shimmer stays above 3.1:1 (large text).
  */
 :root {
 	--paper: #f9f7f3;
@@ -38,12 +38,11 @@
 	--line: rgb(23 25 31 / 14%);
 	--line-strong: rgb(23 25 31 / 40%);
 	--accent: #b8431a;
+	--accent-2: var(--rust);
 	--ember: #e0602a;
 	--amber: #f0a044;
 	--rust: #8f3515;
 	--gold: #f7d49a;
-	--sand: #ebdfd0;
-	--clay: #c9825f;
 	--sky: #b7cdd6;
 	--sky-2: #93a8c6;
 	--night: #15171c;
@@ -102,6 +101,7 @@
 		--line: rgb(238 231 219 / 14%);
 		--line-strong: rgb(238 231 219 / 40%);
 		--accent: var(--amber);
+		--accent-2: var(--ember);
 		--tool: #1e1e1e;
 		--tool-line: rgb(255 255 255 / 24%);
 		--browser-tabs: #0f1115;
@@ -470,8 +470,7 @@ a.brand:hover .brand__logo {
 }
 
 .site-nav a[aria-current] {
-	color: var(--accent);
-	text-decoration-color: var(--accent);
+	text-decoration-color: var(--accent-2);
 }
 
 @media (max-width: 760px) {
@@ -970,8 +969,8 @@ a.brand:hover .brand__logo {
 	gap: var(--space-2xs);
 	margin: 0;
 	padding: var(--space-xl);
-	background: linear-gradient(150deg, var(--sand), #dcae8f 50%, var(--clay));
-	color: #17191f;
+	background: linear-gradient(150deg, var(--accent) 40%, var(--accent-2));
+	color: var(--paper);
 }
 
 .features__number {
@@ -1017,13 +1016,14 @@ a.brand:hover .brand__logo {
 	--reveal-delay: 0.3s;
 }
 
-/* The icon of each card large and drawn with a fine line. */
-.feature__icon {
+/* The icon of each card and step large, drawn with a 1.5px line. */
+.feature__icon,
+.step__icon {
 	width: 48px;
 	height: 48px;
 	margin-bottom: var(--space-xs);
 	color: var(--accent);
-	stroke-width: 1;
+	stroke-width: 0.75;
 }
 
 .feature__title {
@@ -1132,6 +1132,11 @@ a.brand:hover .brand__logo {
 
 .step:nth-child(3) {
 	--reveal-delay: 0.24s;
+}
+
+.step__icon {
+	display: block;
+	color: var(--band-ink);
 }
 
 .step__title {
