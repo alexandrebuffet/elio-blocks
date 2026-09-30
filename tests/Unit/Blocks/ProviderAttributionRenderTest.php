@@ -74,6 +74,24 @@ class ProviderAttributionRenderTest extends TestCase
         );
     }
 
+    public function test_links_opening_in_a_new_tab_say_so_to_screen_readers(): void
+    {
+        $this->stubAttribution(self::OPEN_METEO);
+
+        $html = $this->renderBlock('provider-attribution', ['linkTarget' => '_blank']);
+
+        $this->assertStringContainsString(
+            '<a class="wp-block-elio-provider-attribution__provider-link" href="https://open-meteo.com/" target="_blank" rel="noopener">'
+            . 'Open-Meteo<span class="screen-reader-text"> (opens in a new tab)</span></a>',
+            $html
+        );
+        $this->assertStringContainsString(
+            '<a class="wp-block-elio-provider-attribution__license-link" href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener" target="_blank">'
+            . 'CC BY 4.0<span class="screen-reader-text"> (opens in a new tab)</span></a>',
+            $html
+        );
+    }
+
     public function test_a_report_without_provider_credits_the_site_default_one(): void
     {
         $this->stubAttribution(self::OPEN_METEO);
