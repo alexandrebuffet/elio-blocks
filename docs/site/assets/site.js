@@ -41,11 +41,31 @@ PHP
 `;
 
 // The hero shows the front end without the toolbar, so the Weather block is
-// in sight.
+// in sight. A link of the editor to the site ("View Post" opens a new tab,
+// where the site of the demo does not exist) asks this page for the front end
+// tab instead.
 const HERO_SETUP = `<?php
 require '/wordpress/wp-load.php';
 wp_mkdir_p( WPMU_PLUGIN_DIR );
 file_put_contents( WPMU_PLUGIN_DIR . '/elio-demo-toolbar.php', "<?php add_filter( 'show_admin_bar', '__return_false' );\\n" );
+file_put_contents( WPMU_PLUGIN_DIR . '/elio-demo-links.php', <<<'PHP'
+<?php
+add_action( 'admin_print_footer_scripts', function () {
+	?>
+	<script>
+	document.addEventListener( 'click', ( event ) => {
+		const link = event.target.closest && event.target.closest( 'a[href]' );
+		if ( ! link || link.origin !== location.origin || link.pathname.includes( '/wp-admin/' ) ) {
+			return;
+		}
+		event.preventDefault();
+		window.top.postMessage( { type: 'elio-demo-view', url: link.href }, '*' );
+	}, true );
+	</script>
+	<?php
+} );
+PHP
+);
 `;
 
 const blueprintPromise = fetch( 'blueprint.json' )
@@ -242,14 +262,31 @@ function initLiveDemo() {
 				frontScreen,
 				'Live demo: the post on the front end'
 			);
-			front.src = `${ siteUrl }/?p=1000`;
+			// The page the front end tab shows: the post, or what a link of
+			// the editor opened.
+			let frontUrl = new URL( `${ siteUrl }/?p=1000` );
+			front.src = frontUrl.href;
 			reloadTab = ( name ) => {
 				if ( name === 'front' ) {
-					front.src = `${ siteUrl }/?p=1000&t=${ Date.now() }`;
+					frontUrl.searchParams.set( 't', String( Date.now() ) );
+					front.src = frontUrl.href;
 				} else {
 					playground.goTo( blueprint.landingPage );
 				}
 			};
+			window.addEventListener( 'message', ( event ) => {
+				if (
+					event.origin !== PLAYGROUND ||
+					event.data?.type !== 'elio-demo-view' ||
+					! String( event.data.url ).startsWith( `${ siteUrl }/` )
+				) {
+					return;
+				}
+				frontUrl = new URL( event.data.url );
+				selectTab(
+					tabs.find( ( tab ) => tab.dataset.liveTab === 'front' )
+				);
+			} );
 			reload.disabled = false;
 			reload.addEventListener( 'click', () => {
 				reload.classList.remove( 'is-spinning' );
