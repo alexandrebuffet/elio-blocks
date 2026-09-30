@@ -319,6 +319,49 @@ describe( 'weather-report view: refresh policy', () => {
 	} );
 } );
 
+describe( 'weather-report view: relative date clock', () => {
+	const visibility = vi.spyOn( document, 'hidden', 'get' );
+	const start = () => store().callbacks.startRelativeDateClock();
+
+	beforeEach( () => {
+		vi.useFakeTimers().setSystemTime( new Date( '2026-09-21T14:00:00Z' ) );
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	it( 'keeps now current with one timer, however many blocks show a relative date', () => {
+		const stops = [ start(), start() ];
+
+		expect( vi.getTimerCount() ).toBe( 1 );
+
+		vi.advanceTimersByTime( 30000 );
+
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-09-21T14:00:30Z' )
+		);
+
+		stops[ 0 ]();
+		expect( vi.getTimerCount() ).toBe( 1 );
+
+		stops[ 1 ]();
+		expect( vi.getTimerCount() ).toBe( 0 );
+	} );
+
+	it( 'catches up at once when the visitor comes back to the page', async () => {
+		visibility.mockReturnValue( false );
+		setContext( { query: {} } );
+		vi.setSystemTime( new Date( '2026-09-21T15:00:00Z' ) );
+
+		await runAction( store().actions.handleVisibilityChange() );
+
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-09-21T15:00:00Z' )
+		);
+	} );
+} );
+
 describe( 'weather-report view: forecast rows', () => {
 	const sync = () => store().callbacks.syncForecastItems();
 	const day = ( n ) => ( { timestamp: `2026-07-0${ n }T00:00:00+02:00` } );

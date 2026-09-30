@@ -95,6 +95,18 @@ describe( 'last-updated view', () => {
 		expect( state().formattedLastUpdated ).toBe( '14:32 JST' );
 	} );
 
+	it( 'words a relative date, counted from the clock of the report', () => {
+		setContext( makeContext( { format: 'human-diff' } ) );
+		state().now = Date.parse( '2026-07-01T05:37:10Z' );
+
+		expect( state().formattedLastUpdated ).toBe( '5 minutes ago' );
+
+		state().now = Date.parse( '2026-07-01T07:32:10Z' );
+
+		expect( state().formattedLastUpdated ).toBe( '2 hours ago' );
+		expect( state().lastUpdatedDatetime ).toBe( FETCHED_AT );
+	} );
+
 	it( 'prints nothing without data', () => {
 		setContext( makeContext( { query: { data: null } } ) );
 

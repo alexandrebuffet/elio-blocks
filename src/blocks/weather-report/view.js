@@ -34,6 +34,17 @@ const EXPIRY_MARGIN = 5000;
 const REFRESH_SPREAD = 30000;
 
 /**
+ * How often relative dates ("5 minutes ago") are brought up to date.
+ */
+const RELATIVE_DATE_TICK = 30000;
+
+/**
+ * The one timer of the page behind state.now, and the number of blocks
+ * showing a relative date that keep it running.
+ */
+const relativeDateClock = { blocks: 0, timer: 0 };
+
+/**
  * Checks whether a coordinate is usable. 0 is valid (equator, prime meridian).
  *
  * @param {number|string|null|undefined} value Latitude or longitude.
@@ -75,6 +86,12 @@ function isFresh( query ) {
 
 const { state, actions } = store( 'elio/weather-report', {
 	state: {
+		/**
+		 * Milliseconds since the epoch: now, which the date blocks count
+		 * relative dates from. Kept current by callbacks.startRelativeDateClock
+		 * while a block shows one.
+		 */
+		now: Date.now(),
 		/**
 		 * Returns the forecast items sliced to the count defined by the
 		 * nearest forecast-template context (forecastType / forecastCount).
@@ -192,6 +209,29 @@ const { state, actions } = store( 'elio/weather-report', {
 			return () => clearTimeout( timeoutId );
 		},
 		/**
+		 * Keeps state.now current while a date block shows a relative date
+		 * ("5 minutes ago"), so it does not go stale on an open page
+		 * (data-wp-watch on the datetime, sun-event and last-updated blocks
+		 * whose format is "human-diff"). One timer for the page, however many
+		 * blocks: the first one starts it, the last one to leave the page
+		 * (client-side navigation) stops it.
+		 *
+		 * @return {() => void} Cleanup.
+		 */
+		startRelativeDateClock() {
+			if ( relativeDateClock.blocks++ === 0 ) {
+				relativeDateClock.timer = setInterval( () => {
+					state.now = Date.now();
+				}, RELATIVE_DATE_TICK );
+			}
+
+			return () => {
+				if ( --relativeDateClock.blocks === 0 ) {
+					clearInterval( relativeDateClock.timer );
+				}
+			};
+		},
+		/**
 		 * Syncs the computed forecastItems into the nearest forecast-template
 		 * context so that data-wp-each can use a plain context array (SSR-safe).
 		 * Called via data-wp-watch on the forecast-template wrapper.
@@ -224,10 +264,17 @@ const { state, actions } = store( 'elio/weather-report', {
 		 * Handles data-wp-on-document--visibilitychange.
 		 * Refreshes weather data when the user returns to the page (timers of
 		 * hidden tabs may be frozen), unless the server would send the same
-		 * weather forecast again.
+		 * weather forecast again, and brings relative dates up to date.
 		 */
 		*handleVisibilityChange() {
-			if ( document.hidden || isFresh( getContext().query ) ) {
+			if ( document.hidden ) {
+				return;
+			}
+
+			// Timers of hidden tabs are slowed down: relative dates catch up at once.
+			state.now = Date.now();
+
+			if ( isFresh( getContext().query ) ) {
 				return;
 			}
 

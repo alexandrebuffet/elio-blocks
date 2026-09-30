@@ -279,6 +279,17 @@ class DerivedStateTest extends TestCase
         $this->assertSame('2026-07-01T05:32:10+00:00', $this->evaluate('lastUpdatedDatetime', $fetched));
     }
 
+    public function test_a_relative_date_is_printed_in_the_site_format_for_the_view_script_to_word(): void
+    {
+        $relative = ['format' => 'human-diff'];
+        $fetched  = ['query' => ['data' => ['meta' => ['fetched_at' => '2026-07-01T05:32:10+00:00']]]];
+
+        $this->assertSame('14:15', $this->evaluate('formattedDateTime', $relative + ['displayType' => 'time']));
+        $this->assertSame('2026-07-01', $this->evaluate('formattedDateTime', $relative));
+        $this->assertSame('19:01', $this->evaluate('formattedSunEvent', $relative + ['displayType' => 'sunset']));
+        $this->assertSame('14:32', $this->evaluate('formattedLastUpdated', $relative + $fetched));
+    }
+
     public function test_falls_back_to_the_site_timezone_when_the_provider_gives_none(): void
     {
         $context = ['displayType' => 'time', 'query' => ['data' => ['meta' => ['timezone' => '']]]];
