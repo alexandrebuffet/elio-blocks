@@ -322,22 +322,7 @@ function initNav() {
 	targets.forEach( ( target ) => observer.observe( target ) );
 }
 
-/* Reveal on scroll, and the figures counting up */
-
-function countUp( element ) {
-	const target = Number( element.textContent );
-	const duration = 1200;
-	const started = performance.now();
-	const tick = ( now ) => {
-		const progress = Math.min( 1, ( now - started ) / duration );
-		const eased = 1 - Math.pow( 1 - progress, 3 );
-		element.textContent = String( Math.round( target * eased ) );
-		if ( progress < 1 ) {
-			window.requestAnimationFrame( tick );
-		}
-	};
-	window.requestAnimationFrame( tick );
-}
+/* Reveal on scroll */
 
 function initReveal() {
 	const elements = document.querySelectorAll( '.reveal' );
@@ -355,9 +340,6 @@ function initReveal() {
 					return;
 				}
 				entry.target.classList.add( 'is-visible' );
-				entry.target
-					.querySelectorAll( '[data-count]' )
-					.forEach( countUp );
 				observer.unobserve( entry.target );
 			} );
 		},

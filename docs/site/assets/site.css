@@ -27,9 +27,8 @@
  * so desaturated it reads as black; the sky of the photo (--sky, --sky-2)
  * only as touches of light in the front end band. Contrast (WCAG 2.2 AA):
  * --ink-2 on --paper 6.9:1, --accent on --paper 5.1:1, --ink on --ember
- * 4.9:1, on --clay 5.7:1,
- * --on-night-2 on --night 6.9:1; the light shimmer stays above 3.1:1 (large
- * text).
+ * 4.9:1, --on-night-2 on --night 6.9:1; the light shimmer stays above 3.1:1
+ * (large text).
  */
 :root {
 	--paper: #f9f7f3;
@@ -43,8 +42,6 @@
 	--amber: #f0a044;
 	--rust: #8f3515;
 	--gold: #f7d49a;
-	--sand: #ebdfd0;
-	--clay: #c9825f;
 	--sky: #b7cdd6;
 	--sky-2: #93a8c6;
 	--night: #15171c;
@@ -114,6 +111,7 @@
 		--browser-hover: rgb(255 255 255 / 6%);
 		--browser-line: rgb(255 255 255 / 8%);
 		--shimmer: var(--amber), var(--gold), #e8703a, var(--gold), var(--amber);
+		--snackbar-edge: rgb(238 231 219 / 16%);
 	}
 }
 
@@ -775,7 +773,7 @@ a.brand:hover .brand__logo {
 	inset: 0;
 	display: grid;
 	place-items: center;
-	background: var(--browser-field);
+	background: var(--paper-2);
 	visibility: hidden;
 	opacity: 0;
 	transition: opacity 0.6s ease, visibility 0s 0.6s;
@@ -820,7 +818,7 @@ a.brand:hover .brand__logo {
 	border-radius: 4px;
 	background: var(--night);
 	color: var(--on-night);
-	box-shadow: 0 16px 40px -12px rgb(0 0 0 / 50%);
+	box-shadow: 0 0 0 1px var(--snackbar-edge, transparent), 0 16px 40px -12px rgb(0 0 0 / 50%);
 	font-size: var(--text-s);
 	animation: snackbar-in 0.5s var(--ease) both;
 }
@@ -948,8 +946,8 @@ a.brand:hover .brand__logo {
 }
 
 /*
- * Features: an editorial grid of cards, each in a light rule, and the count
- * of blocks in a block of warm, muted light, from sand to clay.
+ * Features: an editorial grid of cards, each in a light rule, the last one
+ * over two columns.
  */
 .features {
 	display: grid;
@@ -964,37 +962,6 @@ a.brand:hover .brand__logo {
 	list-style: none;
 }
 
-.features__count {
-	display: flex;
-	flex-direction: column;
-	gap: var(--space-2xs);
-	margin: 0;
-	padding: var(--space-xl);
-	background: linear-gradient(150deg, var(--sand), #dcae8f 50%, var(--clay));
-	color: #17191f;
-}
-
-.features__number {
-	font-family: var(--serif);
-	font-size: var(--text-4xl);
-	line-height: 0.8;
-	letter-spacing: -0.03em;
-	font-variant-numeric: tabular-nums;
-}
-
-.features__unit {
-	font-family: var(--serif);
-	font-style: italic;
-	font-size: var(--text-2xl);
-	line-height: 1;
-}
-
-.features__note {
-	margin-top: auto;
-	padding-top: var(--space-l);
-	font-size: var(--text-s);
-}
-
 .feature {
 	display: grid;
 	align-content: start;
@@ -1004,32 +971,30 @@ a.brand:hover .brand__logo {
 	border: 1px solid var(--line);
 }
 
-/* After the count of blocks: the delay of their column. */
-.feature:nth-child(4n + 1) {
+.feature:last-child {
+	grid-column: span 2;
+}
+
+/* The delay of their column. */
+.feature:nth-child(4n + 2) {
 	--reveal-delay: 0.1s;
 }
 
-.feature:nth-child(4n + 2) {
+.feature:nth-child(4n + 3) {
 	--reveal-delay: 0.2s;
 }
 
-.feature:nth-child(4n + 3) {
+.feature:nth-child(4n + 4) {
 	--reveal-delay: 0.3s;
 }
 
-/* The icon alone, without the frame of a toolbar button. */
-.feature .tool-icon {
-	width: auto;
-	height: auto;
+/* The icon of each card large and drawn with a fine line. */
+.feature__icon {
+	width: 48px;
+	height: 48px;
 	margin-bottom: var(--space-xs);
-	border: 0;
-	background: none;
 	color: var(--accent);
-}
-
-.feature .tool-icon svg {
-	width: 32px;
-	height: 32px;
+	stroke-width: 1;
 }
 
 .feature__title {
@@ -1041,23 +1006,6 @@ a.brand:hover .brand__logo {
 	text-wrap: balance;
 }
 
-/* The icon in a button of the block toolbar. */
-.tool-icon {
-	display: grid;
-	flex: none;
-	place-items: center;
-	width: 40px;
-	height: 40px;
-	border: 1px solid var(--tool-line);
-	border-radius: 4px;
-	background: var(--tool);
-	color: var(--ink);
-}
-
-.tool-icon svg {
-	width: 24px;
-	height: 24px;
-}
 
 .feature p {
 	margin: 0;
@@ -1076,6 +1024,10 @@ a.brand:hover .brand__logo {
 
 	.features {
 		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.feature:last-child {
+		grid-column: auto;
 	}
 }
 
