@@ -759,24 +759,51 @@ a.brand:hover .brand__logo {
 	visibility: hidden;
 }
 
-.live.is-starting .browser__screen::after {
-	content: "";
+/*
+ * While WordPress starts: the sun of the Elio icons rising over a warm
+ * horizon, as high as the demo is far along (--progress, from the script).
+ */
+.loader {
 	position: absolute;
 	inset: 0;
-	background: linear-gradient(100deg, rgb(255 255 255 / 0%) 30%, rgb(255 255 255 / 55%) 50%, rgb(255 255 255 / 0%) 70%);
-	background-size: 250% 100%;
-	animation: sheen 1.6s ease-in-out infinite;
+	overflow: hidden;
+	background: linear-gradient(var(--gold), var(--amber) 50%, var(--ember));
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 0.6s ease, visibility 0s 0.6s;
 }
 
-@keyframes sheen {
+.live.is-starting .loader {
+	visibility: visible;
+	opacity: 1;
+	transition: none;
+}
 
-	from {
-		background-position: 120% 0;
-	}
+.loader::after {
+	content: "";
+	position: absolute;
+	inset: 72% 0 0;
+	background: linear-gradient(var(--ember), var(--rust));
+}
 
-	to {
-		background-position: -120% 0;
-	}
+.loader__sky {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding-bottom: 10%;
+	transform: translateY(calc((1 - var(--progress, 0)) * 30%));
+	transition: transform 1.6s var(--ease);
+}
+
+.loader__sun {
+	width: clamp(80px, 16%, 160px);
+	height: auto;
+	aspect-ratio: 1;
+	color: #fff8ec;
+	stroke-width: 1.25;
+	filter: drop-shadow(0 0 16px rgb(255 241 214 / 90%));
+	animation: spin 12s linear infinite;
 }
 
 /* What the demo is doing, in a notice as the editor shows them. */
@@ -922,14 +949,14 @@ a.brand:hover .brand__logo {
 }
 
 /*
- * Features: an editorial grid under thin rules, each icon a button of the
- * block toolbar set on its rule, and the count of blocks in a flat block of
- * ember.
+ * Features: an editorial grid, each icon a button of the block toolbar, and
+ * the count of blocks in a block of light from gold to russet, --ember its
+ * darkest color as in the front end band.
  */
 .features {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: var(--space-2xl) var(--space-xl);
+	gap: var(--space-3xl) var(--space-2xl);
 }
 
 .features__list {
@@ -944,8 +971,8 @@ a.brand:hover .brand__logo {
 	flex-direction: column;
 	gap: var(--space-2xs);
 	margin: 0;
-	padding: var(--space-l);
-	background: var(--ember);
+	padding: var(--space-xl);
+	background: linear-gradient(150deg, var(--gold), var(--amber) 45%, var(--ember));
 	color: #17191f;
 }
 
@@ -974,9 +1001,7 @@ a.brand:hover .brand__logo {
 	display: grid;
 	align-content: start;
 	justify-items: start;
-	gap: var(--space-s);
-	padding-top: var(--space-l);
-	border-top: 1px solid var(--line-strong);
+	gap: var(--space-m);
 }
 
 /* After the count of blocks: the delay of their column. */
@@ -1052,54 +1077,57 @@ a.brand:hover .brand__logo {
 }
 
 /*
- * Front end: a night band in both color schemes, the photo seen through it as
- * through a rainy window.
+ * Front end: a band of warm light in both color schemes, from russet to gold,
+ * drifting slowly. --ember is its darkest color: --ink stays at 4.9:1 at least
+ * on all of it.
  */
 .section--inverse {
-	--band: var(--night);
-	--band-ink: var(--on-night);
-	--band-ink-2: rgb(238 231 219 / 95%);
-	--band-accent: var(--amber);
-	--band-line: rgb(238 231 219 / 22%);
-	--band-veil: rgb(21 23 28 / 55%);
+	--band-ink: #17191f;
+	--band-line: rgb(23 25 31 / 30%);
 	isolation: isolate;
 	overflow: hidden;
-	background:
-		linear-gradient(var(--band-veil), var(--band-veil)),
-		url(images/clouds-1000.jpg) 50% 50% / cover var(--band);
+	background: var(--ember);
 	color: var(--band-ink);
 }
 
+.section--inverse::before,
+.section--inverse::after {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	inset: -50%;
+	animation: drift 26s ease-in-out infinite alternate;
+}
+
+.section--inverse::before {
+	background:
+		radial-gradient(closest-side at 30% 40%, var(--gold), rgb(247 212 154 / 0%)),
+		radial-gradient(closest-side at 72% 62%, var(--amber), rgb(240 160 68 / 0%));
+}
+
+.section--inverse::after {
+	background:
+		radial-gradient(closest-side at 62% 34%, #e8703a, rgb(232 112 58 / 0%)),
+		radial-gradient(closest-side at 38% 72%, rgb(247 212 154 / 70%), rgb(247 212 154 / 0%));
+	animation-duration: 34s;
+	animation-direction: alternate-reverse;
+}
+
+@keyframes drift {
+
+	to {
+		transform: rotate(50deg) scale(1.2) translate(6%, -4%);
+	}
+}
+
 .section--inverse .eyebrow,
-.section--inverse p {
-	color: var(--band-ink-2);
+.section--inverse p,
+.section--inverse .display em {
+	color: var(--band-ink);
 }
 
 .section--inverse .eyebrow::before {
-	background: var(--band-accent);
-}
-
-.section--inverse .display em {
-	color: var(--band-accent);
-}
-
-/*
- * Rain on a window, over the photo of the plugin: the script draws it, the
- * band color over the photo is what shows without it.
- */
-.rain {
-	position: absolute;
-	z-index: -1;
-	inset: 0;
-	width: 100%;
-	height: 100%;
-}
-
-@media (forced-colors: active) {
-
-	.rain {
-		display: none;
-	}
+	background: var(--band-ink);
 }
 
 .steps {
