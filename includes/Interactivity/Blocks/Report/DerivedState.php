@@ -26,6 +26,11 @@ final class DerivedState
 
     private const NBSP = "\u{00A0}";
 
+    /**
+     * Format of the date format picker for a relative date, as the Date block of WordPress reads it.
+     */
+    private const RELATIVE_DATE_FORMAT = 'human-diff';
+
     private const CARDINALS = array( 'N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW' );
 
     /**
@@ -353,6 +358,7 @@ final class DerivedState
 
     /**
      * Formats a date in the format of the block, in the timezone of the location.
+     * A relative one ("human-diff") in the site format.
      *
      * @param string $kind 'date' or 'time': picks the site format when the block sets none.
      */
@@ -364,7 +370,9 @@ final class DerivedState
 
         $format = $this->context()['format'] ?? '';
 
-        if (! is_string($format) || '' === $format) {
+        // A relative date ("5 minutes ago") would be stale in a cached page: the
+        // server prints the date in the site format, the view script words it.
+        if (! is_string($format) || '' === $format || self::RELATIVE_DATE_FORMAT === $format) {
             $format = (string) get_option('time' === $kind ? 'time_format' : 'date_format');
         }
 

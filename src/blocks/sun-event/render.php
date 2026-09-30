@@ -36,6 +36,11 @@ $extra_wrapper_attributes = array(
     'class'           => 'elio-tabular-nums',
     'data-wp-context' => wp_json_encode($context),
 );
+
+// A relative date ("5 minutes ago") is worded in the browser, kept current by the clock of the report.
+if ('human-diff' === $format) {
+    $extra_wrapper_attributes['data-wp-watch'] = 'callbacks.startRelativeDateClock';
+}
 ?>
 <p <?php echo wp_kses_data(get_block_wrapper_attributes($extra_wrapper_attributes)); ?>>
     <?php if ($show_prefix && $prefix !== '') : ?>

@@ -407,6 +407,27 @@ describe( 'leaf blocks in the editor', () => {
 			).toBe( 'Maintenant' );
 		} );
 
+		it( 'word a relative date like the front, the "human-diff" format of the picker', () => {
+			vi.useFakeTimers().setSystemTime(
+				new Date( '2026-07-01T05:37:10Z' )
+			);
+			const relative = { format: 'human-diff' };
+
+			expect( shown( LastUpdatedEdit, { attributes: relative } ) ).toBe(
+				'5 minutes ago'
+			);
+			expect(
+				shown( DatetimeEdit, {
+					attributes: { ...relative, displayType: 'time' },
+				} )
+			).toBe( '22 minutes ago' );
+			expect(
+				shown( SunEventEdit, {
+					attributes: { ...relative, displayType: 'sunset' },
+				} )
+			).toBe( 'in 4 hours' );
+		} );
+
 		it( 'give an hourly row the sun event of the day', () => {
 			expect(
 				shown( SunEventEdit, {

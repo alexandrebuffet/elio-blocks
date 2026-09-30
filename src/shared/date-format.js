@@ -78,6 +78,89 @@ const BOUNDARY = `(?:(?<=${ WORD })(?!${ WORD })|(?<!${ WORD })(?=${ WORD }))`;
 const formatters = new Map();
 
 /**
+ * Units of a relative date ("5 minutes ago"), each with its length in seconds
+ * and the count from which the next one is used: the thresholds of moment's
+ * fromNow(), which humanTimeDiff() of `@wordpress/date` and the "human-diff"
+ * option of the date format picker follow. Under 45 seconds, the date is "now".
+ */
+const RELATIVE_UNITS = [
+	[ 'minute', 60, 45 ],
+	[ 'hour', 3600, 22 ],
+	[ 'day', 86400, 26 ],
+	[ 'month', 2629800, 11 ],
+	[ 'year', 31557600, Infinity ],
+];
+
+/**
+ * Intl relative time formatters by WordPress locale.
+ *
+ * @type {Map<string, {auto: Intl.RelativeTimeFormat, always: Intl.RelativeTimeFormat}>}
+ */
+const relativeFormatters = new Map();
+
+/**
+ * Returns the relative time formatters of a WordPress locale, built once: the
+ * browser words relative dates in the language of the site, which the view
+ * scripts could not translate ("fr_FR", "de_DE_formal": its language and
+ * region, else its language, else English).
+ *
+ * @param {string} [locale] WordPress locale.
+ * @return {{auto: Intl.RelativeTimeFormat, always: Intl.RelativeTimeFormat}} Formatters: "now" (auto), counts (always).
+ */
+function getRelativeFormatters( locale = '' ) {
+	if ( ! relativeFormatters.has( locale ) ) {
+		const parts = String( locale ).split( '_' );
+		const tags = [ parts.slice( 0, 2 ).join( '-' ), parts[ 0 ], 'en' ];
+		let relative = null;
+
+		for ( const tag of tags ) {
+			try {
+				relative = {
+					auto: new Intl.RelativeTimeFormat( tag, {
+						numeric: 'auto',
+					} ),
+					always: new Intl.RelativeTimeFormat( tag ),
+				};
+				break;
+			} catch {
+				// RangeError: not a language tag.
+			}
+		}
+
+		relativeFormatters.set( locale, relative );
+	}
+
+	return relativeFormatters.get( locale );
+}
+
+/**
+ * Words the time between a date and now: "5 minutes ago", "in 3 hours", "now".
+ *
+ * @param {number} ms     Milliseconds since the epoch.
+ * @param {number} now    Milliseconds since the epoch the date is counted from.
+ * @param {string} locale WordPress locale.
+ * @return {string} Relative date.
+ */
+function formatRelativeDate( ms, now, locale ) {
+	const { auto, always } = getRelativeFormatters( locale );
+	const seconds = ( ms - now ) / 1000;
+
+	if ( Math.abs( seconds ) < 45 ) {
+		return auto.format( 0, 'second' );
+	}
+
+	for ( const [ unit, length, next ] of RELATIVE_UNITS ) {
+		const count = Math.max( 1, Math.round( Math.abs( seconds ) / length ) );
+
+		if ( count < next ) {
+			return always.format( Math.sign( seconds ) * count, unit );
+		}
+	}
+
+	return '';
+}
+
+/**
  * Returns the Intl formatter of a timezone, built once.
  *
  * @param {string} timeZone IANA timezone name.
@@ -441,6 +524,7 @@ function declineDate( date, dateFormat, names ) {
  * @typedef {Object} DateApi
  * @property {(format: string, date?: Date|string|number, timezone?: string) => string} date        Formats a date, untranslated.
  * @property {(format: string, date?: Date|string|number, timezone?: string) => string} dateI18n    Formats a date, translated.
+ * @property {(date: Date|string|number, now?: Date|string|number) => string}           relative    Words the time between a date and now ("5 minutes ago"), in the language of the site.
  * @property {() => DateSettings}                                                       getSettings Site date settings, with the default formats.
  */
 
@@ -480,6 +564,14 @@ export function createDateApi( settings = {} ) {
 	return {
 		date: formatWith( ENGLISH ),
 		dateI18n: formatWith( l10n ),
+		relative: ( value, now = Date.now() ) => {
+			const ms = toMilliseconds( value );
+			const from = toMilliseconds( now );
+
+			return Number.isNaN( ms ) || Number.isNaN( from )
+				? ''
+				: formatRelativeDate( ms, from, settings.l10n?.locale );
+		},
 		getSettings: () => ( {
 			...settings,
 			formats: { date: 'F j, Y', time: 'g:i a', ...settings.formats },

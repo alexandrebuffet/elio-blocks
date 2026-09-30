@@ -168,4 +168,28 @@ describe( 'datetime view', () => {
 		setContext( makeContext( { item: { timestamp: 'soon' } } ) );
 		expect( state().formattedDateTime ).toBe( '' );
 	} );
+
+	describe( 'relative dates', () => {
+		afterEach( () => {
+			delete state().now;
+		} );
+
+		it( 'words the time of a row relative to the clock of the report', () => {
+			// 11:15 in Tokyo: the row is three hours ahead.
+			state().now = Date.parse( '2026-07-01T11:15:00+09:00' );
+			setContext( makeContext( { format: 'human-diff' } ) );
+
+			expect( state().formattedDateTime ).toBe( 'in 3 hours' );
+			expect( state().datetime ).toBe( '2026-07-01T14:15:00+09:00' );
+		} );
+
+		it( 'keeps the label of the current hour, decided on that clock too', () => {
+			state().now = Date.parse( '2026-07-01T14:40:00+09:00' );
+			setContext(
+				makeContext( { format: 'human-diff', currentAsLabel: true } )
+			);
+
+			expect( state().formattedDateTime ).toBe( 'Now' );
+		} );
+	} );
 } );

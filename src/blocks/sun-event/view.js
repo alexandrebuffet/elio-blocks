@@ -33,9 +33,12 @@ const dateApi = ( weatherForecast ) =>
 
 /*
  * Getters mirrored server-side by DerivedState (PHP), which prints the same
- * values in the server-rendered HTML. Logic lives in shared/weather-dates.
+ * values in the server-rendered HTML, but for a relative date ("5 minutes
+ * ago"): the server prints the date in the site format, stale anyway in a
+ * cached page, and the getter words it once the script runs. Logic lives in
+ * shared/weather-dates.
  */
-store( 'elio/weather-report', {
+const { state } = store( 'elio/weather-report', {
 	state: {
 		/**
 		 * Returns the ISO date-time for the datetime attribute of the <time> element.
@@ -58,6 +61,8 @@ store( 'elio/weather-report', {
 					displayType: 'time',
 					format,
 					timezone: getWeatherForecastTimezone( query?.data ),
+					// Relative dates count from it, kept current by the report.
+					now: state.now,
 				}
 			);
 		},
