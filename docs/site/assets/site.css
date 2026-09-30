@@ -27,8 +27,8 @@
  * so desaturated it reads as black; the sky of the photo (--sky, --sky-2)
  * only as touches of light in the front end band. Contrast (WCAG 2.2 AA):
  * --ink-2 on --paper 6.9:1, --accent on --paper 5.1:1, --ink on --ember
- * 4.9:1, --on-night-2 on --night 6.9:1; the light shimmer stays above 3.1:1
- * (large text).
+ * 4.9:1, on --clay 5.7:1, --on-night-2 on --night 6.9:1; the light shimmer
+ * stays above 3.1:1 (large text).
  */
 :root {
 	--paper: #f9f7f3;
@@ -42,6 +42,8 @@
 	--amber: #f0a044;
 	--rust: #8f3515;
 	--gold: #f7d49a;
+	--sand: #ebdfd0;
+	--clay: #c9825f;
 	--sky: #b7cdd6;
 	--sky-2: #93a8c6;
 	--night: #15171c;
@@ -946,8 +948,8 @@ a.brand:hover .brand__logo {
 }
 
 /*
- * Features: an editorial grid of cards, each in a light rule, the last one
- * over two columns.
+ * Features: an editorial grid of cards, each in a light rule, and the count
+ * of blocks in a block of warm, muted light, from sand to clay.
  */
 .features {
 	display: grid;
@@ -962,6 +964,37 @@ a.brand:hover .brand__logo {
 	list-style: none;
 }
 
+.features__count {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2xs);
+	margin: 0;
+	padding: var(--space-xl);
+	background: linear-gradient(150deg, var(--sand), #dcae8f 50%, var(--clay));
+	color: #17191f;
+}
+
+.features__number {
+	font-family: var(--serif);
+	font-size: var(--text-4xl);
+	line-height: 0.8;
+	letter-spacing: -0.03em;
+	font-variant-numeric: tabular-nums;
+}
+
+.features__unit {
+	font-family: var(--serif);
+	font-style: italic;
+	font-size: var(--text-2xl);
+	line-height: 1;
+}
+
+.features__note {
+	margin-top: auto;
+	padding-top: var(--space-l);
+	font-size: var(--text-s);
+}
+
 .feature {
 	display: grid;
 	align-content: start;
@@ -971,20 +1004,16 @@ a.brand:hover .brand__logo {
 	border: 1px solid var(--line);
 }
 
-.feature:last-child {
-	grid-column: span 2;
-}
-
-/* The delay of their column. */
-.feature:nth-child(4n + 2) {
+/* After the count of blocks: the delay of their column. */
+.feature:nth-child(4n + 1) {
 	--reveal-delay: 0.1s;
 }
 
-.feature:nth-child(4n + 3) {
+.feature:nth-child(4n + 2) {
 	--reveal-delay: 0.2s;
 }
 
-.feature:nth-child(4n + 4) {
+.feature:nth-child(4n + 3) {
 	--reveal-delay: 0.3s;
 }
 
@@ -1024,10 +1053,6 @@ a.brand:hover .brand__logo {
 
 	.features {
 		grid-template-columns: minmax(0, 1fr);
-	}
-
-	.feature:last-child {
-		grid-column: auto;
 	}
 }
 
