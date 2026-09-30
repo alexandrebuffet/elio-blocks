@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
 # Applies the protections of the GitHub repository: the rulesets of
-# .github/rulesets/, the wordpress-org deployment environment, the Actions
-# permissions and the security features. Run it once the repository is
+# .github/rulesets/, the wordpress-org deployment environment, GitHub Pages
+# and its github-pages environment, the Actions permissions and the security
+# features. Run it once the repository is
 # public (a private repository of a free account has none of them), by an
 # admin, with the GitHub CLI signed in. Running it again updates in place.
 #
@@ -79,6 +80,24 @@ for policy in "branch main" "tag *.*.*"; do
 			-f type="${policy%% *}" -f name="${policy#* }"
 	fi
 done
+
+echo "GitHub Pages"
+# Built and deployed by the Deploy site workflow, from main only.
+if gh api "repos/$repo/pages" --silent 2>/dev/null; then
+	gh api -X PUT "repos/$repo/pages" --silent -f build_type=workflow
+else
+	gh api -X POST "repos/$repo/pages" --silent -f build_type=workflow
+fi
+gh api -X PUT "repos/$repo/environments/github-pages" --silent --input - <<'JSON'
+{
+	"deployment_branch_policy": { "protected_branches": false, "custom_branch_policies": true }
+}
+JSON
+existing_policies="$(gh api "repos/$repo/environments/github-pages/deployment-branch-policies" --jq '.branch_policies[] | "\(.type) \(.name)"')"
+if ! grep -qxF "branch main" <<<"$existing_policies"; then
+	gh api -X POST "repos/$repo/environments/github-pages/deployment-branch-policies" --silent \
+		-f type=branch -f name=main
+fi
 
 echo "Rulesets"
 for file in "$rulesets_dir"/*.json; do
