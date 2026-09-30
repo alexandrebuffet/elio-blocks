@@ -12,7 +12,8 @@
  *   Preview, which the "Try it live" links load with the plugin zip of the
  *   site in place of the WordPress.org slug.
  * - icons.svg and icons.json: the Elio collection (src/icons/) as one sprite
- *   of symbols stroked in currentColor, and its labels and condition mappings.
+ *   of symbols stroked in currentColor (the page sets their width), and its
+ *   labels and condition mappings.
  *
  * The deploy workflow adds elio-blocks.zip, the package of the plugin, next to
  * index.html. Preview locally with `npm run build:site`, then serve _site/.
@@ -60,13 +61,15 @@ const symbols = manifest.icons.map( ( { slug } ) => {
 		join( root, 'src/icons/svg', `${ slug }.svg` ),
 		'utf8'
 	);
-	// The Figma frame (clipPath) goes, the strokes take the color of the text.
+	// The Figma frame (clipPath) goes, the strokes take the color of the text
+	// and the width the page gives them (the icon block has a stroke width).
 	const body = svg
 		.replace( /^[\s\S]*?<svg[^>]*>/, '' )
 		.replace( /<\/svg>\s*$/, '' )
 		.replace( /<defs>[\s\S]*?<\/defs>/g, '' )
 		.replace( /<g clip-path="[^"]*">([\s\S]*?)<\/g>/g, '$1' )
 		.replace( /(stroke|fill)="black"/g, '$1="currentColor"' )
+		.replace( / stroke-width="[^"]*"/g, '' )
 		.trim();
 	return `<symbol id="${ slug }" viewBox="0 0 24 24" fill="none">${ body }</symbol>`;
 } );

@@ -67,9 +67,6 @@ async function initIconGrid() {
 	if ( ! grid || ! data ) {
 		return;
 	}
-	document.querySelectorAll( '[data-icon-count]' ).forEach( ( element ) => {
-		element.textContent = String( data.icons.length );
-	} );
 	const items = data.icons.map( ( { slug, label } ) => {
 		const item = document.createElement( 'li' );
 		item.title = label;
@@ -142,6 +139,7 @@ async function showWeather( button ) {
 	const report = document.querySelector( '.report' );
 	const field = ( name ) =>
 		document.querySelector( `[data-weather="${ name }"]` );
+	const status = document.querySelector( '[data-weather-status]' );
 	const { city, lat, lon } = button.dataset;
 
 	document.querySelectorAll( '.city' ).forEach( ( other ) => {
@@ -192,6 +190,9 @@ async function showWeather( button ) {
 		);
 		field( 'description' ).textContent = describe( condition );
 		report.dataset.sky = current.is_day ? 'day' : 'night';
+		status.textContent = `${ city }: ${ temperature(
+			current.temperature_2m
+		) }, ${ describe( condition ).toLowerCase() }.`;
 
 		const rows = [
 			{
@@ -213,7 +214,6 @@ async function showWeather( button ) {
 				const label = document.createElement( 'span' );
 				label.textContent = row.label;
 				const value = document.createElement( 'span' );
-				value.className = 'tabular';
 				value.textContent = temperature( row.value );
 				item.append(
 					label,
@@ -249,55 +249,11 @@ function initReport() {
 	}
 }
 
-/* Screenshot tabs */
+/* Screenshots, then the live demo, in one set of tabs */
 
-function initTabs() {
-	const tabs = [ ...document.querySelectorAll( '[role="tab"]' ) ];
-	const panel = document.getElementById( 'shot' );
-	const image = panel?.querySelector( 'img' );
-	if ( ! image ) {
-		return;
-	}
-	const caption = document.querySelector( '[data-shot-caption]' );
-
-	const select = ( tab ) => {
-		const number = tab.dataset.shot;
-		tabs.forEach( ( other ) => {
-			const selected = other === tab;
-			other.setAttribute( 'aria-selected', String( selected ) );
-			other.tabIndex = selected ? 0 : -1;
-		} );
-		panel.setAttribute( 'aria-labelledby', tab.id );
-		image.classList.add( 'is-changing' );
-		const next = new window.Image();
-		next.src = `assets/wporg/screenshot-${ number }.png`;
-		next.decode()
-			.catch( () => {} )
-			.then( () => {
-				image.src = next.src;
-				image.alt = SCREENSHOTS[ number ];
-				image.width = next.naturalWidth || image.width;
-				image.height = next.naturalHeight || image.height;
-				caption.textContent = SCREENSHOTS[ number ];
-				image.classList.remove( 'is-changing' );
-			} );
-	};
-
-	tabs.forEach( ( tab, index ) => {
-		tab.addEventListener( 'click', () => select( tab ) );
-		tab.addEventListener( 'keydown', ( event ) => {
-			const step = { ArrowRight: 1, ArrowLeft: -1 }[ event.key ];
-			if ( ! step ) {
-				return;
-			}
-			const next = tabs[ ( index + step + tabs.length ) % tabs.length ];
-			next.focus();
-			select( next );
-		} );
-	} );
+function isPhone() {
+	return window.matchMedia( '(max-width: 860px)' ).matches;
 }
-
-/* Playground demo */
 
 async function playgroundUrl() {
 	const blueprint = await fetch( 'blueprint.json' ).then( ( response ) =>
@@ -321,9 +277,16 @@ async function playgroundUrl() {
 	) }`;
 }
 
-function initPlayground() {
-	const frame = document.querySelector( '[data-playground]' );
-	const start = document.querySelector( '[data-playground-start]' );
+function initDemo() {
+	const tabs = [ ...document.querySelectorAll( '[role="tab"]' ) ];
+	const panel = document.getElementById( 'shot' );
+	const image = panel?.querySelector( '.window__image' );
+	const live = panel?.querySelector( '[data-playground]' );
+	if ( ! image || ! live ) {
+		return;
+	}
+	const caption = document.querySelector( '[data-shot-caption]' );
+	const liveTab = tabs.find( ( tab ) => tab.dataset.shot === 'live' );
 	const urlPromise = playgroundUrl().catch( () => null );
 
 	urlPromise.then( ( url ) => {
@@ -334,13 +297,13 @@ function initPlayground() {
 		}
 	} );
 
-	const launch = async () => {
+	const start = async () => {
 		const url = await urlPromise;
-		if ( ! url || frame.querySelector( 'iframe' ) ) {
+		if ( ! url || live.querySelector( 'iframe' ) ) {
 			return;
 		}
 		// A phone gets the whole screen.
-		if ( window.matchMedia( '(max-width: 860px)' ).matches ) {
+		if ( isPhone() ) {
 			window.open( url, '_blank', 'noopener' );
 			return;
 		}
@@ -348,18 +311,144 @@ function initPlayground() {
 		iframe.src = url;
 		iframe.title = 'Elio Blocks in WordPress Playground';
 		iframe.allow = 'clipboard-read; clipboard-write';
-		frame.replaceChildren( iframe );
+		live.replaceChildren( iframe );
 	};
 
-	start?.addEventListener( 'click', launch );
+	const select = ( tab ) => {
+		const number = tab.dataset.shot;
+		tabs.forEach( ( other ) => {
+			const selected = other === tab;
+			other.setAttribute( 'aria-selected', String( selected ) );
+			other.tabIndex = selected ? 0 : -1;
+		} );
+		panel.setAttribute( 'aria-labelledby', tab.id );
+
+		if ( number === 'live' ) {
+			live.hidden = false;
+			caption.textContent =
+				'A whole WordPress site, running in your browser.';
+			return;
+		}
+		live.hidden = true;
+		image.classList.add( 'is-changing' );
+		const next = new window.Image();
+		next.src = `assets/wporg/screenshot-${ number }.png`;
+		next.decode()
+			.catch( () => {} )
+			.then( () => {
+				image.src = next.src;
+				image.alt = SCREENSHOTS[ number ];
+				image.width = next.naturalWidth || image.width;
+				image.height = next.naturalHeight || image.height;
+				caption.textContent = SCREENSHOTS[ number ];
+				image.classList.remove( 'is-changing' );
+			} );
+	};
+
+	tabs.forEach( ( tab, index ) => {
+		tab.addEventListener( 'click', () => select( tab ) );
+		tab.addEventListener( 'keydown', ( event ) => {
+			const targets = {
+				ArrowRight: tabs[ ( index + 1 ) % tabs.length ],
+				ArrowLeft: tabs[ ( index - 1 + tabs.length ) % tabs.length ],
+				Home: tabs[ 0 ],
+				End: tabs[ tabs.length - 1 ],
+			};
+			const next = targets[ event.key ];
+			if ( ! next ) {
+				return;
+			}
+			event.preventDefault();
+			next.focus();
+			select( next );
+		} );
+	} );
+
+	live.querySelector( '[data-playground-start]' )?.addEventListener(
+		'click',
+		start
+	);
+
+	// "Try it live" links: the demo tab, started.
 	document
 		.querySelectorAll(
 			'a[data-playground-link]:not([data-playground-new-tab])'
 		)
-		.forEach( ( link ) => link.addEventListener( 'click', launch ) );
+		.forEach( ( link ) =>
+			link.addEventListener( 'click', () => {
+				select( liveTab );
+				start();
+			} )
+		);
 }
 
+/* Icon settings, as in the block inspector */
+
+function initIconControls() {
+	const grid = document.querySelector( '[data-icon-grid]' );
+	if ( ! grid ) {
+		return;
+	}
+	document
+		.querySelectorAll( '[data-icon-stroke]' )
+		.forEach( ( input ) =>
+			input.addEventListener( 'change', () =>
+				grid.style.setProperty( '--icon-stroke', input.value )
+			)
+		);
+	document.querySelectorAll( '[data-icon-color]' ).forEach( ( input ) =>
+		input.addEventListener( 'change', () => {
+			grid.dataset.color = input.value;
+		} )
+	);
+}
+
+/* Reveal on scroll, and the figures counting up */
+
+function countUp( element ) {
+	const target = Number( element.textContent );
+	const duration = 1200;
+	const started = performance.now();
+	const tick = ( now ) => {
+		const progress = Math.min( 1, ( now - started ) / duration );
+		const eased = 1 - Math.pow( 1 - progress, 3 );
+		element.textContent = String( Math.round( target * eased ) );
+		if ( progress < 1 ) {
+			window.requestAnimationFrame( tick );
+		}
+	};
+	window.requestAnimationFrame( tick );
+}
+
+function initReveal() {
+	const elements = document.querySelectorAll( '.reveal' );
+	const still = window.matchMedia( '(prefers-reduced-motion: reduce)' );
+	if ( ! ( 'IntersectionObserver' in window ) || still.matches ) {
+		elements.forEach( ( element ) =>
+			element.classList.add( 'is-visible' )
+		);
+		return;
+	}
+	const observer = new window.IntersectionObserver(
+		( entries ) => {
+			entries.forEach( ( entry ) => {
+				if ( ! entry.isIntersecting ) {
+					return;
+				}
+				entry.target.classList.add( 'is-visible' );
+				entry.target
+					.querySelectorAll( '[data-count]' )
+					.forEach( countUp );
+				observer.unobserve( entry.target );
+			} );
+		},
+		{ rootMargin: '0px 0px -10% 0px' }
+	);
+	elements.forEach( ( element ) => observer.observe( element ) );
+}
+
+initReveal();
 initIconGrid();
+initIconControls();
 initReport();
-initTabs();
-initPlayground();
+initDemo();
