@@ -1,35 +1,10 @@
 /**
  * The presentation site: the live demo of the hero (WordPress Playground in
- * two windows, the editor and the front end of one site), the screenshot
- * tabs, the condition icons (icons.json) and the scroll reveals.
+ * two windows, the editor and the front end of one site), the condition icon
+ * studio (icons.json) and the scroll reveals.
  */
 
 const PLAYGROUND = 'https://playground.wordpress.net';
-
-const SCREENSHOTS = {
-	1: {
-		url: 'my-site.test/wp-admin/post.php',
-		caption:
-			'The Weather block in the Block Editor, with an hourly forecast and its location settings.',
-	},
-	2: {
-		url: 'my-site.test/weather-in-paris',
-		caption: 'A daily forecast on the front end.',
-	},
-	3: {
-		url: 'my-site.test/wp-admin/post-new.php',
-		caption: 'Start blank and choose a layout for the Weather block.',
-	},
-	4: {
-		url: 'my-site.test/wp-admin/post-new.php',
-		caption: 'Search for a location by name.',
-	},
-	5: {
-		url: 'my-site.test/wp-admin/admin.php?page=elio-blocks-settings',
-		caption:
-			'The General section of the settings page: units and data refresh.',
-	},
-};
 
 // The windows of the hero show the editor without its welcome guide, and
 // the front end without the toolbar, so the Weather block is in sight.
@@ -54,6 +29,9 @@ const blueprintPromise = fetch( 'blueprint.json' )
 
 const zipUrl = new URL( 'elio-blocks.zip', document.baseURI ).href;
 
+const wide = window.matchMedia( '(min-width: 1024px)' );
+const phone = window.matchMedia( '(max-width: 599px)' );
+
 function svgIcon( slug ) {
 	const svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 	svg.setAttribute( 'class', 'icon' );
@@ -62,6 +40,12 @@ function svgIcon( slug ) {
 	use.setAttribute( 'href', `icons.svg#${ slug }` );
 	svg.append( use );
 	return svg;
+}
+
+function pressOne( buttons, pressed ) {
+	buttons.forEach( ( button ) =>
+		button.setAttribute( 'aria-pressed', String( button === pressed ) )
+	);
 }
 
 /* The full demo, in a new tab */
@@ -93,10 +77,17 @@ async function initPlaygroundLinks() {
 
 /* The live demo of the hero */
 
-// An iframe laid out at a desktop width, scaled down to its window.
+// A page laid out at a desktop or tablet width, scaled down to its window
+// (never up: a wider window gets a wider page).
 function fitScreen( screen ) {
-	const width = Number( screen.dataset.width );
 	const resize = () => {
+		if ( ! screen.clientWidth ) {
+			return;
+		}
+		const width = Math.max(
+			Number( screen.dataset.width ),
+			screen.clientWidth
+		);
 		screen.style.setProperty( '--screen-width', `${ width }px` );
 		screen.style.setProperty(
 			'--screen-scale',
@@ -116,14 +107,6 @@ function liveFrame( screen, title ) {
 	return iframe;
 }
 
-function canStartByItself() {
-	return (
-		window.matchMedia( '(min-width: 861px)' ).matches &&
-		! navigator.connection?.saveData &&
-		! window.matchMedia( '(prefers-reduced-data: reduce)' ).matches
-	);
-}
-
 function initLiveDemo() {
 	const live = document.querySelector( '[data-live]' );
 	if ( ! live ) {
@@ -132,9 +115,32 @@ function initLiveDemo() {
 	const editorScreen = live.querySelector( '[data-live-screen="editor"]' );
 	const frontScreen = live.querySelector( '[data-live-screen="front"]' );
 	const reload = live.querySelector( '[data-live-reload]' );
-	const status = document.querySelector( '[data-live-status]' );
-	const startButton = document.querySelector( '[data-live-start]' );
+	const status = live.querySelector( '[data-live-status]' );
+	const startButton = live.querySelector( '[data-live-start]' );
+	const openLink = live.querySelector( '[data-live-open]' );
+	const views = [ ...live.querySelectorAll( '[data-live-view]' ) ];
 	[ editorScreen, frontScreen ].forEach( fitScreen );
+
+	// Side by side on a wide screen, one window at a time below.
+	const showView = ( view ) => {
+		live.dataset.view = view;
+		pressOne(
+			views,
+			views.find( ( button ) => button.dataset.liveView === view )
+		);
+	};
+	views.forEach( ( button ) =>
+		button.addEventListener( 'click', () =>
+			showView( button.dataset.liveView )
+		)
+	);
+	const fitView = () => {
+		if ( ! wide.matches && live.dataset.view === 'both' ) {
+			showView( 'front' );
+		}
+	};
+	fitView();
+	wide.addEventListener( 'change', fitView );
 
 	let started = false;
 	const start = async () => {
@@ -203,16 +209,25 @@ function initLiveDemo() {
 			} );
 			live.classList.remove( 'is-starting' );
 			live.classList.add( 'is-live' );
-			status.textContent = 'Live: a real WordPress, in your browser.';
+			status.textContent = 'Live: a real WordPress, in your browser';
 		} catch {
 			live.classList.remove( 'is-starting' );
-			status.textContent =
-				'The live demo could not start here: try it in a new tab.';
+			status.textContent = 'The live demo could not start here';
+			openLink.hidden = false;
 		}
 	};
 
 	startButton.addEventListener( 'click', start );
-	if ( canStartByItself() ) {
+	if ( phone.matches ) {
+		// A phone gets the demo on its whole screen, in a new tab.
+		status.textContent = 'The editor and the front end, live';
+		openLink.hidden = false;
+	} else if (
+		navigator.connection?.saveData ||
+		window.matchMedia( '(prefers-reduced-data: reduce)' ).matches
+	) {
+		startButton.hidden = false;
+	} else {
 		// Once the page itself is shown.
 		const idle = window.requestIdleCallback ?? window.setTimeout;
 		if ( document.readyState === 'complete' ) {
@@ -220,88 +235,49 @@ function initLiveDemo() {
 		} else {
 			window.addEventListener( 'load', () => idle( start ) );
 		}
-	} else if ( window.matchMedia( '(min-width: 861px)' ).matches ) {
-		startButton.hidden = false;
-	} else {
-		// A phone gets the demo on its whole screen, in a new tab.
-		status.textContent = 'The editor and the front end, live.';
-		document.querySelector( '[data-live-open]' ).hidden = false;
 	}
 }
 
-/* Screenshots */
-
-function initScreens() {
-	const tabs = [ ...document.querySelectorAll( '[role="tab"]' ) ];
-	const panel = document.getElementById( 'shot' );
-	const image = panel?.querySelector( '.stage__image' );
-	if ( ! image ) {
-		return;
-	}
-	const caption = document.querySelector( '[data-shot-caption]' );
-	const address = panel.querySelector( '[data-shot-url]' );
-
-	const select = ( tab ) => {
-		const shot = SCREENSHOTS[ tab.dataset.shot ];
-		tabs.forEach( ( other ) => {
-			const selected = other === tab;
-			other.setAttribute( 'aria-selected', String( selected ) );
-			other.tabIndex = selected ? 0 : -1;
-		} );
-		panel.setAttribute( 'aria-labelledby', tab.id );
-		image.classList.add( 'is-changing' );
-		const next = new window.Image();
-		next.src = `assets/wporg/screenshot-${ tab.dataset.shot }.png`;
-		next.decode()
-			.catch( () => {} )
-			.then( () => {
-				image.src = next.src;
-				image.alt = shot.caption;
-				image.width = next.naturalWidth || image.width;
-				image.height = next.naturalHeight || image.height;
-				caption.textContent = shot.caption;
-				address.textContent = shot.url;
-				image.classList.remove( 'is-changing' );
-			} );
-	};
-
-	tabs.forEach( ( tab, index ) => {
-		tab.addEventListener( 'click', () => select( tab ) );
-		tab.addEventListener( 'keydown', ( event ) => {
-			const targets = {
-				ArrowRight: tabs[ ( index + 1 ) % tabs.length ],
-				ArrowLeft: tabs[ ( index - 1 + tabs.length ) % tabs.length ],
-				Home: tabs[ 0 ],
-				End: tabs[ tabs.length - 1 ],
-			};
-			const next = targets[ event.key ];
-			if ( ! next ) {
-				return;
-			}
-			event.preventDefault();
-			next.focus();
-			select( next );
-		} );
-	} );
-}
-
-/* Condition icons, set as in the block inspector */
+/* The condition icon studio, a tiny block editor */
 
 function describe( condition ) {
 	const text = condition.replace( /-/g, ' ' );
 	return text.charAt( 0 ).toUpperCase() + text.slice( 1 );
 }
 
-async function initConditions() {
-	const list = document.querySelector( '[data-conditions]' );
+// A plausible temperature for each condition, day and night.
+function temperatureOf( condition, isNight ) {
+	const temperatures = [
+		[ /thunder/, 22 ],
+		[ /freezing|snow/, -2 ],
+		[ /showers/, 15 ],
+		[ /rain|drizzle/, 12 ],
+		[ /fog/, 8 ],
+		[ /overcast/, 16 ],
+		[ /partly/, 20 ],
+		[ /clear/, 24 ],
+	];
+	const [ , value ] = temperatures.find( ( [ pattern ] ) =>
+		pattern.test( condition )
+	) ?? [ null, 18 ];
+	return isNight ? value - 7 : value;
+}
+
+async function initStudio() {
+	const studio = document.querySelector( '[data-studio]' );
 	const data = await iconsPromise;
-	if ( ! list || ! data ) {
+	if ( ! studio || ! data ) {
 		return;
 	}
-	// One tile per condition, with its day and night icons.
+	const icon = studio.querySelector( '[data-studio-icon]' );
+	const temperature = studio.querySelector( '[data-studio-temperature]' );
+	const name = studio.querySelector( '[data-studio-condition]' );
+	const strip = studio.querySelector( '[data-studio-strip]' );
+
+	// One condition per icon, with its day and night icons.
 	const conditions = new Map();
 	data.conditionMappings.forEach( ( { condition, dayOrNight, iconSlug } ) => {
-		const icons = conditions.get( condition ) ?? {};
+		const icons = conditions.get( condition ) ?? { condition };
 		if ( dayOrNight === 'all' ) {
 			icons.day = iconSlug;
 			icons.night = iconSlug;
@@ -310,43 +286,75 @@ async function initConditions() {
 		}
 		conditions.set( condition, icons );
 	} );
-	const uses = [];
-	list.replaceChildren(
-		...[ ...conditions ].map( ( [ condition, icons ] ) => {
-			const item = document.createElement( 'li' );
-			const icon = svgIcon( icons.day );
-			uses.push( { use: icon.firstChild, icons } );
-			const name = document.createElement( 'span' );
-			name.textContent = describe( condition );
-			item.append( icon, name );
-			return item;
-		} )
+	const seen = new Set();
+	const choices = [ ...conditions.values() ].filter( ( { day } ) =>
+		seen.has( day ) ? false : seen.add( day )
 	);
 
-	document
-		.querySelectorAll( '[data-icon-time]' )
-		.forEach( ( input ) =>
-			input.addEventListener( 'change', () =>
-				uses.forEach( ( { use, icons } ) =>
-					use.setAttribute(
-						'href',
-						`icons.svg#${ icons[ input.value ] ?? icons.day }`
-					)
+	let current = choices[ 0 ];
+	const isNight = () => studio.dataset.sky === 'night';
+	const render = () => {
+		const slug = isNight() ? current.night : current.day;
+		icon.setAttribute( 'href', `icons.svg#${ slug }` );
+		temperature.textContent = String(
+			temperatureOf( current.condition, isNight() )
+		);
+		name.textContent = describe( current.condition );
+		buttons.forEach( ( { button, choice } ) =>
+			button
+				.querySelector( 'use' )
+				.setAttribute(
+					'href',
+					`icons.svg#${ isNight() ? choice.night : choice.day }`
 				)
-			)
 		);
-	document
-		.querySelectorAll( '[data-icon-stroke]' )
+	};
+
+	const buttons = choices.map( ( choice ) => {
+		const button = document.createElement( 'button' );
+		button.type = 'button';
+		button.className = 'studio__choice';
+		button.setAttribute( 'aria-label', describe( choice.condition ) );
+		button.setAttribute( 'aria-pressed', String( choice === current ) );
+		button.append( svgIcon( choice.day ) );
+		button.addEventListener( 'click', () => {
+			current = choice;
+			pressOne(
+				buttons.map( ( item ) => item.button ),
+				button
+			);
+			studio.classList.remove( 'is-switching' );
+			// Reading the layout restarts the animation.
+			void studio.offsetWidth;
+			studio.classList.add( 'is-switching' );
+			render();
+		} );
+		return { button, choice };
+	} );
+	strip.replaceChildren( ...buttons.map( ( { button } ) => button ) );
+
+	const stroke = studio.querySelector( '[data-studio-stroke]' );
+	const strokeValue = studio.querySelector( '[data-studio-stroke-value]' );
+	stroke.addEventListener( 'input', () => {
+		studio.style.setProperty( '--icon-stroke', stroke.value );
+		strokeValue.textContent = stroke.value;
+	} );
+	studio
+		.querySelectorAll( 'input[name="studio-color"]' )
 		.forEach( ( input ) =>
-			input.addEventListener( 'change', () =>
-				list.style.setProperty( '--icon-stroke', input.value )
-			)
+			input.addEventListener( 'change', () => {
+				studio.dataset.color = input.value;
+			} )
 		);
-	document.querySelectorAll( '[data-icon-color]' ).forEach( ( input ) =>
-		input.addEventListener( 'change', () => {
-			list.dataset.color = input.value;
+	const times = [ ...studio.querySelectorAll( '[data-studio-time]' ) ];
+	times.forEach( ( button ) =>
+		button.addEventListener( 'click', () => {
+			studio.dataset.sky = button.dataset.studioTime;
+			pressOne( times, button );
+			render();
 		} )
 	);
+	render();
 }
 
 /* Reveal on scroll, and the figures counting up */
@@ -396,5 +404,4 @@ function initReveal() {
 initReveal();
 initPlaygroundLinks();
 initLiveDemo();
-initScreens();
-initConditions();
+initStudio();
