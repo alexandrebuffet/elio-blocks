@@ -447,17 +447,24 @@ a.brand:hover .brand__logo {
 	margin-left: auto;
 }
 
+/* The link of the section on screen stays underlined. */
 .site-nav a {
 	font-size: var(--text-s);
-	color: var(--ink-2);
+	font-weight: 500;
+	color: var(--ink);
 	text-decoration: underline;
 	text-decoration-color: transparent;
-	text-underline-offset: 0.35em;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 0.4em;
 	transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
 .site-nav a:hover {
-	color: var(--ink);
+	text-decoration-color: var(--line-strong);
+}
+
+.site-nav a[aria-current] {
+	color: var(--accent);
 	text-decoration-color: var(--accent);
 }
 
@@ -1045,31 +1052,22 @@ a.brand:hover .brand__logo {
 }
 
 /*
- * Front end: a band the other way round from the page, night on a light page
- * and day on a dark one, with a sun about to rise under it.
+ * Front end: a night band in both color schemes, the photo seen through it as
+ * through a rainy window.
  */
 .section--inverse {
 	--band: var(--night);
 	--band-ink: var(--on-night);
-	--band-ink-2: var(--on-night-2);
+	--band-ink-2: rgb(238 231 219 / 95%);
 	--band-accent: var(--amber);
 	--band-line: rgb(238 231 219 / 22%);
+	--band-veil: rgb(21 23 28 / 55%);
 	isolation: isolate;
 	overflow: hidden;
-	padding-bottom: calc(var(--space-section) * 1.5);
-	background: var(--band);
+	background:
+		linear-gradient(var(--band-veil), var(--band-veil)),
+		url(images/clouds-1000.jpg) 50% 50% / cover var(--band);
 	color: var(--band-ink);
-}
-
-@media (prefers-color-scheme: dark) {
-
-	.section--inverse {
-		--band: #f9f7f3;
-		--band-ink: #17191f;
-		--band-ink-2: #5a554d;
-		--band-accent: #b8431a;
-		--band-line: rgb(23 25 31 / 20%);
-	}
 }
 
 .section--inverse .eyebrow,
@@ -1085,21 +1083,22 @@ a.brand:hover .brand__logo {
 	color: var(--band-accent);
 }
 
-/* The sun about to rise under the section. */
-.glow {
+/*
+ * Rain on a window, over the photo of the plugin: the script draws it, the
+ * band color over the photo is what shows without it.
+ */
+.rain {
 	position: absolute;
 	z-index: -1;
 	inset: 0;
-	background: radial-gradient(60% 40% at 50% 112%, var(--gold) 0%, var(--amber) 22%, var(--ember) 48%, rgb(224 96 42 / 0%) 100%);
-	transform-origin: 50% 100%;
-	animation: breathe 7s ease-in-out infinite;
+	width: 100%;
+	height: 100%;
 }
 
-@keyframes breathe {
+@media (forced-colors: active) {
 
-	50% {
-		opacity: 0.8;
-		transform: scaleY(1.08);
+	.rain {
+		display: none;
 	}
 }
 
