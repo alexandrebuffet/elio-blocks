@@ -69,7 +69,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 /** @var ChildDefinition $instanceofDef */
                 $instanceofDef = clone $instanceofDef;
                 $instanceofDef->setAbstract(\true)->setParent($parent ?: '.abstract.instanceof.' . $id);
-                $parent = '.instanceof.' . $interface . '.' . $key . '.' . $id;
+                $parent = '.instanceof.' . strtr($interface, "\x00\r\n", '---') . '.' . $key . '.' . $id;
                 $container->setDefinition($parent, $instanceofDef);
                 $instanceofTags[] = [$interface, $instanceofDef->getTags()];
                 $instanceofBindings = $instanceofDef->getBindings() + $instanceofBindings;
@@ -95,10 +95,19 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 $definition = substr_replace($definition, 'Child', 62, 0);
             }
             /** @var ChildDefinition $definition */
-            $definition = unserialize($definition);
+            $definition = unserialize($definition, ['allowed_classes' => \true]);
             $definition->setParent($parent);
             if (null !== $shared && !isset($definition->getChanges()['shared'])) {
                 $definition->setShared($shared);
+            }
+            // Tags are added from the most specific type to the least specific one
+            if (1 < \count($instanceofTags)) {
+                $depths = [];
+                foreach ($instanceofTags as [$interface]) {
+                    $depths[$interface] ??= \count(class_parents($interface) ?: []) + \count(class_implements($interface) ?: []);
+                }
+                uasort($instanceofTags, static fn($a, $b) => $depths[$a[0]] <=> $depths[$b[0]]);
+                $instanceofTags = array_values($instanceofTags);
             }
             // Don't add tags to service decorators
             $i = \count($instanceofTags);
@@ -129,7 +138,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
     private function mergeConditionals(array $autoconfiguredInstanceof, array $instanceofConditionals, ContainerBuilder $container): array
     {
         // make each value an array of ChildDefinition
-        $conditionals = array_map(fn($childDef) => [$childDef], $autoconfiguredInstanceof);
+        $conditionals = array_map(static fn($childDef) => [$childDef], $autoconfiguredInstanceof);
         foreach ($instanceofConditionals as $interface => $instanceofDef) {
             // make sure the interface/class exists (but don't validate automaticInstanceofConditionals)
             if (!$container->getReflectionClass($interface)) {

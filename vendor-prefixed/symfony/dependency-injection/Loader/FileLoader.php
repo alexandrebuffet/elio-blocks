@@ -34,7 +34,7 @@ use ElioBlocks\Vendor\Symfony\Component\DependencyInjection\Exception\LogicExcep
  */
 abstract class FileLoader extends BaseFileLoader
 {
-    public const ANONYMOUS_ID_REGEXP = '/^\.\d+_[^~]*+~[._a-zA-Z\d]{7}$/';
+    public const ANONYMOUS_ID_REGEXP = ContainerBuilder::ANONYMOUS_ID_REGEXP;
     protected bool $isLoadingInstanceof = \false;
     protected array $instanceof = [];
     protected array $interfaces = [];
@@ -119,7 +119,7 @@ abstract class FileLoader extends BaseFileLoader
             foreach (['Arguments', 'Properties', 'MethodCalls', 'Configurator', 'Factory', 'Bindings'] as $key) {
                 $serialized = serialize($prototype->{'get' . $key}());
                 if (strpos($serialized, 'O:48:"Symfony\Component\DependencyInjection\Definition"') || strpos($serialized, 'O:53:"Symfony\Component\DependencyInjection\ChildDefinition"')) {
-                    $getPrototype = static fn() => $getPrototype()->{'set' . $key}(unserialize($serialized));
+                    $getPrototype = static fn() => $getPrototype()->{'set' . $key}(unserialize($serialized, ['allowed_classes' => \true]));
                 }
             }
         }
@@ -170,7 +170,6 @@ abstract class FileLoader extends BaseFileLoader
                 if ($r->isInterface()) {
                     $this->interfaces[] = $class;
                 }
-                $autoconfigureAttributes?->processClass($this->container, $r);
                 $definition->setAbstract(\true)->addTag('container.excluded', ['source' => 'because the class is abstract']);
                 continue;
             }

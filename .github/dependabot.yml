@@ -24,6 +24,13 @@ updates:
     commit-message:
       prefix: build
       include: scope
+    ignore:
+      # Test dependencies pinned to the React major WordPress ships to blocks:
+      # they follow @wordpress/element, and react and react-dom move together.
+      - dependency-name: 'react'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-dom'
+        update-types: ['version-update:semver-major']
     groups:
       # The @wordpress packages are released together and move together.
       wordpress:
@@ -44,6 +51,9 @@ updates:
       # Scoped into vendor-prefixed/ by `composer scope-deps`: a bump of the
       # lock file alone would leave the shipped copy behind.
       - dependency-name: 'symfony/*'
+      # WPCS 3 requires PHP_CodeSniffer 3.
+      - dependency-name: 'squizlabs/php_codesniffer'
+        update-types: ['version-update:semver-major']
     groups:
       composer-minor-and-patch:
         update-types: [minor, patch]
