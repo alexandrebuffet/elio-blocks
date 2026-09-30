@@ -29,4 +29,10 @@ describe( 'provider-attribution block type', () => {
 			typography: { fontSize: '0.75em', textAlign: 'center' },
 		} );
 	} );
+
+	it( 'opens its links in the same tab unless told otherwise', () => {
+		expect( createBlock( metadata.name ).attributes.linkTarget ).toBe(
+			'_self'
+		);
+	} );
 } );
