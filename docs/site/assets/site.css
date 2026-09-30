@@ -24,8 +24,10 @@
 
 /*
  * Warm tones from the photo of the plugin (ember, amber, cream), and a blue
- * so desaturated it reads as black. Contrast (WCAG 2.2 AA): --ink-2 on
- * --paper 6.9:1, --accent on --paper 5.1:1, --ink on --ember 4.9:1,
+ * so desaturated it reads as black; the sky of the photo (--sky, --sky-2)
+ * only as touches of light in the front end band. Contrast (WCAG 2.2 AA):
+ * --ink-2 on --paper 6.9:1, --accent on --paper 5.1:1, --ink on --ember
+ * 4.9:1, on --clay 5.7:1,
  * --on-night-2 on --night 6.9:1; the light shimmer stays above 3.1:1 (large
  * text).
  */
@@ -41,6 +43,10 @@
 	--amber: #f0a044;
 	--rust: #8f3515;
 	--gold: #f7d49a;
+	--sand: #ebdfd0;
+	--clay: #c9825f;
+	--sky: #b7cdd6;
+	--sky-2: #93a8c6;
 	--night: #15171c;
 	--night-2: #1e2027;
 	--on-night: #eee7db;
@@ -760,14 +766,16 @@ a.brand:hover .brand__logo {
 }
 
 /*
- * While WordPress starts: the sun of the Elio icons rising over a warm
- * horizon, as high as the demo is far along (--progress, from the script).
+ * While WordPress starts: the screen of the tab, empty, the sun of the Elio
+ * icons turning slowly, and a thin bar as far as the demo has got
+ * (--progress, from the script).
  */
 .loader {
 	position: absolute;
 	inset: 0;
-	overflow: hidden;
-	background: linear-gradient(var(--gold), var(--amber) 50%, var(--ember));
+	display: grid;
+	place-items: center;
+	background: var(--browser-field);
 	visibility: hidden;
 	opacity: 0;
 	transition: opacity 0.6s ease, visibility 0s 0.6s;
@@ -779,30 +787,21 @@ a.brand:hover .brand__logo {
 	transition: none;
 }
 
-.loader::after {
+.loader::before {
 	content: "";
 	position: absolute;
-	inset: 72% 0 0;
-	background: linear-gradient(var(--ember), var(--rust));
-}
-
-.loader__sky {
-	position: absolute;
-	inset: 0;
-	display: grid;
-	place-items: center;
-	padding-bottom: 10%;
-	transform: translateY(calc((1 - var(--progress, 0)) * 30%));
+	inset: 0 0 auto;
+	height: 2px;
+	background: var(--accent);
+	transform: scaleX(var(--progress, 0));
+	transform-origin: left;
 	transition: transform 1.6s var(--ease);
 }
 
 .loader__sun {
-	width: clamp(80px, 16%, 160px);
-	height: auto;
-	aspect-ratio: 1;
-	color: #fff8ec;
-	stroke-width: 1.25;
-	filter: drop-shadow(0 0 16px rgb(255 241 214 / 90%));
+	width: 40px;
+	height: 40px;
+	color: var(--ink-2);
 	animation: spin 12s linear infinite;
 }
 
@@ -949,14 +948,13 @@ a.brand:hover .brand__logo {
 }
 
 /*
- * Features: an editorial grid, each icon a button of the block toolbar, and
- * the count of blocks in a block of light from gold to russet, --ember its
- * darkest color as in the front end band.
+ * Features: an editorial grid of cards, each in a light rule, and the count
+ * of blocks in a block of warm, muted light, from sand to clay.
  */
 .features {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: var(--space-3xl) var(--space-2xl);
+	gap: var(--space-l);
 }
 
 .features__list {
@@ -972,7 +970,7 @@ a.brand:hover .brand__logo {
 	gap: var(--space-2xs);
 	margin: 0;
 	padding: var(--space-xl);
-	background: linear-gradient(150deg, var(--gold), var(--amber) 45%, var(--ember));
+	background: linear-gradient(150deg, var(--sand), #dcae8f 50%, var(--clay));
 	color: #17191f;
 }
 
@@ -1002,6 +1000,8 @@ a.brand:hover .brand__logo {
 	align-content: start;
 	justify-items: start;
 	gap: var(--space-m);
+	padding: var(--space-xl);
+	border: 1px solid var(--line);
 }
 
 /* After the count of blocks: the delay of their column. */
@@ -1017,11 +1017,14 @@ a.brand:hover .brand__logo {
 	--reveal-delay: 0.3s;
 }
 
-/* As large as a button of the block toolbar. */
+/* The icon alone, without the frame of a toolbar button. */
 .feature .tool-icon {
-	width: 48px;
-	height: 48px;
+	width: auto;
+	height: auto;
 	margin-bottom: var(--space-xs);
+	border: 0;
+	background: none;
+	color: var(--accent);
 }
 
 .feature .tool-icon svg {
@@ -1078,8 +1081,8 @@ a.brand:hover .brand__logo {
 
 /*
  * Front end: a band of warm light in both color schemes, from russet to gold,
- * drifting slowly. --ember is its darkest color: --ink stays at 4.9:1 at least
- * on all of it.
+ * a few touches of the sky of the photo in it, drifting slowly. --ember is its
+ * darkest color: --ink stays at 4.9:1 at least on all of it.
  */
 .section--inverse {
 	--band-ink: #17191f;
@@ -1101,12 +1104,14 @@ a.brand:hover .brand__logo {
 
 .section--inverse::before {
 	background:
+		radial-gradient(16% 20% at 33% 43%, rgb(183 205 214 / 85%), rgb(183 205 214 / 0%)),
 		radial-gradient(closest-side at 30% 40%, var(--gold), rgb(247 212 154 / 0%)),
 		radial-gradient(closest-side at 72% 62%, var(--amber), rgb(240 160 68 / 0%));
 }
 
 .section--inverse::after {
 	background:
+		radial-gradient(10% 13% at 40% 70%, rgb(147 168 198 / 60%), rgb(147 168 198 / 0%)),
 		radial-gradient(closest-side at 62% 34%, #e8703a, rgb(232 112 58 / 0%)),
 		radial-gradient(closest-side at 38% 72%, rgb(247 212 154 / 70%), rgb(247 212 154 / 0%));
 	animation-duration: 34s;
