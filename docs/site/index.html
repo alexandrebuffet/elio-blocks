@@ -94,6 +94,9 @@
 							<div class="browser__screen" id="live-front" role="tabpanel" aria-labelledby="live-tab-front" data-live-screen="front" data-url="my-site.test/weather-in-paris" data-width="1280">
 								<img class="browser__poster browser__poster--contain" src="assets/wporg/screenshot-2.png" alt="A daily forecast on the front end." width="2488" height="684">
 							</div>
+							<div class="loader" aria-hidden="true">
+								<div class="loader__sky"><svg class="loader__sun"><use href="icons.svg#sun"/></svg></div>
+							</div>
 							<div class="snackbar" data-live-snackbar>
 								<p class="snackbar__text" role="status" data-live-status>A real WordPress, in your browser.</p>
 								<button type="button" class="button button--small button--light" data-live-start hidden><span>Start the live demo</span><span class="button__icon" aria-hidden="true">→</span></button>
@@ -155,7 +158,6 @@
 		</section>
 
 		<section class="section section--inverse" aria-labelledby="front-title">
-			<canvas class="rain" data-rain aria-hidden="true"></canvas>
 			<div class="container">
 				<header class="section__header reveal">
 					<p class="eyebrow">On the front end</p>
