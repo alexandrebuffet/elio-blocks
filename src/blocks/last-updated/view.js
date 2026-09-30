@@ -12,7 +12,6 @@ import {
 	formatItemDate,
 	getWeatherForecastTimezone,
 	withWeatherForecastTimezone,
-	getSunEvent,
 } from '../../shared/weather-dates';
 
 /**
@@ -35,28 +34,27 @@ const dateApi = ( weatherForecast ) =>
  * Getters mirrored server-side by DerivedState (PHP), which prints the same
  * values in the server-rendered HTML, but for a relative date ("5 minutes
  * ago"): the server prints the date in the site format, stale anyway in a
- * cached page, and the getter words it once the script runs. Logic lives in
- * shared/weather-dates.
+ * cached page, and the getter words it once the script runs. They read the
+ * weather forecast of the report, which each refresh replaces: the time
+ * follows it.
  */
 const { state } = store( 'elio/weather-report', {
 	state: {
 		/**
-		 * Returns the ISO date-time for the datetime attribute of the <time> element.
+		 * Returns the ISO date-time the provider was asked at, for the datetime attribute of the <time> element.
 		 */
-		get sunEventDatetime() {
-			const { item, query, displayType } = getContext();
-
-			return toText( getSunEvent( item, query?.data, displayType ) );
+		get lastUpdatedDatetime() {
+			return toText( getContext().query?.data?.meta?.fetched_at );
 		},
 		/**
-		 * Returns the sunrise or sunset time, in the timezone of the location.
+		 * Returns the time the provider was asked at, in the timezone of the location.
 		 */
-		get formattedSunEvent() {
-			const { item, query, displayType, format } = getContext();
+		get formattedLastUpdated() {
+			const { query, format } = getContext();
 
 			return formatItemDate(
 				dateApi( query?.data ),
-				getSunEvent( item, query?.data, displayType ),
+				query?.data?.meta?.fetched_at,
 				{
 					displayType: 'time',
 					format,

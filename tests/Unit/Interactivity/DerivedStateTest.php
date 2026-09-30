@@ -135,6 +135,7 @@ class DerivedStateTest extends TestCase
                 'precipitationUnit', 'precipitationProbability', 'precipitationProbabilityUnit', 'uvIndex',
                 'conditionDescription', 'dailyTemperature', 'dailyTemperatureUnit', 'hourlyTemperature',
                 'hourlyTemperatureUnit', 'datetime', 'formattedDateTime', 'sunEventDatetime', 'formattedSunEvent',
+                'lastUpdatedDatetime', 'formattedLastUpdated',
             ] as $getter
         ) {
             $context = array_replace(
@@ -266,6 +267,27 @@ class DerivedStateTest extends TestCase
         $hourly = ['item' => ['sunrise' => null, 'sunset' => null]];
 
         $this->assertSame('04:29', $this->evaluate('formattedSunEvent', $hourly));
+    }
+
+    public function test_last_update_is_when_the_provider_was_asked_in_the_timezone_of_the_location(): void
+    {
+        // 05:32 UTC is 14:32 in Tokyo, 07:32 in Paris.
+        $fetched = ['query' => ['data' => ['meta' => ['fetched_at' => '2026-07-01T05:32:10+00:00']]]];
+
+        $this->assertSame('14:32', $this->evaluate('formattedLastUpdated', $fetched));
+        $this->assertSame('01/07 14:32', $this->evaluate('formattedLastUpdated', $fetched + ['format' => 'd/m H:i']));
+        $this->assertSame('2026-07-01T05:32:10+00:00', $this->evaluate('lastUpdatedDatetime', $fetched));
+    }
+
+    public function test_a_relative_date_is_printed_in_the_site_format_for_the_view_script_to_word(): void
+    {
+        $relative = ['format' => 'human-diff'];
+        $fetched  = ['query' => ['data' => ['meta' => ['fetched_at' => '2026-07-01T05:32:10+00:00']]]];
+
+        $this->assertSame('14:15', $this->evaluate('formattedDateTime', $relative + ['displayType' => 'time']));
+        $this->assertSame('2026-07-01', $this->evaluate('formattedDateTime', $relative));
+        $this->assertSame('19:01', $this->evaluate('formattedSunEvent', $relative + ['displayType' => 'sunset']));
+        $this->assertSame('14:32', $this->evaluate('formattedLastUpdated', $relative + $fetched));
     }
 
     public function test_falls_back_to_the_site_timezone_when_the_provider_gives_none(): void

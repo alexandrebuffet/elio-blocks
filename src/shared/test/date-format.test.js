@@ -316,3 +316,60 @@ describe( 'declined month names, like wp_maybe_decline_date()', () => {
 		).toBe( '5 de gener de 2026' );
 	} );
 } );
+
+describe( 'relative dates, like the "human-diff" format of the Date block', () => {
+	const NOW = Date.parse( '2026-07-01T12:00:00Z' );
+	const ago = ( seconds ) => NOW - seconds * 1000;
+	const french = createDateApi( { l10n: { locale: 'fr_FR' } } );
+	const english = createDateApi( { l10n: { locale: 'en_US' } } );
+
+	it( 'words the time to now in the language of the site', () => {
+		expect( french.relative( ago( 5 * 60 ), NOW ) ).toBe(
+			'il y a 5 minutes'
+		);
+		expect( english.relative( ago( -3 * 3600 ), NOW ) ).toBe(
+			'in 3 hours'
+		);
+	} );
+
+	it( 'says "now" under 45 seconds', () => {
+		expect( english.relative( ago( 44 ), NOW ) ).toBe( 'now' );
+		expect( french.relative( ago( -10 ), NOW ) ).toBe( 'maintenant' );
+	} );
+
+	it( 'moves to the next unit at the thresholds of humanTimeDiff()', () => {
+		expect( english.relative( ago( 45 ), NOW ) ).toBe( '1 minute ago' );
+		expect( english.relative( ago( 44 * 60 ), NOW ) ).toBe(
+			'44 minutes ago'
+		);
+		expect( english.relative( ago( 45 * 60 ), NOW ) ).toBe( '1 hour ago' );
+		expect( english.relative( ago( 21 * 3600 ), NOW ) ).toBe(
+			'21 hours ago'
+		);
+		expect( english.relative( ago( 22 * 3600 ), NOW ) ).toBe( '1 day ago' );
+		expect( english.relative( ago( 26 * 86400 ), NOW ) ).toBe(
+			'1 month ago'
+		);
+		expect( english.relative( ago( 400 * 86400 ), NOW ) ).toBe(
+			'1 year ago'
+		);
+	} );
+
+	it( 'reads the language of a WordPress locale Intl does not know as a whole', () => {
+		const formal = createDateApi( { l10n: { locale: 'de_DE_formal' } } );
+
+		expect( formal.relative( ago( -3 * 3600 ), NOW ) ).toBe(
+			'in 3 Stunden'
+		);
+	} );
+
+	it( 'falls back to English without a locale', () => {
+		expect( createDateApi().relative( ago( 120 ), NOW ) ).toBe(
+			'2 minutes ago'
+		);
+	} );
+
+	it( 'prints nothing for a value that is not a date', () => {
+		expect( english.relative( 'soon', NOW ) ).toBe( '' );
+	} );
+} );

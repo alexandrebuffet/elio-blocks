@@ -93,6 +93,16 @@ describe( 'sun-event view', () => {
 		expect( state().formattedSunEvent ).toBe( '04:29 JST' );
 	} );
 
+	it( 'words a relative time, counted from the clock of the report', () => {
+		state().now = Date.parse( '2026-07-01T17:01:00+09:00' );
+		setContext(
+			makeContext( { displayType: 'sunset', format: 'human-diff' } )
+		);
+
+		expect( state().formattedSunEvent ).toBe( 'in 2 hours' );
+		delete state().now;
+	} );
+
 	it( 'prints nothing without data', () => {
 		setContext( makeContext( { item: null, query: { data: null } } ) );
 

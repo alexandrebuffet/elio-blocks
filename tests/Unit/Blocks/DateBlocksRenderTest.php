@@ -8,8 +8,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The datetime and sun-event blocks format dates in the browser without the
- * wp-date script: they put the date settings of the site in the page.
+ * The datetime, sun-event and last-updated blocks format dates in the browser without the
+ * wp-date script: they put the date settings of the site in the page, and have
+ * the report keep a relative date ("5 minutes ago") current.
  */
 class DateBlocksRenderTest extends TestCase
 {
@@ -48,8 +49,9 @@ class DateBlocksRenderTest extends TestCase
     public static function dateBlocks(): array
     {
         return [
-            'datetime'  => ['datetime'],
-            'sun-event' => ['sun-event'],
+            'datetime'     => ['datetime'],
+            'sun-event'    => ['sun-event'],
+            'last-updated' => ['last-updated'],
         ];
     }
 
@@ -70,5 +72,15 @@ class DateBlocksRenderTest extends TestCase
         $metadata = json_decode((string) file_get_contents(dirname(__DIR__, 3) . "/src/blocks/{$name}/block.json"), true);
 
         $this->assertNotContains('wp-date', (array) ( $metadata['viewScript'] ?? [] ));
+    }
+
+    #[DataProvider('dateBlocks')]
+    public function test_runs_the_clock_of_relative_dates_only_for_a_relative_date(string $name): void
+    {
+        $clock = 'data-wp-watch="callbacks.startRelativeDateClock"';
+
+        $this->assertStringContainsString($clock, $this->renderBlock($name, ['format' => 'human-diff']));
+        $this->assertStringNotContainsString($clock, $this->renderBlock($name, ['format' => 'H:i']));
+        $this->assertStringNotContainsString($clock, $this->renderBlock($name));
     }
 }
