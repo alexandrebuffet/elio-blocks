@@ -11,9 +11,8 @@
  * - blueprint.json: the Playground blueprint of the WordPress.org Live
  *   Preview, which the "Try it live" links load with the plugin zip of the
  *   site in place of the WordPress.org slug.
- * - icons.svg and icons.json: the Elio collection (src/icons/) as one sprite
- *   of symbols stroked in currentColor (the page sets their width), and its
- *   labels and condition mappings.
+ * - icons.svg: the Elio collection (src/icons/) as one sprite of symbols
+ *   stroked in currentColor (the page sets their width).
  *
  * The deploy workflow adds elio-blocks.zip, the package of the plugin, next to
  * index.html. Preview locally with `npm run build:site`, then serve _site/.
@@ -76,13 +75,6 @@ const symbols = manifest.icons.map( ( { slug } ) => {
 writeFileSync(
 	join( out, 'icons.svg' ),
 	`<svg xmlns="http://www.w3.org/2000/svg">${ symbols.join( '' ) }</svg>\n`
-);
-writeFileSync(
-	join( out, 'icons.json' ),
-	JSON.stringify( {
-		icons: manifest.icons,
-		conditionMappings: manifest.conditionMappings,
-	} )
 );
 
 process.stdout.write( `Site built in ${ out }\n` );

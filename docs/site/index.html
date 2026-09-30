@@ -7,7 +7,7 @@
 	<meta name="description" content="Display the current weather and forecasts for any location, with WordPress blocks that look, feel and behave like the ones you already use. Free, no API key by default.">
 	<meta name="theme-color" content="#f9f7f3">
 	<meta property="og:title" content="Elio Blocks — Weather blocks for WordPress">
-	<meta property="og:description" content="The weather, with blocks. Free, no API key by default, made for the Block Editor.">
+	<meta property="og:description" content="Weather, with blocks. Free, no API key by default, made for the Block Editor.">
 	<meta property="og:type" content="website">
 	<meta property="og:image" content="assets/images/clouds-2000.jpg">
 	<link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -41,23 +41,21 @@
 			<nav class="site-nav" aria-label="Main">
 				<a href="#live">Demo</a>
 				<a href="#features">Features</a>
-				<a href="#icons">Icons</a>
 				<a href="#faq">FAQ</a>
-				<a href="https://github.com/alexandrebuffet/elio-blocks" target="_blank" rel="noopener">GitHub<span class="screen-reader-text"> (opens in a new tab)</span></a>
 			</nav>
-			<a class="button button--small" href="#" data-playground-link target="_blank" rel="noopener"><span>Try it live</span><span class="button__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
+			<a class="button button--small" href="https://wordpress.org/plugins/elio-blocks/"><span>Install</span><span class="button__icon" aria-hidden="true">→</span></a>
 		</div>
 	</header>
 
 	<main id="main">
 		<section class="hero" aria-labelledby="hero-title">
 			<div class="container hero__top">
-				<h1 class="display hero__title" id="hero-title">The weather, <em class="shimmer">with blocks.</em></h1>
+				<h1 class="display hero__title" id="hero-title">Weather, <em class="shimmer">with blocks.</em></h1>
 				<div class="hero__intro">
-					<p class="lead">Current conditions and forecasts for any location, with blocks that look, feel and behave like the ones you already use every day.</p>
+					<p class="lead">Elio Blocks brings the weather to the WordPress Block Editor, the way WordPress would have built it. Add the Weather block, search for a place, and the live forecast is right there, from Open-Meteo by default, with more providers to come.</p>
 					<div class="actions">
-						<a class="button" href="#" data-playground-link target="_blank" rel="noopener"><span>Try it live</span><span class="button__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
-						<a class="button button--secondary" href="https://github.com/alexandrebuffet/elio-blocks" target="_blank" rel="noopener"><span>View on GitHub</span><span class="button__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
+						<a class="button" href="https://wordpress.org/plugins/elio-blocks/"><span>Install the plugin</span><span class="button__icon" aria-hidden="true">→</span></a>
+						<a class="button button--secondary" href="#" data-playground-link target="_blank" rel="noopener"><span>Try it live</span><span class="button__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
 					</div>
 					<p class="hero__meta">Free &middot; No API key by default &middot; WordPress 6.7+ &middot; Soon on WordPress.org</p>
 				</div>
@@ -66,25 +64,17 @@
 			<div class="scene" id="live">
 				<img class="scene__photo" src="assets/images/clouds-2000.jpg" srcset="assets/images/clouds-1000.jpg 1000w, assets/images/clouds-2000.jpg 2000w" sizes="100vw" alt="" width="2000" height="1326" fetchpriority="high">
 				<div class="container live" data-live data-tab="editor">
-					<div class="live__label">
-						<p class="live__kicker"><span class="live__dot" aria-hidden="true"></span>Live demo</p>
-						<p class="live__status" role="status" data-live-status>A real WordPress, in your browser.</p>
-						<p class="live__hint">Edit the post, save, then open the Front end tab.</p>
-						<button type="button" class="button button--small" data-live-start hidden><span>Start the live demo</span><span class="button__icon" aria-hidden="true">→</span></button>
-						<a class="button button--small" href="#" data-playground-link data-live-open target="_blank" rel="noopener" hidden><span>Open the live demo</span><span class="button__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
-					</div>
-
 					<div class="browser live__window">
 						<div class="browser__tabs">
 							<span class="browser__dots" aria-hidden="true"><span></span><span></span><span></span></span>
 							<div class="browser__tablist" role="tablist" aria-label="Live demo">
 								<button type="button" class="browser__tab" role="tab" id="live-tab-editor" aria-controls="live-editor" aria-selected="true" data-live-tab="editor">
 									<svg class="browser__favicon" viewBox="0 0 24 24" aria-hidden="true"><use href="#wp-pencil"/></svg>
-									<span>Editor</span>
+									<span>Weather in the editor</span>
 								</button>
 								<button type="button" class="browser__tab" role="tab" id="live-tab-front" aria-controls="live-front" aria-selected="false" tabindex="-1" data-live-tab="front">
 									<svg class="browser__favicon" viewBox="0 0 24 24" aria-hidden="true"><use href="#wp-globe"/></svg>
-									<span>Front end</span>
+									<span>Weather on your site</span>
 								</button>
 							</div>
 						</div>
@@ -106,67 +96,63 @@
 							<div class="browser__screen" id="live-front" role="tabpanel" aria-labelledby="live-tab-front" data-live-screen="front" data-url="my-site.test/weather-in-paris" data-width="1280">
 								<img class="browser__poster browser__poster--contain" src="assets/wporg/screenshot-2.png" alt="A daily forecast on the front end." width="2488" height="684">
 							</div>
+							<div class="snackbar" data-live-snackbar>
+								<p class="snackbar__text" role="status" data-live-status>A real WordPress, in your browser.</p>
+								<button type="button" class="button button--small button--light" data-live-start hidden><span>Start the live demo</span><span class="button__icon" aria-hidden="true">→</span></button>
+								<a class="button button--small button--light" href="#" data-playground-link data-live-open target="_blank" rel="noopener" hidden><span>Open the live demo</span><span class="button__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</section>
 
-		<section class="section statement" aria-label="About Elio Blocks">
-			<div class="container">
-				<p class="statement__text reveal">Elio Blocks brings the weather to the Block Editor <em>the way WordPress would have built it.</em> Insert the Weather block, search for a place, and the live forecast is right there in the editor, from Open-Meteo by default, and from other providers as they come.</p>
-				<dl class="facts">
-					<div class="fact reveal"><dt>Blocks</dt><dd data-count>21</dd></div>
-					<div class="fact reveal"><dt>Ready-made layouts</dt><dd data-count>4</dd></div>
-					<div class="fact reveal"><dt>API key, by default</dt><dd>0</dd></div>
-					<div class="fact reveal"><dt>Shortcode, widget or iframe</dt><dd>0</dd></div>
-				</dl>
-			</div>
-		</section>
-
 		<section class="section" id="features" aria-labelledby="features-title">
-			<div class="container split">
-				<header class="split__aside reveal">
+			<div class="container">
+				<header class="section__header reveal">
 					<p class="eyebrow">Made for the Block Editor</p>
 					<h2 class="display section__title" id="features-title">Feels native, <em>because it&nbsp;is.</em></h2>
 				</header>
-				<ol class="features">
-					<li class="feature reveal">
-						<span class="tool-icon" aria-hidden="true"><svg class="icon"><use href="icons.svg#sun-cloud"></use></svg></span>
-						<h3 class="feature__title">A report, like the Query block</h3>
-						<p>The Weather block works like the Query block: it gets the forecast of a place and hands it to the blocks inside it. From there, everything is a block: temperature, wind, UV index, sunrise, the condition icon. Add them, remove them, reorder them, nest them in rows and columns.</p>
-					</li>
-					<li class="feature reveal">
-						<span class="tool-icon" aria-hidden="true"><svg class="icon"><use href="icons.svg#cloud-sun-layout"></use></svg></span>
-						<h3 class="feature__title">A Forecast Template, like the Post Template</h3>
-						<p>Hourly and daily forecasts repeat a Forecast Template you design once, the way the Post Template repeats inside a Query block.</p>
-					</li>
-					<li class="feature reveal">
-						<span class="tool-icon" aria-hidden="true"><svg><use href="#wp-symbol"></use></svg></span>
-						<h3 class="feature__title">Start from a layout</h3>
-						<p>Pick Default, Minimal, Hourly or Daily Forecast, or start blank and build your own.</p>
-					</li>
-					<li class="feature reveal">
-						<span class="tool-icon" aria-hidden="true"><svg><use href="#wp-styles"></use></svg></span>
-						<h3 class="feature__title">Every design tool you expect</h3>
-						<p>Colors, typography, spacing and borders come from the standard block supports: the same panels as core blocks, your theme’s presets, <code>theme.json</code> included.</p>
-					</li>
-					<li class="feature reveal">
-						<span class="tool-icon" aria-hidden="true"><svg><use href="#wp-cog"></use></svg></span>
-						<h3 class="feature__title">Your site’s settings, respected</h3>
-						<p>Dates in your site’s language and formats, in the timezone of the location. Metric or imperial, site-wide or per block.</p>
-					</li>
-					<li class="feature reveal">
-						<span class="tool-icon" aria-hidden="true"><svg><use href="#wp-seen"></use></svg></span>
-						<h3 class="feature__title">What you see is what you get</h3>
-						<p>The editor shows the real forecast of your location, styled exactly as it will be on your site.</p>
-					</li>
-					<li class="feature reveal">
-						<span class="tool-icon" aria-hidden="true"><svg><use href="#wp-plugins"></use></svg></span>
-						<h3 class="feature__title">Open-Meteo by default, open to more</h3>
-						<p>The weather comes from Open-Meteo, with no account and no key for non-commercial use, or with the key of a subscription. Weather providers are pluggable: Elio Blocks can add more, and so can your own code, through its PHP API.</p>
-					</li>
-				</ol>
+				<div class="features">
+					<p class="features__count reveal"><span class="features__number" data-count>21</span> <span class="features__unit">blocks</span> <span class="features__note">Every piece of the weather is a block of its own: add it, move it, style it.</span></p>
+					<ol class="features__list" role="list">
+						<li class="feature reveal">
+							<span class="tool-icon" aria-hidden="true"><svg class="icon"><use href="icons.svg#sun-cloud"></use></svg></span>
+							<h3 class="feature__title">A report, like the Query block</h3>
+							<p>The Weather block works like the Query block: it gets the forecast of a place and hands it to the blocks inside it. From there, everything is a block: temperature, wind, UV index, sunrise, the condition icon. Add them, remove them, reorder them, nest them in rows and columns.</p>
+						</li>
+						<li class="feature reveal">
+							<span class="tool-icon" aria-hidden="true"><svg class="icon"><use href="icons.svg#cloud-sun-layout"></use></svg></span>
+							<h3 class="feature__title">A Forecast Template, like the Post Template</h3>
+							<p>Hourly and daily forecasts repeat a Forecast Template you design once, the way the Post Template repeats inside a Query block.</p>
+						</li>
+						<li class="feature reveal">
+							<span class="tool-icon" aria-hidden="true"><svg><use href="#wp-symbol"></use></svg></span>
+							<h3 class="feature__title">Start from a layout</h3>
+							<p>Pick Default, Minimal, Hourly or Daily Forecast, or start blank and build your own.</p>
+						</li>
+						<li class="feature reveal">
+							<span class="tool-icon" aria-hidden="true"><svg><use href="#wp-styles"></use></svg></span>
+							<h3 class="feature__title">Every design tool you expect</h3>
+							<p>Colors, typography, spacing and borders come from the standard block supports: the same panels as core blocks, your theme’s presets, <code>theme.json</code> included.</p>
+						</li>
+						<li class="feature reveal">
+							<span class="tool-icon" aria-hidden="true"><svg><use href="#wp-cog"></use></svg></span>
+							<h3 class="feature__title">Your site’s settings, respected</h3>
+							<p>Dates in your site’s language and formats, in the timezone of the location. Metric or imperial, site-wide or per block.</p>
+						</li>
+						<li class="feature reveal">
+							<span class="tool-icon" aria-hidden="true"><svg><use href="#wp-seen"></use></svg></span>
+							<h3 class="feature__title">What you see is what you get</h3>
+							<p>The editor shows the real forecast of your location, styled exactly as it will be on your site.</p>
+						</li>
+						<li class="feature reveal">
+							<span class="tool-icon" aria-hidden="true"><svg><use href="#wp-plugins"></use></svg></span>
+							<h3 class="feature__title">Open-Meteo by default, open to more</h3>
+							<p>The weather comes from Open-Meteo, with no account and no key for non-commercial use, or with the key of a subscription. Weather providers are pluggable: Elio Blocks can add more, and so can your own code, through its PHP API.</p>
+						</li>
+					</ol>
+				</div>
 			</div>
 		</section>
 
@@ -194,50 +180,6 @@
 			</div>
 		</section>
 
-		<section class="section" id="icons" aria-labelledby="icons-title">
-			<div class="container split">
-				<header class="split__aside reveal">
-					<p class="eyebrow">Condition icons</p>
-					<h2 class="display section__title" id="icons-title">Icons, <em>your way.</em></h2>
-					<p class="lead">Every weather condition has its icon, by day and by night. Choose the collection for the whole site, for one report or for one icon, set their stroke and color like any block, or register your own collection in a few lines of PHP.</p>
-				</header>
-
-				<div class="studio reveal" data-studio data-color="ink" data-sky="day">
-					<div class="studio__canvas">
-						<div class="studio__preview">
-							<svg class="icon studio__icon" aria-hidden="true"><use data-studio-icon href="icons.svg#sun"></use></svg>
-							<p class="studio__temperature"><span data-studio-temperature>24</span>°</p>
-							<p class="studio__condition"><span data-studio-condition>Clear sky</span> · Paris</p>
-						</div>
-						<div class="studio__strip" role="group" aria-label="Weather condition" data-studio-strip></div>
-					</div>
-					<div class="studio__panel" role="group" aria-labelledby="studio-title">
-						<p class="studio__title" id="studio-title"><span class="tool-icon" aria-hidden="true"><svg class="icon"><use href="icons.svg#sun-cloud"></use></svg></span>Condition Icon</p>
-						<div class="studio__field">
-							<div class="studio__label"><label for="studio-stroke">Stroke width</label><output for="studio-stroke" data-studio-stroke-value>1.5</output></div>
-							<input class="studio__range" type="range" id="studio-stroke" min="0.75" max="2.5" step="0.25" value="1.5" data-studio-stroke>
-						</div>
-						<fieldset class="studio__field">
-							<legend class="studio__label">Color</legend>
-							<div class="swatches">
-								<label class="swatch swatch--ink"><input type="radio" name="studio-color" value="ink" checked><span class="screen-reader-text">Ink</span></label>
-								<label class="swatch swatch--ember"><input type="radio" name="studio-color" value="ember"><span class="screen-reader-text">Ember</span></label>
-								<label class="swatch swatch--rust"><input type="radio" name="studio-color" value="rust"><span class="screen-reader-text">Rust</span></label>
-								<label class="swatch swatch--amber"><input type="radio" name="studio-color" value="amber"><span class="screen-reader-text">Amber</span></label>
-							</div>
-						</fieldset>
-						<div class="studio__field">
-							<span class="studio__label" id="studio-time">Time of day</span>
-							<div class="segmented segmented--small" role="group" aria-labelledby="studio-time">
-								<button type="button" class="segmented__option" data-studio-time="day" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="icons.svg#sun"></use></svg>Day</button>
-								<button type="button" class="segmented__option" data-studio-time="night" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="icons.svg#moon"></use></svg>Night</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
 		<section class="section section--flush" id="faq" aria-labelledby="faq-title">
 			<div class="container split">
 				<header class="split__aside reveal">
@@ -261,6 +203,10 @@
 						<p>Yes. Colors, spacing and typography come from the standard design tools of the Block Editor. Beyond that, use <code>theme.json</code>, block style variations or plain CSS.</p>
 					</details>
 					<details>
+						<summary>Can I change the weather icons?</summary>
+						<p>Yes. Every condition has its icon, by day and by night, with a stroke and a color you set like any block. Choose the icon collection for the whole site, a report or a single icon, or register your own collection in a few lines of PHP.</p>
+					</details>
+					<details>
 						<summary>Does it work with the Classic Editor, widgets or page builders?</summary>
 						<p>No. Elio Blocks only provides blocks, for the Block Editor and the Site Editor.</p>
 					</details>
@@ -281,8 +227,8 @@
 			<div class="container closing__inner">
 				<h2 class="display closing__title" id="closing-title">Let the <em class="shimmer shimmer--night">sunshine</em> in.</h2>
 				<div class="actions actions--center">
-					<a class="button button--light" href="#" data-playground-link target="_blank" rel="noopener"><span>Try it live</span><span class="button__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
-					<a class="button button--secondary-light" href="https://github.com/alexandrebuffet/elio-blocks" target="_blank" rel="noopener"><span>View on GitHub</span><span class="button__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
+					<a class="button button--light" href="https://wordpress.org/plugins/elio-blocks/"><span>Install the plugin</span><span class="button__icon" aria-hidden="true">→</span></a>
+					<a class="button button--secondary-light" href="#" data-playground-link target="_blank" rel="noopener"><span>Try it live</span><span class="button__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
 				</div>
 			</div>
 		</section>
