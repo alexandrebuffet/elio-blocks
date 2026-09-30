@@ -11,11 +11,14 @@ if (! defined('ABSPATH')) {
 }
 
 /**
- * Gives the provider-attribution block Block Hooks inserts in a report the
- * attributes of its default variation (block.json), the ones the report
- * variations and the inserter give it: a credit smaller than the report and
- * centered. As attributes, they show in its Typography panel, where they can
- * be changed, instead of a stylesheet default no panel knows about.
+ * Puts the provider-attribution block Block Hooks inserts in a report laid
+ * out as a flex row (the Minimal variation) on a line of its own, instead of
+ * a place in the row next to the temperature.
+ *
+ * Its size and alignment are the default of its style attribute (block.json),
+ * which every way of adding it applies: Block Hooks on the server, the toggle
+ * Block Hooks adds to the report inspector (createBlock()), the inserter and
+ * the report variations.
  */
 class StyleHookedProviderAttribution implements HookInterface
 {
@@ -33,10 +36,10 @@ class StyleHookedProviderAttribution implements HookInterface
     }
 
     /**
-     * Sets the attributes of the provider-attribution block Block Hooks inserts.
+     * Gives the block Block Hooks inserts in a flex report a line of its own.
      *
-     * In a report laid out as a flex row (the Minimal variation), the credit
-     * takes a line of its own instead of a place in the row.
+     * Its style attribute is replaced as a whole: the default one, with the
+     * layout added, so it keeps its size and alignment.
      *
      * @param array<string, mixed>|null $parsedHookedBlock Block about to be inserted, null if another filter removed it.
      * @param string                    $hookedBlockType   Its name.
@@ -50,39 +53,31 @@ class StyleHookedProviderAttribution implements HookInterface
         string $relativePosition,
         array $parsedAnchorBlock
     ): ?array {
-        if (null === $parsedHookedBlock) {
-            return null;
+        if (null === $parsedHookedBlock || 'flex' !== ( $parsedAnchorBlock['attrs']['layout']['type'] ?? null )) {
+            return $parsedHookedBlock;
         }
 
-        $attributes = $this->getDefaultAttributes();
+        $style           = $parsedHookedBlock['attrs']['style'] ?? $this->getDefaultStyle();
+        $style['layout'] = array(
+            'selfStretch' => 'fixed',
+            'flexSize'    => '100%',
+        );
 
-        if ('flex' === ( $parsedAnchorBlock['attrs']['layout']['type'] ?? null )) {
-            $attributes['style']['layout'] = array(
-                'selfStretch' => 'fixed',
-                'flexSize'    => '100%',
-            );
-        }
-
-        $parsedHookedBlock['attrs'] = array_replace_recursive($attributes, $parsedHookedBlock['attrs'] ?? array());
+        $parsedHookedBlock['attrs']['style'] = $style;
 
         return $parsedHookedBlock;
     }
 
     /**
-     * Returns the attributes of the default variation of the block.
+     * Returns the default of the style attribute of the block.
      *
      * @return array<string, mixed>
      */
-    private function getDefaultAttributes(): array
+    private function getDefaultStyle(): array
     {
         $blockType = WP_Block_Type_Registry::get_instance()->get_registered(self::BLOCK_NAME);
+        $default   = null !== $blockType ? ( $blockType->attributes['style']['default'] ?? null ) : null;
 
-        foreach (null !== $blockType ? $blockType->get_variations() : array() as $variation) {
-            if (! empty($variation['isDefault']) && is_array($variation['attributes'] ?? null)) {
-                return $variation['attributes'];
-            }
-        }
-
-        return array();
+        return is_array($default) ? $default : array();
     }
 }

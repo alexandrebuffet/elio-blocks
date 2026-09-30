@@ -16,35 +16,24 @@ import {
 } from '../forecast/variations';
 
 /**
- * Attributes of the credit of the provider: those of its default variation,
- * which Block Hooks and the inserter give it too (StyleHookedProviderAttribution).
- */
-const PROVIDER_ATTRIBUTION_ATTRIBUTES =
-	providerAttributionMetadata.variations.find(
-		( { isDefault } ) => isDefault
-	).attributes;
-
-/**
  * Credit of the provider, last in every variation. Block Hooks add it to the
  * reports of templates, patterns and posts saved before it existed, but a
  * report saved without it counts as one it was removed from (its metadata
- * ignores it from then on): a report made in the editor gets it here.
+ * ignores it from then on): a report made in the editor gets it here. Its size
+ * and alignment are the default of its style attribute.
  */
-export const PROVIDER_ATTRIBUTION_BLOCK = [
-	'elio/provider-attribution',
-	PROVIDER_ATTRIBUTION_ATTRIBUTES,
-];
+export const PROVIDER_ATTRIBUTION_BLOCK = [ 'elio/provider-attribution' ];
 
 /**
  * Credit of the provider in a report laid out as a flex row: on a line of its
- * own, as StyleHookedProviderAttribution places it in such a report.
+ * own, as StyleHookedProviderAttribution places it in such a report. A style
+ * given replaces the default one: it starts from it.
  */
 const PROVIDER_ATTRIBUTION_ROW_BLOCK = [
 	'elio/provider-attribution',
 	{
-		...PROVIDER_ATTRIBUTION_ATTRIBUTES,
 		style: {
-			...PROVIDER_ATTRIBUTION_ATTRIBUTES.style,
+			...providerAttributionMetadata.attributes.style.default,
 			layout: { selfStretch: 'fixed', flexSize: '100%' },
 		},
 	},
