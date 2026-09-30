@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Elio Blocks — Weather blocks for WordPress</title>
 	<meta name="description" content="Display the current weather and forecasts for any location, with WordPress blocks that look, feel and behave like the ones you already use. Free, no API key by default.">
-	<meta name="theme-color" content="#eee7db">
+	<meta name="theme-color" content="#f9f7f3">
 	<meta property="og:title" content="Elio Blocks — Weather blocks for WordPress">
 	<meta property="og:description" content="The weather, with blocks. Free, no API key by default, made for the Block Editor.">
 	<meta property="og:type" content="website">
@@ -13,18 +13,19 @@
 	<link rel="icon" href="favicon.svg" type="image/svg+xml">
 	<link rel="preload" href="assets/fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 	<link rel="preload" href="assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preconnect" href="https://playground.wordpress.net">
 	<link rel="stylesheet" href="assets/site.css">
 	<script>document.documentElement.classList.add( 'js' );</script>
-	<script src="assets/site.js" defer></script>
+	<script type="module" src="assets/site.js"></script>
 </head>
 <body>
 	<!-- WordPress icons (@wordpress/icons, GPL-2.0-or-later), for the features. -->
 	<svg class="sprite" aria-hidden="true" focusable="false">
 		<symbol id="wp-loop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.63852 15.2138C9.21283 15.3979 8.74333 15.5 8.25 15.5C6.317 15.5 4.75 13.933 4.75 12C4.75 10.067 6.317 8.5 8.25 8.5C10.183 8.5 11.5 9.75 12 12C12.5 14.25 13.817 15.5 15.75 15.5C17.683 15.5 19.25 13.933 19.25 12C19.25 10.067 17.683 8.5 15.75 8.5C15.2567 8.5 14.7872 8.60207 14.3615 8.78624"/></symbol>
-		<symbol id="wp-post-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 10H8.5M10 10H17M7 14H8.5M10 14H17M6 19.25H18C18.6904 19.25 19.25 18.6904 19.25 18V6C19.25 5.30964 18.6904 4.75 18 4.75H6C5.30964 4.75 4.75 5.30964 4.75 6V18C4.75 18.6904 5.30964 19.25 6 19.25Z"/></symbol>
 		<symbol id="wp-layout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.75 19.25H18C18.6904 19.25 19.25 18.6904 19.25 18V9.75M9.75 19.25H6C5.30964 19.25 4.75 18.6904 4.75 18V9.75M9.75 19.25V9.75M19.25 9.75V6C19.25 5.30964 18.6904 4.75 18 4.75H6C5.30964 4.75 4.75 5.30964 4.75 6V9.75M19.25 9.75H9.75M9.75 9.75H4.75"/></symbol>
+		<symbol id="wp-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.2071 6.20711L20.2929 11.2929C20.6834 11.6834 20.6834 12.3166 20.2929 12.7071L15.2071 17.7929C14.8166 18.1834 14.1834 18.1834 13.7929 17.7929L8.70711 12.7071C8.31658 12.3166 8.31658 11.6834 8.70711 11.2929L13.7929 6.20711C14.1834 5.81658 14.8166 5.81658 15.2071 6.20711Z"/><path d="M9.5 5.5L3.70711 11.2929C3.31658 11.6834 3.31658 12.3166 3.70711 12.7071L9.5 18.5"/></symbol>
 		<symbol id="wp-styles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 4.75C7.99594 4.75 4.75 7.99593 4.75 12C4.75 16.0041 7.99594 19.25 12 19.25L12 4.75Z" fill="currentColor" stroke="none"/><path d="M12 19.25C16.0041 19.25 19.25 16.0041 19.25 12C19.25 7.99594 16.0041 4.75 12 4.75C7.99594 4.75 4.75 7.99594 4.75 12C4.75 16.0041 7.99594 19.25 12 19.25Z" stroke-linejoin="round"/></symbol>
-		<symbol id="wp-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.75 7.25L4.75 18C4.75 18.6904 5.30964 19.25 6 19.25H18C18.6904 19.25 19.25 18.6904 19.25 18V7.25V6C19.25 5.30964 18.6904 4.75 18 4.75H6C5.30964 4.75 4.75 5.30964 4.75 6V7.25ZM19.25 7.25H4.75M7.25 10.75H9.25M11 10.75H13M14.75 10.75H16.75M7.25 14.5H9.25M11 14.5H13M14.75 14.5H16.75"/><path d="M18 4.75H6C5.30964 4.75 4.75 5.30964 4.75 6V7.25H19.25V6C19.25 5.30964 18.6904 4.75 18 4.75Z" fill="currentColor"/></symbol>
+		<symbol id="wp-cog" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.38646 8.95505C5.36302 8.99564 5.37092 9.04706 5.40547 9.07874L6.96476 10.509C7.08306 10.1089 7.24777 9.72864 7.45264 9.37456C7.66022 9.01579 7.90904 8.68387 8.19262 8.38527L6.17287 7.74956C6.12816 7.73549 6.07968 7.75436 6.05624 7.79495L5.38646 8.95505Z" fill="currentColor" stroke-linejoin="round"/><path d="M12.6698 19.25C12.7167 19.25 12.7573 19.2174 12.7674 19.1717L13.2265 17.106C12.833 17.2001 12.4223 17.25 12 17.25C11.5777 17.25 11.167 17.2001 10.7736 17.106L11.2326 19.1717C11.2428 19.2174 11.2834 19.25 11.3303 19.25L12.6698 19.25Z" fill="currentColor" stroke-linejoin="round"/><path d="M11.3303 4.75C11.2834 4.75 11.2428 4.78255 11.2326 4.82831L10.7736 6.89403C11.167 6.79986 11.5777 6.75 12 6.75C12.4223 6.75 12.833 6.79987 13.2265 6.89403L12.7674 4.82831C12.7573 4.78255 12.7167 4.75 12.6698 4.75L11.3303 4.75Z" fill="currentColor" stroke-linejoin="round"/><path d="M17.9438 7.79495C17.9204 7.75436 17.8719 7.73549 17.8272 7.74956L15.8074 8.38528C16.091 8.68388 16.3398 9.0158 16.5474 9.37457C16.7523 9.72865 16.917 10.1089 17.0353 10.509L18.5946 9.07874C18.6291 9.04706 18.637 8.99564 18.6136 8.95505L17.9438 7.79495Z" fill="currentColor" stroke-linejoin="round"/><path d="M6.05625 16.205C6.07968 16.2456 6.12816 16.2645 6.17287 16.2504L8.19262 15.6147C7.90904 15.3161 7.66022 14.9842 7.45264 14.6254C7.24777 14.2714 7.08307 13.8911 6.96476 13.491L5.40547 14.9213C5.37093 14.9529 5.36303 15.0044 5.38646 15.045L6.05625 16.205Z" fill="currentColor" stroke-linejoin="round"/><path d="M18.6136 15.0449C18.637 15.0044 18.6291 14.9529 18.5946 14.9213L17.0353 13.491C16.917 13.8911 16.7523 14.2713 16.5474 14.6254C16.3398 14.9842 16.091 15.3161 15.8074 15.6147L17.8272 16.2504C17.8719 16.2645 17.9204 16.2456 17.9438 16.205L18.6136 15.0449Z" fill="currentColor" stroke-linejoin="round"/><path d="M12 6.75C14.8995 6.75 17.25 9.10051 17.25 12C17.25 14.8995 14.8995 17.25 12 17.25C9.10051 17.25 6.75 14.8995 6.75 12C6.75 9.10051 9.10051 6.75 12 6.75Z"/><path d="M12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8Z"/></symbol>
 		<symbol id="wp-seen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.0645 13C18.5918 10.0366 15.5337 8 12 8C8.46631 8 5.40825 10.0366 3.93555 13"/><circle cx="12" cy="12.5" r="3" fill="currentColor"/></symbol>
 		<symbol id="wp-plugins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.3995 11.5711L12.2175 8.38909L10.273 6.44454L7.67678 9.04074C7.3017 9.41581 7.09099 9.92452 7.09099 10.455L7.09099 13.455C7.09099 13.7202 6.98563 13.9745 6.7981 14.1621L5.14645 15.8137C4.95118 16.009 4.95118 16.3256 5.14645 16.5208L7.26777 18.6421C7.46303 18.8374 7.77961 18.8374 7.97487 18.6421L9.62652 16.9905C9.81406 16.8029 10.0684 16.6976 10.3336 16.6976H13.3336C13.8641 16.6976 14.3728 16.4869 14.7478 16.1118L17.344 13.5156L15.3995 11.5711ZM12.2175 8.38909L16.1066 4.5M15.3995 11.5711L19.2886 7.68198"/></symbol>
 	</svg>
@@ -39,12 +40,12 @@
 			</a>
 			<nav class="site-nav" aria-label="Main">
 				<a href="#features">Features</a>
-				<a href="#demo">Demo</a>
+				<a href="#screens">Screens</a>
 				<a href="#icons">Icons</a>
 				<a href="#faq">FAQ</a>
-				<a href="https://github.com/alexandrebuffet/elio-blocks">GitHub</a>
+				<a href="https://github.com/alexandrebuffet/elio-blocks" target="_blank" rel="noopener">GitHub<span class="screen-reader-text"> (opens in a new tab)</span></a>
 			</nav>
-			<a class="link-arrow" href="#demo" data-playground-link>Try it live</a>
+			<a class="link-arrow" href="#" data-playground-link target="_blank" rel="noopener"><span class="link-arrow__text">Try it live</span><span class="link-arrow__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
 		</div>
 	</header>
 
@@ -55,8 +56,8 @@
 				<div class="hero__intro">
 					<p class="lead">Current conditions and forecasts for any location, with blocks that look, feel and behave like the ones you already use every day.</p>
 					<div class="actions">
-						<a class="button" href="#demo" data-playground-link>Try it live</a>
-						<a class="link-arrow" href="https://github.com/alexandrebuffet/elio-blocks">View on GitHub</a>
+						<a class="button" href="#" data-playground-link target="_blank" rel="noopener">Try it live<span class="screen-reader-text"> (opens in a new tab)</span></a>
+						<a class="link-arrow" href="https://github.com/alexandrebuffet/elio-blocks" target="_blank" rel="noopener"><span class="link-arrow__text">View on GitHub</span><span class="link-arrow__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
 					</div>
 					<p class="hero__meta">Free &middot; No API key by default &middot; WordPress 6.7+ &middot; Soon on WordPress.org</p>
 				</div>
@@ -65,39 +66,42 @@
 			<div class="scene">
 				<img class="scene__photo" src="assets/images/clouds-2000.jpg" srcset="assets/images/clouds-1000.jpg 1000w, assets/images/clouds-2000.jpg 2000w" sizes="100vw" alt="" width="2000" height="1326" fetchpriority="high">
 				<div class="container scene__inner">
-					<p class="scene__coordinates" data-weather="coordinates">48°51′N&ensp;2°21′E</p>
+					<p class="scene__coordinates" aria-hidden="true">48°51′N&ensp;2°21′E</p>
 
-					<figure class="report" data-sky="day">
-						<div class="report__body">
-							<p class="report__location" data-weather="location">Paris</p>
-							<div class="report__now">
-								<svg class="icon report__icon" aria-hidden="true"><use data-weather="icon" href="icons.svg#sun-high"></use></svg>
-								<p class="report__temperature"><span data-weather="temperature">21.4</span>°C</p>
+					<div class="live" data-live>
+						<div class="browser live__editor">
+							<div class="browser__bar">
+								<span class="browser__dots" aria-hidden="true"><span></span><span></span><span></span></span>
+								<span class="browser__url">my-site.test/wp-admin/post.php</span>
+								<span class="browser__tag">Editor</span>
 							</div>
-							<p class="report__description" data-weather="description">Mainly clear</p>
-							<ol class="report__hours" data-weather="hours" aria-label="Next hours">
-								<li><span>Now</span><svg class="icon" aria-hidden="true"><use href="icons.svg#sun-high"></use></svg><span>21.4°C</span></li>
-								<li><span>3 pm</span><svg class="icon" aria-hidden="true"><use href="icons.svg#sun-high"></use></svg><span>22°C</span></li>
-								<li><span>4 pm</span><svg class="icon" aria-hidden="true"><use href="icons.svg#sun-cloud"></use></svg><span>21.8°C</span></li>
-								<li><span>5 pm</span><svg class="icon" aria-hidden="true"><use href="icons.svg#sun-cloud"></use></svg><span>20.9°C</span></li>
-								<li><span>6 pm</span><svg class="icon" aria-hidden="true"><use href="icons.svg#clouds"></use></svg><span>19.6°C</span></li>
-							</ol>
+							<div class="browser__screen" data-live-screen="editor" data-width="1280">
+								<img class="browser__poster" src="assets/wporg/screenshot-1.png" alt="The Weather block in the Block Editor, with an hourly forecast and its location settings." width="2560" height="1600">
+							</div>
 						</div>
-						<figcaption class="report__credit">Weather data by <a href="https://open-meteo.com/">Open-Meteo</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></figcaption>
-					</figure>
-
-					<div class="cities">
-						<p class="cities__label" id="cities-label">Live weather, now, in</p>
-						<div class="cities__list" role="group" aria-labelledby="cities-label">
-							<button type="button" class="city" aria-pressed="true" data-city="Paris" data-lat="48.8566" data-lon="2.3522">Paris</button>
-							<button type="button" class="city" aria-pressed="false" data-city="Reykjavík" data-lat="64.1466" data-lon="-21.9426">Reykjavík</button>
-							<button type="button" class="city" aria-pressed="false" data-city="Tokyo" data-lat="35.6762" data-lon="139.6503">Tokyo</button>
-							<button type="button" class="city" aria-pressed="false" data-city="Darwin" data-lat="-12.4637" data-lon="130.8444">Darwin</button>
-							<button type="button" class="city" aria-pressed="false" data-city="New York" data-lat="40.7128" data-lon="-74.006">New York</button>
+						<div class="browser live__front">
+							<div class="browser__bar">
+								<span class="browser__dots" aria-hidden="true"><span></span><span></span><span></span></span>
+								<span class="browser__url">my-site.test/weather-in-paris</span>
+								<button type="button" class="browser__reload" data-live-reload disabled>
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.05-4.95M19 5v4h-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+									<span class="screen-reader-text">Reload the front end</span>
+								</button>
+								<span class="browser__tag">Front end</span>
+							</div>
+							<div class="browser__screen" data-live-screen="front" data-width="1280">
+								<img class="browser__poster browser__poster--contain" src="assets/wporg/screenshot-2.png" alt="A daily forecast on the front end." width="2488" height="684">
+							</div>
 						</div>
 					</div>
+
+					<div class="live__note">
+						<p class="live__status" role="status"><span class="live__dot" aria-hidden="true"></span><span data-live-status>A real WordPress, in your browser.</span></p>
+						<p class="live__hint">Edit the post on the left, save, then reload the front end on the right.</p>
+						<button type="button" class="button button--small" data-live-start hidden>Start the live demo</button>
+						<a class="link-arrow" href="#" data-playground-link data-live-open target="_blank" rel="noopener" hidden><span class="link-arrow__text">Open the live demo</span><span class="link-arrow__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
+					</div>
 				</div>
-				<p class="screen-reader-text" role="status" data-weather-status></p>
 			</div>
 		</section>
 
@@ -121,76 +125,64 @@
 				</header>
 				<ol class="features">
 					<li class="feature reveal">
-						<svg class="feature__icon" aria-hidden="true"><use href="#wp-loop"></use></svg>
-						<h3 class="feature__title">A report, like the Query Loop</h3>
+						<h3 class="feature__title"><span class="tool-icon" aria-hidden="true"><svg><use href="#wp-loop"></use></svg></span>A report, like the Query Loop</h3>
 						<p>The Weather block works like the Query Loop: it gets the forecast of a place and hands it to the blocks inside it. From there, everything is a block: temperature, wind, UV index, sunrise, the condition icon. Add them, remove them, reorder them, nest them in rows and columns.</p>
 					</li>
 					<li class="feature reveal">
-						<svg class="feature__icon" aria-hidden="true"><use href="#wp-post-list"></use></svg>
-						<h3 class="feature__title">A Forecast Template, like the Post Template</h3>
+						<h3 class="feature__title"><span class="tool-icon" aria-hidden="true"><svg><use href="#wp-layout"></use></svg></span>A Forecast Template, like the Post Template</h3>
 						<p>Hourly and daily forecasts repeat a Forecast Template you design once, the way the Post Template repeats inside a Query Loop.</p>
 					</li>
 					<li class="feature reveal">
-						<svg class="feature__icon" aria-hidden="true"><use href="#wp-layout"></use></svg>
-						<h3 class="feature__title">Start from a layout</h3>
+						<h3 class="feature__title"><span class="tool-icon" aria-hidden="true"><svg><use href="#wp-symbol"></use></svg></span>Start from a layout</h3>
 						<p>Pick Default, Minimal, Hourly or Daily Forecast, or start blank and build your own.</p>
 					</li>
 					<li class="feature reveal">
-						<svg class="feature__icon" aria-hidden="true"><use href="#wp-styles"></use></svg>
-						<h3 class="feature__title">Every design tool you expect</h3>
+						<h3 class="feature__title"><span class="tool-icon" aria-hidden="true"><svg><use href="#wp-styles"></use></svg></span>Every design tool you expect</h3>
 						<p>Colors, typography, spacing and borders come from the standard block supports: the same panels as core blocks, your theme’s presets, <code>theme.json</code> included.</p>
 					</li>
 					<li class="feature reveal">
-						<svg class="feature__icon" aria-hidden="true"><use href="#wp-calendar"></use></svg>
-						<h3 class="feature__title">Your site’s settings, respected</h3>
+						<h3 class="feature__title"><span class="tool-icon" aria-hidden="true"><svg><use href="#wp-cog"></use></svg></span>Your site’s settings, respected</h3>
 						<p>Dates in your site’s language and formats, in the timezone of the location. Metric or imperial, site-wide or per block.</p>
 					</li>
 					<li class="feature reveal">
-						<svg class="feature__icon" aria-hidden="true"><use href="#wp-seen"></use></svg>
-						<h3 class="feature__title">What you see is what you get</h3>
+						<h3 class="feature__title"><span class="tool-icon" aria-hidden="true"><svg><use href="#wp-seen"></use></svg></span>What you see is what you get</h3>
 						<p>The editor shows the real forecast of your location, styled exactly as it will be on your site.</p>
 					</li>
 					<li class="feature reveal">
-						<svg class="feature__icon" aria-hidden="true"><use href="#wp-plugins"></use></svg>
-						<h3 class="feature__title">Open-Meteo by default, open to more</h3>
+						<h3 class="feature__title"><span class="tool-icon" aria-hidden="true"><svg><use href="#wp-plugins"></use></svg></span>Open-Meteo by default, open to more</h3>
 						<p>The weather comes from Open-Meteo, with no account and no key for non-commercial use, or with the key of a subscription. Weather providers are pluggable: Elio Blocks can add more, and so can your own code, through its PHP API.</p>
 					</li>
 				</ol>
 			</div>
 		</section>
 
-		<section class="section section--flush" id="demo" aria-labelledby="demo-title">
-			<div class="container demo__header reveal">
-				<div class="demo__intro">
-					<h2 class="display section__title" id="demo-title">See it, <em>then try&nbsp;it.</em></h2>
-					<p class="lead">Browse the editor and the front end, or open the live demo: WordPress Playground runs a whole WordPress site in this page, with Elio Blocks installed and a post ready to edit. Nothing to install.</p>
-				</div>
-				<div class="tabs" role="tablist" aria-label="Screenshots and live demo">
+		<section class="section section--flush" id="screens" aria-labelledby="screens-title">
+			<div class="container screens__header reveal">
+				<h2 class="display section__title" id="screens-title">Every screen, <em>up&nbsp;close.</em></h2>
+				<div class="tabs" role="tablist" aria-label="Screenshots">
 					<button type="button" role="tab" class="tab" id="tab-1" aria-controls="shot" aria-selected="true" data-shot="1">Editor</button>
 					<button type="button" role="tab" class="tab" id="tab-2" aria-controls="shot" aria-selected="false" data-shot="2" tabindex="-1">Front end</button>
 					<button type="button" role="tab" class="tab" id="tab-3" aria-controls="shot" aria-selected="false" data-shot="3" tabindex="-1">Layouts</button>
 					<button type="button" role="tab" class="tab" id="tab-4" aria-controls="shot" aria-selected="false" data-shot="4" tabindex="-1">Location</button>
 					<button type="button" role="tab" class="tab" id="tab-5" aria-controls="shot" aria-selected="false" data-shot="5" tabindex="-1">Settings</button>
-					<button type="button" role="tab" class="tab tab--live" id="tab-live" aria-controls="shot" aria-selected="false" data-shot="live" tabindex="-1">Try it live</button>
 				</div>
 			</div>
 			<div class="stage">
 				<img class="stage__photo" src="assets/images/clouds-2000.jpg" srcset="assets/images/clouds-1000.jpg 1000w, assets/images/clouds-2000.jpg 2000w" sizes="100vw" alt="" width="2000" height="1326" loading="lazy">
 				<div class="container">
-					<div class="window" id="shot" role="tabpanel" aria-labelledby="tab-1" tabindex="0">
-						<img class="window__image" src="assets/wporg/screenshot-1.png" alt="The Weather block in the Block Editor, with an hourly forecast and its location settings." width="2560" height="1600" loading="lazy" decoding="async">
-						<div class="window__live" data-playground hidden>
-							<button type="button" class="demo__start" data-playground-start>
-								<span class="demo__label">Start the demo</span>
-								<span class="demo__hint">Loads WordPress Playground, about 30&nbsp;MB</span>
-							</button>
+					<div class="browser stage__browser" id="shot" role="tabpanel" aria-labelledby="tab-1" tabindex="0">
+						<div class="browser__bar">
+							<span class="browser__dots" aria-hidden="true"><span></span><span></span><span></span></span>
+							<span class="browser__url" data-shot-url>my-site.test/wp-admin/post.php</span>
+						</div>
+						<div class="browser__screen">
+							<img class="stage__image" src="assets/wporg/screenshot-1.png" alt="The Weather block in the Block Editor, with an hourly forecast and its location settings." width="2560" height="1600" loading="lazy" decoding="async">
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="container stage__footer">
 				<p class="stage__caption" data-shot-caption>The Weather block in the Block Editor, with an hourly forecast and its location settings.</p>
-				<a class="link-arrow" href="#" data-playground-link data-playground-new-tab target="_blank" rel="noopener">Open the demo in a new tab<span class="screen-reader-text"> (opens in a new tab)</span></a>
 			</div>
 		</section>
 
@@ -223,8 +215,13 @@
 				<header class="split__aside reveal">
 					<p class="eyebrow">Condition icons</p>
 					<h2 class="display section__title" id="icons-title">Icons, <em>your way.</em></h2>
-					<p class="lead">Elio Blocks comes with its own collection, drawn for it, by day and by night. Choose the collection for the whole site, for one report or for one icon, set their stroke and color like any block, or register your own collection in a few lines of PHP. On WordPress 7.1, they join the Icon block too.</p>
+					<p class="lead">Every weather condition has its icon, by day and by night. Choose the collection for the whole site, for one report or for one icon, set their stroke and color like any block, or register your own collection in a few lines of PHP.</p>
 					<div class="icon-controls">
+						<fieldset class="choice">
+							<legend class="choice__legend">Time</legend>
+							<label><input type="radio" name="icon-time" value="day" data-icon-time checked> Day</label>
+							<label><input type="radio" name="icon-time" value="night" data-icon-time> Night</label>
+						</fieldset>
 						<fieldset class="choice">
 							<legend class="choice__legend">Stroke</legend>
 							<label><input type="radio" name="icon-stroke" value="1" data-icon-stroke> Thin</label>
@@ -239,7 +236,7 @@
 						</fieldset>
 					</div>
 				</header>
-				<ul class="icon-grid" data-icon-grid data-color="ink" aria-label="Icons of the Elio collection"></ul>
+				<ul class="conditions" data-conditions data-color="ink" aria-label="Weather conditions and their icons"></ul>
 			</div>
 		</section>
 
@@ -275,7 +272,7 @@
 					</details>
 					<details>
 						<summary>Where is the source code?</summary>
-						<p>On <a href="https://github.com/alexandrebuffet/elio-blocks">GitHub</a>, where the plugin is developed in the open. Issues and pull requests welcome.</p>
+						<p>On <a href="https://github.com/alexandrebuffet/elio-blocks" target="_blank" rel="noopener">GitHub<span class="screen-reader-text"> (opens in a new tab)</span></a>, where the plugin is developed in the open. Issues and pull requests welcome.</p>
 					</details>
 				</div>
 			</div>
@@ -286,8 +283,8 @@
 			<div class="container closing__inner">
 				<h2 class="display closing__title" id="closing-title">Let the <em class="shimmer shimmer--night">sunshine</em> in.</h2>
 				<div class="actions actions--center">
-					<a class="button button--light" href="#demo" data-playground-link>Try it live</a>
-					<a class="link-arrow" href="https://github.com/alexandrebuffet/elio-blocks">View on GitHub</a>
+					<a class="button button--light" href="#" data-playground-link target="_blank" rel="noopener">Try it live<span class="screen-reader-text"> (opens in a new tab)</span></a>
+					<a class="link-arrow" href="https://github.com/alexandrebuffet/elio-blocks" target="_blank" rel="noopener"><span class="link-arrow__text">View on GitHub</span><span class="link-arrow__icon" aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a>
 				</div>
 			</div>
 		</section>
@@ -297,7 +294,7 @@
 		<div class="container site-footer__inner">
 			<p class="brand"><img class="brand__logo" src="favicon.svg" alt="" width="24" height="24"><span class="brand__name">Elio Blocks</span></p>
 			<p>Free software, licensed under the GPLv2 or later. Weather data by <a href="https://open-meteo.com/">Open-Meteo</a>.</p>
-			<p><a href="https://github.com/alexandrebuffet/elio-blocks">GitHub</a> · Made by <a href="https://github.com/alexandrebuffet">Alexandre Buffet</a></p>
+			<p><a href="https://github.com/alexandrebuffet/elio-blocks" target="_blank" rel="noopener">GitHub<span class="screen-reader-text"> (opens in a new tab)</span></a> · Made by <a href="https://github.com/alexandrebuffet" target="_blank" rel="noopener">Alexandre Buffet<span class="screen-reader-text"> (opens in a new tab)</span></a></p>
 		</div>
 	</footer>
 </body>
