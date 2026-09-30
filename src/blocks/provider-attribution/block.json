@@ -13,6 +13,11 @@
 		"elio/weather-report": "lastChild"
 	},
 	"attributes": {
+		"linkTarget": {
+			"type": "string",
+			"default": "_self",
+			"enum": ["_self", "_blank"]
+		},
 		"style": {
 			"type": "object",
 			"default": {

@@ -5,7 +5,8 @@
  *
  * One sentence, its name and the license linked: each link names where it
  * leads, the sentence around it what it is. The links open in the same tab,
- * as the other links of the page do.
+ * as the other links of the page do, unless the block says otherwise; then
+ * each says so to screen readers.
  *
  * @var array    $attributes Block attributes.
  * @var string   $content    Inner block content.
@@ -27,10 +28,18 @@ if (null === $attribution) {
     return;
 }
 
+$opens_in_new_tab   = isset($attributes['linkTarget']) && '_blank' === $attributes['linkTarget'];
+$new_tab_attributes = $opens_in_new_tab ? ' target="_blank" rel="noopener"' : '';
+$new_tab_notice     = $opens_in_new_tab
+    ? '<span class="screen-reader-text"> ' . esc_html__('(opens in a new tab)', 'elio-blocks') . '</span>'
+    : '';
+
 $provider_link = sprintf(
-    '<a class="wp-block-elio-provider-attribution__provider-link" href="%1$s">%2$s</a>',
+    '<a class="wp-block-elio-provider-attribution__provider-link" href="%1$s"%3$s>%2$s%4$s</a>',
     esc_url($attribution['url']),
-    esc_html($attribution['name'])
+    esc_html($attribution['name']),
+    $new_tab_attributes,
+    $new_tab_notice
 );
 
 if ('' === $attribution['license']) {
@@ -42,9 +51,12 @@ if ('' === $attribution['license']) {
 } else {
     $license = '' !== $attribution['license_url']
         ? sprintf(
-            '<a class="wp-block-elio-provider-attribution__license-link" href="%1$s" rel="license">%2$s</a>',
+            '<a class="wp-block-elio-provider-attribution__license-link" href="%1$s" rel="%3$s"%4$s>%2$s%5$s</a>',
             esc_url($attribution['license_url']),
-            esc_html($attribution['license'])
+            esc_html($attribution['license']),
+            $opens_in_new_tab ? 'license noopener' : 'license',
+            $opens_in_new_tab ? ' target="_blank"' : '',
+            $new_tab_notice
         )
         : esc_html($attribution['license']);
 
@@ -57,10 +69,14 @@ if ('' === $attribution['license']) {
 }
 
 $allowed_html = array(
-    'a' => array(
+    'a'    => array(
+        'class'  => true,
+        'href'   => true,
+        'rel'    => true,
+        'target' => true,
+    ),
+    'span' => array(
         'class' => true,
-        'href'  => true,
-        'rel'   => true,
     ),
 );
 ?>

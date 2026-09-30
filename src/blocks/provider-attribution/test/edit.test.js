@@ -19,6 +19,21 @@ vi.mock( '@wordpress/block-editor', () => ( {
 		className: 'wp-block-elio-provider-attribution',
 		...props,
 	} ),
+	InspectorControls: ( { children } ) => (
+		<div data-testid="inspector">{ children }</div>
+	),
+} ) );
+vi.mock( '@wordpress/components', () => ( {
+	__experimentalToolsPanel: ( { children } ) => <div>{ children }</div>,
+	__experimentalToolsPanelItem: ( { children } ) => <div>{ children }</div>,
+	ToggleControl: ( { label, checked, onChange } ) => (
+		<input
+			type="checkbox"
+			aria-label={ label }
+			checked={ checked }
+			onChange={ ( event ) => onChange( event.target.checked ) }
+		/>
+	),
 } ) );
 vi.mock( '../../../stores/elio-data', () => ( { store: 'elio/data' } ) );
 
@@ -39,7 +54,12 @@ const SILENT = {
 	attribution: null,
 };
 
-function renderEdit( providers, provider = '' ) {
+function renderEdit(
+	providers,
+	provider = '',
+	attributes = {},
+	setAttributes = () => {}
+) {
 	const registry = createRegistry();
 	registry.register(
 		createReduxStore( 'elio/data', {
@@ -51,6 +71,8 @@ function renderEdit( providers, provider = '' ) {
 	return renderWithRegistry(
 		registry,
 		<ProviderAttributionEdit
+			attributes={ attributes }
+			setAttributes={ setAttributes }
 			context={ { 'elio/reportProvider': provider } }
 		/>
 	).container;
@@ -67,6 +89,7 @@ describe( 'provider-attribution edit', () => {
 		const license = container.querySelector(
 			'.wp-block-elio-provider-attribution__license-link'
 		);
+		expect( credit.hasAttribute( 'rel' ) ).toBe( false );
 		expect( paragraph.textContent ).toBe(
 			'Weather data by Open-Meteo, licensed under CC BY 4.0'
 		);
@@ -101,6 +124,38 @@ describe( 'provider-attribution edit', () => {
 		expect( container.textContent ).toBe(
 			'Weather data by Acme <Weather>'
 		);
+	} );
+
+	it( 'opens its links in a new tab when asked, and says so to screen readers', () => {
+		const container = renderEdit( [ OPEN_METEO ], '', {
+			linkTarget: '_blank',
+		} );
+
+		const links = container.querySelectorAll( 'p a' );
+		expect( links ).toHaveLength( 2 );
+		links.forEach( ( link ) => {
+			expect( link.getAttribute( 'target' ) ).toBe( '_blank' );
+			expect( link.getAttribute( 'rel' ) ).toContain( 'noopener' );
+			expect(
+				link.querySelector( '.screen-reader-text' ).textContent
+			).toBe( ' (opens in a new tab)' );
+		} );
+		expect( links[ 1 ].getAttribute( 'rel' ) ).toBe( 'license noopener' );
+	} );
+
+	it( 'sets the link target from its setting', () => {
+		const setAttributes = vi.fn();
+		const container = renderEdit( [ OPEN_METEO ], '', {}, setAttributes );
+
+		const toggle = container.querySelector(
+			'input[aria-label="Open in new tab"]'
+		);
+		expect( toggle.checked ).toBe( false );
+		toggle.click();
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			linkTarget: '_blank',
+		} );
 	} );
 
 	it( 'keeps a click on a credit link in the editor', () => {
