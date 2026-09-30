@@ -14,6 +14,7 @@
 /docs
 /scripts
 /tests
+/_site
 
 # Build and config files
 /package.json
@@ -32,6 +33,7 @@
 /.editorconfig
 /.gitignore
 /.npmignore
+/.stylelintignore
 /.nvmrc
 
 # Documentation

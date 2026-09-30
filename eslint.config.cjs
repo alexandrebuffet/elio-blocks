@@ -40,6 +40,8 @@ module.exports = [
 			'src/blocks/weather-report/icons/components/**',
 			'src/icons/brand/components/**',
 			'vendor-prefixed/**',
+			// The presentation site built by npm run build:site.
+			'_site/**',
 			// Git worktrees of Claude Code: other checkouts of the plugin, with their own config.
 			'.claude/**',
 		],

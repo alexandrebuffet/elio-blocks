@@ -135,6 +135,8 @@ npm run build
 
 The WordPress.org package is built by the `build-plugin.yml` GitHub Actions workflow: run it by hand to get a ZIP to test.
 
+The presentation site, [alexandrebuffet.github.io/elio-blocks](https://alexandrebuffet.github.io/elio-blocks/), lives in `docs/site/`: `npm run build:site` assembles it into `_site/`, which any static server can show (the Playground demo needs `elio-blocks.zip` next to it, added by the `deploy-site.yml` workflow).
+
 Bug reports and pull requests are welcome on [GitHub](https://github.com/alexandrebuffet/elio-blocks/issues).
 
 ## Credits
