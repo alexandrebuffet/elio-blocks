@@ -12,7 +12,8 @@
  *   Preview, which the "Try it live" links load with the plugin zip of the
  *   site in place of the WordPress.org slug.
  * - icons.svg: the Elio collection (src/icons/) as one sprite of symbols
- *   stroked in currentColor (the page sets their width).
+ *   stroked in currentColor (the page sets their width), and the plain logo
+ *   of the admin menu (RegisterOptionsPage::MENU_ICON) as `elio-menu`.
  *
  * The deploy workflow adds elio-blocks.zip, the package of the plugin, next to
  * index.html. Preview locally with `npm run build:site`, then serve _site/.
@@ -72,6 +73,23 @@ const symbols = manifest.icons.map( ( { slug } ) => {
 		.trim();
 	return `<symbol id="${ slug }" viewBox="0 0 24 24" fill="none">${ body }</symbol>`;
 } );
+// The logo of the admin menu, one color, as WordPress paints it.
+const menuIcon = Buffer.from(
+	readFileSync(
+		join( root, 'includes/Settings/Hooks/RegisterOptionsPage.php' ),
+		'utf8'
+	).match( /MENU_ICON = 'data:image\/svg\+xml;base64,([^']+)'/ )[ 1 ],
+	'base64'
+).toString( 'utf8' );
+symbols.push(
+	menuIcon
+		.replace(
+			/<svg[^>]*viewBox="([^"]+)"[^>]*>/,
+			'<symbol id="elio-menu" viewBox="$1">'
+		)
+		.replace( '</svg>', '</symbol>' )
+		.replace( /fill="black"/g, 'fill="currentColor"' )
+);
 writeFileSync(
 	join( out, 'icons.svg' ),
 	`<svg xmlns="http://www.w3.org/2000/svg">${ symbols.join( '' ) }</svg>\n`

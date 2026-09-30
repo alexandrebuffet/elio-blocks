@@ -6,17 +6,46 @@
 
 const PLAYGROUND = 'https://playground.wordpress.net';
 
-// The windows of the hero show the editor without its welcome guide, and
-// the front end without the toolbar, so the Weather block is in sight.
+// Both demos, the hero and the full one: the visitor is a stranger from far
+// away (a name, an avatar of a flying saucer, the author of the sample post),
+// and the editor opens without its welcome guide.
 const DEMO_SETUP = `<?php
 require '/wordpress/wp-load.php';
+wp_update_user( array(
+	'ID' => 1,
+	'display_name' => 'Stranger',
+	'nickname' => 'Stranger',
+	'first_name' => 'Stranger',
+) );
+wp_update_post( array( 'ID' => 1000, 'post_author' => 1 ) );
 update_user_meta( 1, $wpdb->get_blog_prefix() . 'persisted_preferences', array(
 	'core/edit-post' => array( 'welcomeGuide' => false ),
 	'core' => array( 'welcomeGuide' => false ),
 	'_modified' => gmdate( 'c' ),
 ) );
+$uploads = wp_upload_dir();
+wp_mkdir_p( $uploads['basedir'] );
+file_put_contents( $uploads['basedir'] . '/stranger.svg', <<<'SVG'
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3fd49a"/><stop offset="1" stop-color="#2a63d9"/></linearGradient></defs><rect width="64" height="64" fill="url(#g)"/><g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 30a10 10 0 0 1 20 0"/><ellipse cx="32" cy="33" rx="20" ry="6"/><path d="M25 44l-3 6M32 45v6M39 44l3 6"/></g><g fill="#fff"><circle cx="23" cy="33" r="1.8"/><circle cx="32" cy="34.5" r="1.8"/><circle cx="41" cy="33" r="1.8"/></g></svg>
+SVG
+);
 wp_mkdir_p( WPMU_PLUGIN_DIR );
-file_put_contents( WPMU_PLUGIN_DIR . '/elio-demo.php', "<?php add_filter( 'show_admin_bar', '__return_false' );\\n" );
+file_put_contents( WPMU_PLUGIN_DIR . '/elio-demo-stranger.php', <<<'PHP'
+<?php
+add_filter( 'pre_get_avatar_data', function ( $args ) {
+	$args['url'] = wp_upload_dir()['baseurl'] . '/stranger.svg';
+	return $args;
+} );
+PHP
+);
+`;
+
+// The hero shows the front end without the toolbar, so the Weather block is
+// in sight.
+const HERO_SETUP = `<?php
+require '/wordpress/wp-load.php';
+wp_mkdir_p( WPMU_PLUGIN_DIR );
+file_put_contents( WPMU_PLUGIN_DIR . '/elio-demo-toolbar.php', "<?php add_filter( 'show_admin_bar', '__return_false' );\\n" );
 `;
 
 const blueprintPromise = fetch( 'blueprint.json' )
@@ -46,6 +75,7 @@ async function initPlaygroundLinks() {
 					pluginData: { resource: 'url', url: zipUrl },
 				},
 				...( rest.steps ?? [] ),
+				{ step: 'runPHP', code: DEMO_SETUP },
 			],
 		} )
 	) }`;
@@ -191,6 +221,7 @@ function initLiveDemo() {
 				}
 			}
 			await client.runPHP( playground, { code: DEMO_SETUP } );
+			await client.runPHP( playground, { code: HERO_SETUP } );
 			await playground.goTo( blueprint.landingPage );
 			const siteUrl = ( await playground.absoluteUrl ).replace(
 				/\/$/,
