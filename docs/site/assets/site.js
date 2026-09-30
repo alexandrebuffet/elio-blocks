@@ -1,7 +1,7 @@
 /**
  * The presentation site: the live demo of the hero (WordPress Playground in
- * one window, the editor and the front end of one site in two tabs), the
- * condition icon studio (icons.json) and the scroll reveals.
+ * one window, the editor and the front end of one site in two tabs) and the
+ * scroll reveals.
  */
 
 const PLAYGROUND = 'https://playground.wordpress.net';
@@ -19,10 +19,6 @@ wp_mkdir_p( WPMU_PLUGIN_DIR );
 file_put_contents( WPMU_PLUGIN_DIR . '/elio-demo.php', "<?php add_filter( 'show_admin_bar', '__return_false' );\\n" );
 `;
 
-const iconsPromise = fetch( 'icons.json' )
-	.then( ( response ) => response.json() )
-	.catch( () => null );
-
 const blueprintPromise = fetch( 'blueprint.json' )
 	.then( ( response ) => response.json() )
 	.catch( () => null );
@@ -30,22 +26,6 @@ const blueprintPromise = fetch( 'blueprint.json' )
 const zipUrl = new URL( 'elio-blocks.zip', document.baseURI ).href;
 
 const phone = window.matchMedia( '(max-width: 599px)' );
-
-function svgIcon( slug ) {
-	const svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
-	svg.setAttribute( 'class', 'icon' );
-	svg.setAttribute( 'aria-hidden', 'true' );
-	const use = document.createElementNS( 'http://www.w3.org/2000/svg', 'use' );
-	use.setAttribute( 'href', `icons.svg#${ slug }` );
-	svg.append( use );
-	return svg;
-}
-
-function pressOne( buttons, pressed ) {
-	buttons.forEach( ( button ) =>
-		button.setAttribute( 'aria-pressed', String( button === pressed ) )
-	);
-}
 
 /* The full demo, in a new tab */
 
@@ -118,6 +98,7 @@ function initLiveDemo() {
 	const status = live.querySelector( '[data-live-status]' );
 	const startButton = live.querySelector( '[data-live-start]' );
 	const openLink = live.querySelector( '[data-live-open]' );
+	const snackbar = live.querySelector( '[data-live-snackbar]' );
 	const tabs = [ ...live.querySelectorAll( '[data-live-tab]' ) ];
 	[ editorScreen, frontScreen ].forEach( fitScreen );
 
@@ -133,6 +114,10 @@ function initLiveDemo() {
 			item.setAttribute( 'aria-selected', String( item === tab ) );
 			item.tabIndex = item === tab ? 0 : -1;
 		} );
+		// The notice has said its piece once the visitor uses the demo.
+		if ( changed && live.classList.contains( 'is-live' ) ) {
+			snackbar.classList.add( 'is-dismissed' );
+		}
 		const screen = name === 'front' ? frontScreen : editorScreen;
 		url.textContent = screen.dataset.url;
 		// The front end shows what the editor saved.
@@ -233,7 +218,8 @@ function initLiveDemo() {
 			} );
 			live.classList.remove( 'is-starting' );
 			live.classList.add( 'is-live' );
-			status.textContent = 'A real WordPress, running in your browser.';
+			status.textContent =
+				'WordPress is ready. Edit the post, save it, then open “Weather on your site”.';
 		} catch {
 			live.classList.remove( 'is-starting' );
 			status.textContent = 'The live demo could not start here.';
@@ -244,7 +230,7 @@ function initLiveDemo() {
 	startButton.addEventListener( 'click', start );
 	if ( phone.matches ) {
 		// A phone gets the demo on its whole screen, in a new tab.
-		status.textContent = 'The editor and the front end, live.';
+		status.textContent = 'Try the editor and your site, live.';
 		openLink.hidden = false;
 	} else if (
 		navigator.connection?.saveData ||
@@ -260,125 +246,6 @@ function initLiveDemo() {
 			window.addEventListener( 'load', () => idle( start ) );
 		}
 	}
-}
-
-/* The condition icon studio, a tiny block editor */
-
-function describe( condition ) {
-	const text = condition.replace( /-/g, ' ' );
-	return text.charAt( 0 ).toUpperCase() + text.slice( 1 );
-}
-
-// A plausible temperature for each condition, day and night.
-function temperatureOf( condition, isNight ) {
-	const temperatures = [
-		[ /thunder/, 22 ],
-		[ /freezing|snow/, -2 ],
-		[ /showers/, 15 ],
-		[ /rain|drizzle/, 12 ],
-		[ /fog/, 8 ],
-		[ /overcast/, 16 ],
-		[ /partly/, 20 ],
-		[ /clear/, 24 ],
-	];
-	const [ , value ] = temperatures.find( ( [ pattern ] ) =>
-		pattern.test( condition )
-	) ?? [ null, 18 ];
-	return isNight ? value - 7 : value;
-}
-
-async function initStudio() {
-	const studio = document.querySelector( '[data-studio]' );
-	const data = await iconsPromise;
-	if ( ! studio || ! data ) {
-		return;
-	}
-	const icon = studio.querySelector( '[data-studio-icon]' );
-	const temperature = studio.querySelector( '[data-studio-temperature]' );
-	const name = studio.querySelector( '[data-studio-condition]' );
-	const strip = studio.querySelector( '[data-studio-strip]' );
-
-	// One condition per icon, with its day and night icons.
-	const conditions = new Map();
-	data.conditionMappings.forEach( ( { condition, dayOrNight, iconSlug } ) => {
-		const icons = conditions.get( condition ) ?? { condition };
-		if ( dayOrNight === 'all' ) {
-			icons.day = iconSlug;
-			icons.night = iconSlug;
-		} else {
-			icons[ dayOrNight ] = iconSlug;
-		}
-		conditions.set( condition, icons );
-	} );
-	const seen = new Set();
-	const choices = [ ...conditions.values() ].filter( ( { day } ) =>
-		seen.has( day ) ? false : seen.add( day )
-	);
-
-	let current = choices[ 0 ];
-	const isNight = () => studio.dataset.sky === 'night';
-	const render = () => {
-		const slug = isNight() ? current.night : current.day;
-		icon.setAttribute( 'href', `icons.svg#${ slug }` );
-		temperature.textContent = String(
-			temperatureOf( current.condition, isNight() )
-		);
-		name.textContent = describe( current.condition );
-		buttons.forEach( ( { button, choice } ) =>
-			button
-				.querySelector( 'use' )
-				.setAttribute(
-					'href',
-					`icons.svg#${ isNight() ? choice.night : choice.day }`
-				)
-		);
-	};
-
-	const buttons = choices.map( ( choice ) => {
-		const button = document.createElement( 'button' );
-		button.type = 'button';
-		button.className = 'studio__choice';
-		button.setAttribute( 'aria-label', describe( choice.condition ) );
-		button.setAttribute( 'aria-pressed', String( choice === current ) );
-		button.append( svgIcon( choice.day ) );
-		button.addEventListener( 'click', () => {
-			current = choice;
-			pressOne(
-				buttons.map( ( item ) => item.button ),
-				button
-			);
-			studio.classList.remove( 'is-switching' );
-			// Reading the layout restarts the animation.
-			void studio.offsetWidth;
-			studio.classList.add( 'is-switching' );
-			render();
-		} );
-		return { button, choice };
-	} );
-	strip.replaceChildren( ...buttons.map( ( { button } ) => button ) );
-
-	const stroke = studio.querySelector( '[data-studio-stroke]' );
-	const strokeValue = studio.querySelector( '[data-studio-stroke-value]' );
-	stroke.addEventListener( 'input', () => {
-		studio.style.setProperty( '--icon-stroke', stroke.value );
-		strokeValue.textContent = stroke.value;
-	} );
-	studio
-		.querySelectorAll( 'input[name="studio-color"]' )
-		.forEach( ( input ) =>
-			input.addEventListener( 'change', () => {
-				studio.dataset.color = input.value;
-			} )
-		);
-	const times = [ ...studio.querySelectorAll( '[data-studio-time]' ) ];
-	times.forEach( ( button ) =>
-		button.addEventListener( 'click', () => {
-			studio.dataset.sky = button.dataset.studioTime;
-			pressOne( times, button );
-			render();
-		} )
-	);
-	render();
 }
 
 /* Reveal on scroll, and the figures counting up */
@@ -428,4 +295,3 @@ function initReveal() {
 initReveal();
 initPlaygroundLinks();
 initLiveDemo();
-initStudio();
