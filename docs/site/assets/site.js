@@ -1,7 +1,7 @@
 /**
  * The presentation site: the live demo of the hero (WordPress Playground in
- * two windows, the editor and the front end of one site), the condition icon
- * studio (icons.json) and the scroll reveals.
+ * one window, the editor and the front end of one site in two tabs), the
+ * condition icon studio (icons.json) and the scroll reveals.
  */
 
 const PLAYGROUND = 'https://playground.wordpress.net';
@@ -29,7 +29,6 @@ const blueprintPromise = fetch( 'blueprint.json' )
 
 const zipUrl = new URL( 'elio-blocks.zip', document.baseURI ).href;
 
-const wide = window.matchMedia( '(min-width: 1024px)' );
 const phone = window.matchMedia( '(max-width: 599px)' );
 
 function svgIcon( slug ) {
@@ -115,32 +114,50 @@ function initLiveDemo() {
 	const editorScreen = live.querySelector( '[data-live-screen="editor"]' );
 	const frontScreen = live.querySelector( '[data-live-screen="front"]' );
 	const reload = live.querySelector( '[data-live-reload]' );
+	const url = live.querySelector( '[data-live-url]' );
 	const status = live.querySelector( '[data-live-status]' );
 	const startButton = live.querySelector( '[data-live-start]' );
 	const openLink = live.querySelector( '[data-live-open]' );
-	const views = [ ...live.querySelectorAll( '[data-live-view]' ) ];
+	const tabs = [ ...live.querySelectorAll( '[data-live-tab]' ) ];
 	[ editorScreen, frontScreen ].forEach( fitScreen );
 
-	// Side by side on a wide screen, one window at a time below.
-	const showView = ( view ) => {
-		live.dataset.view = view;
-		pressOne(
-			views,
-			views.find( ( button ) => button.dataset.liveView === view )
-		);
-	};
-	views.forEach( ( button ) =>
-		button.addEventListener( 'click', () =>
-			showView( button.dataset.liveView )
-		)
-	);
-	const fitView = () => {
-		if ( ! wide.matches && live.dataset.view === 'both' ) {
-			showView( 'front' );
+	// Set once WordPress runs: what the reload button and the tabs reload.
+	let reloadTab = null;
+
+	// Tabs, as the WAI-ARIA tabs pattern: arrows move between them.
+	const selectTab = ( tab ) => {
+		const name = tab.dataset.liveTab;
+		const changed = live.dataset.tab !== name;
+		live.dataset.tab = name;
+		tabs.forEach( ( item ) => {
+			item.setAttribute( 'aria-selected', String( item === tab ) );
+			item.tabIndex = item === tab ? 0 : -1;
+		} );
+		const screen = name === 'front' ? frontScreen : editorScreen;
+		url.textContent = screen.dataset.url;
+		// The front end shows what the editor saved.
+		if ( changed && name === 'front' && reloadTab ) {
+			reloadTab( 'front' );
 		}
 	};
-	fitView();
-	wide.addEventListener( 'change', fitView );
+	tabs.forEach( ( tab, index ) => {
+		tab.addEventListener( 'click', () => selectTab( tab ) );
+		tab.addEventListener( 'keydown', ( event ) => {
+			const next = {
+				ArrowRight: index + 1,
+				ArrowLeft: index - 1,
+				Home: 0,
+				End: tabs.length - 1,
+			}[ event.key ];
+			if ( next === undefined ) {
+				return;
+			}
+			event.preventDefault();
+			const target = tabs[ ( next + tabs.length ) % tabs.length ];
+			target.focus();
+			selectTab( target );
+		} );
+	} );
 
 	let started = false;
 	const start = async () => {
@@ -199,20 +216,27 @@ function initLiveDemo() {
 				'Live demo: the post on the front end'
 			);
 			front.src = `${ siteUrl }/?p=1000`;
+			reloadTab = ( name ) => {
+				if ( name === 'front' ) {
+					front.src = `${ siteUrl }/?p=1000&t=${ Date.now() }`;
+				} else {
+					playground.goTo( blueprint.landingPage );
+				}
+			};
 			reload.disabled = false;
 			reload.addEventListener( 'click', () => {
 				reload.classList.remove( 'is-spinning' );
 				// Reading the layout restarts the animation.
 				void reload.offsetWidth;
 				reload.classList.add( 'is-spinning' );
-				front.src = `${ siteUrl }/?p=1000&t=${ Date.now() }`;
+				reloadTab( live.dataset.tab );
 			} );
 			live.classList.remove( 'is-starting' );
 			live.classList.add( 'is-live' );
-			status.textContent = 'Live: a real WordPress, in your browser';
+			status.textContent = 'A real WordPress, running in your browser.';
 		} catch {
 			live.classList.remove( 'is-starting' );
-			status.textContent = 'The live demo could not start here';
+			status.textContent = 'The live demo could not start here.';
 			openLink.hidden = false;
 		}
 	};
@@ -220,7 +244,7 @@ function initLiveDemo() {
 	startButton.addEventListener( 'click', start );
 	if ( phone.matches ) {
 		// A phone gets the demo on its whole screen, in a new tab.
-		status.textContent = 'The editor and the front end, live';
+		status.textContent = 'The editor and the front end, live.';
 		openLink.hidden = false;
 	} else if (
 		navigator.connection?.saveData ||
