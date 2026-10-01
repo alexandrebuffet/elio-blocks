@@ -3,14 +3,42 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Elio Blocks — Weather blocks for WordPress</title>
-	<meta name="description" content="Display the current weather and forecasts for any location, with WordPress blocks that look, feel and behave like the ones you already use. Free, no API key by default.">
+	<title>Elio Blocks — Weather forecast blocks for WordPress</title>
+	<meta name="description" content="A free WordPress weather plugin made of real blocks: current weather, hourly and daily forecasts of any location, in the Block Editor. No shortcode, no widget, no API key.">
+	<link rel="canonical" href="https://alexandrebuffet.github.io/elio-blocks/">
 	<meta name="theme-color" content="#fdf9f2" media="(prefers-color-scheme: light)">
 	<meta name="theme-color" content="#14110d" media="(prefers-color-scheme: dark)">
-	<meta property="og:title" content="Elio Blocks — Weather blocks for WordPress">
-	<meta property="og:description" content="Weather, with blocks. Free, no API key by default, made for the Block Editor.">
+	<meta property="og:site_name" content="Elio Blocks">
+	<meta property="og:title" content="Elio Blocks — Weather forecast blocks for WordPress">
+	<meta property="og:description" content="Weather, with blocks. A free weather plugin for the WordPress Block Editor: no shortcode, no widget, no API key by default.">
 	<meta property="og:type" content="website">
-	<meta property="og:image" content="assets/images/clouds-2000.jpg">
+	<meta property="og:url" content="https://alexandrebuffet.github.io/elio-blocks/">
+	<meta property="og:image" content="https://alexandrebuffet.github.io/elio-blocks/assets/images/clouds-2000.jpg">
+	<meta property="og:image:width" content="2000">
+	<meta property="og:image:height" content="1326">
+	<meta property="og:image:alt" content="Cumulus clouds in a blue sky, the photo of the Elio Blocks banner.">
+	<meta name="twitter:card" content="summary_large_image">
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "SoftwareApplication",
+		"name": "Elio Blocks",
+		"alternateName": "Elio Blocks — Weather forecast blocks for WordPress",
+		"description": "A free WordPress weather plugin made of blocks: the current weather and the hourly or daily forecast of any location, in the Block Editor.",
+		"url": "https://alexandrebuffet.github.io/elio-blocks/",
+		"image": "https://alexandrebuffet.github.io/elio-blocks/assets/images/clouds-2000.jpg",
+		"applicationCategory": "Plugin",
+		"applicationSubCategory": "WordPress plugin",
+		"operatingSystem": "WordPress 6.7 or later, PHP 8.2 or later",
+		"installUrl": "https://wordpress.org/plugins/elio-blocks/",
+		"downloadUrl": "https://wordpress.org/plugins/elio-blocks/",
+		"license": "https://www.gnu.org/licenses/gpl-2.0.html",
+		"isAccessibleForFree": true,
+		"offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+		"author": { "@type": "Person", "name": "Alexandre Buffet", "url": "https://github.com/alexandrebuffet" },
+		"sameAs": [ "https://wordpress.org/plugins/elio-blocks/", "https://github.com/alexandrebuffet/elio-blocks" ]
+	}
+	</script>
 	<link rel="icon" href="favicon.svg" type="image/svg+xml">
 	<link rel="preload" href="assets/fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 	<link rel="preload" href="assets/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -53,12 +81,12 @@
 			<div class="container hero__top">
 				<h1 class="display hero__title" id="hero-title">Weather, <em class="shimmer">with blocks.</em></h1>
 				<div class="hero__intro">
-					<p class="lead">Weather blocks for the Block Editor, built the way WordPress builds its own. Add one, choose a place, and the live forecast is there.</p>
+					<p class="lead">Weather forecast blocks for the WordPress Block Editor, built the way WordPress builds its own. Add the Weather block, choose a place, and the live forecast is in your page. No shortcode to memorize, no widget to drag into a sidebar.</p>
 					<div class="actions">
 						<a class="button" href="https://wordpress.org/plugins/elio-blocks/" target="_blank" rel="noopener" aria-label="Get started (opens in a new tab)"><svg class="button__logo" aria-hidden="true"><use href="#wp-wordpress"/></svg><span>Get started</span></a>
 						<a class="button button--secondary" href="#live"><span>Try it now</span><span class="button__icon button__icon--down" aria-hidden="true">↓</span></a>
 					</div>
-					<p class="hero__meta">Free &middot; No API key by default &middot; WordPress 6.7+</p>
+					<p class="hero__meta">Free &middot; No API key by default &middot; No shortcode, ever &middot; WordPress 6.7+</p>
 				</div>
 			</div>
 
@@ -97,10 +125,10 @@
 						</div>
 						<div class="live__screens">
 							<div class="browser__screen" id="live-editor" role="tabpanel" aria-labelledby="live-tab-editor" data-live-screen="editor" data-url="my-site.test/wp-admin/post.php?post=1000&amp;action=edit" data-width="1280">
-								<img class="browser__poster" src="assets/wporg/screenshot-1.png" alt="The Weather block in the Block Editor, with an hourly forecast and its location settings." width="2560" height="1600">
+								<img class="browser__poster" src="assets/wporg/screenshot-1.png" alt="The Weather block in the WordPress Block Editor, with an hourly forecast and its location settings." width="2560" height="1600">
 							</div>
 							<div class="browser__screen" id="live-front" role="tabpanel" aria-labelledby="live-tab-front" data-live-screen="front" data-url="my-site.test/weather-in-paris" data-width="1280">
-								<img class="browser__poster browser__poster--contain" src="assets/wporg/screenshot-2.png" alt="A daily forecast on the front end." width="2488" height="684">
+								<img class="browser__poster browser__poster--contain" src="assets/wporg/screenshot-2.png" alt="A daily weather forecast on the front end of a WordPress site." width="2488" height="684">
 							</div>
 							<div class="loader" aria-hidden="true">
 								<svg class="loader__sun"><use href="icons.svg#sun"/></svg>
@@ -118,42 +146,42 @@
 					<h2 class="display section__title" id="features-title">Feels native, <em>because it&nbsp;is.</em></h2>
 				</header>
 				<div class="features">
-					<p class="features__count reveal"><span class="features__number" data-count>21</span> <span class="features__unit">blocks</span> <span class="features__note">Every piece of the weather is a block of its own. Add it, move it, style it.</span></p>
+					<p class="features__count reveal"><span class="features__number" data-count>21</span> <span class="features__unit">blocks</span> <span class="features__note">Every piece of the weather is a block of its own. Add it, move it, style it. Not one shortcode to memorize.</span></p>
 					<ol class="features__list" role="list">
 						<li class="feature reveal">
 							<svg class="icon feature__icon" aria-hidden="true"><use href="icons.svg#sun-cloud"></use></svg>
-							<h3 class="feature__title">The Weather block is the new Query</h3>
-							<p>It works like the Query block. It gets the forecast of a place and hands it to the blocks inside it. Start from the Default, Minimal, Hourly or Daily Forecast layout, or from scratch.</p>
+							<h3 class="feature__title">The Weather block works like the Query Loop</h3>
+							<p>It gets the weather forecast of a place and hands it to the blocks inside it, as the Query Loop hands posts to its template. Start from the Default, Minimal, Hourly Forecast or Daily Forecast layout, or from a blank canvas. Not from a settings page with forty checkboxes.</p>
 						</li>
 						<li class="feature reveal">
 							<svg class="icon feature__icon" aria-hidden="true"><use href="icons.svg#cloud-sun-layout"></use></svg>
 							<h3 class="feature__title">Template forecasts like you template posts</h3>
-							<p>Hourly and daily forecasts repeat a Forecast Template you design once, the way the Post Template repeats inside a Query block.</p>
+							<p>Hourly and daily forecasts repeat a Forecast Template you design once, the way the Post Template repeats inside a Query Loop. Rows, columns, groups: your layout, not the one table a widget would give you.</p>
 						</li>
 						<li class="feature reveal">
 							<svg class="icon feature__icon" aria-hidden="true"><use href="#wp-styles"></use></svg>
 							<h3 class="feature__title">Every design tool you expect</h3>
-							<p>Colors, typography, spacing and borders come from the standard block supports, with the same panels as core blocks, your theme’s presets, <code>theme.json</code> included.</p>
+							<p>Colors, typography, spacing and borders come from the standard block supports: the same panels as the core blocks, your theme’s presets, <code>theme.json</code> and the Styles of the Site Editor included. No custom color picker, no “Advanced” tab with a CSS box in it.</p>
 						</li>
 						<li class="feature reveal">
 							<svg class="icon feature__icon" aria-hidden="true"><use href="icons.svg#weather-conditions"></use></svg>
 							<h3 class="feature__title">Icons drawn the WordPress way</h3>
-							<p>92 icons, one for each weather condition by day and by night, drawn in the line of the WordPress icons. Not your style? Choose another collection for the whole site, a report or a single icon, or register your own.</p>
+							<p>92 weather icons, one for each condition by day and by night, drawn in the line of the WordPress icons, and registered as an icon collection of WordPress 7.1 for the Icon block. Not your style? Choose another collection for the whole site, a report or a single icon, or register your own.</p>
 						</li>
 						<li class="feature reveal">
 							<svg class="icon feature__icon" aria-hidden="true"><use href="#wp-cog"></use></svg>
 							<h3 class="feature__title">Your site’s settings, respected</h3>
-							<p>Dates in your site’s language and formats, in the timezone of the location. Metric or imperial, site-wide or per block.</p>
+							<p>Dates in your site’s language and date formats, in the timezone of the location. Metric or imperial units, site-wide or per block. Nothing to set a second time in a plugin of its own.</p>
 						</li>
 						<li class="feature reveal">
 							<svg class="icon feature__icon" aria-hidden="true"><use href="#wp-seen"></use></svg>
 							<h3 class="feature__title">What you see is what you get</h3>
-							<p>The editor shows the real forecast of your location, styled exactly as it will be on your site.</p>
+							<p>The editor shows the real weather forecast of your location, styled exactly as it will be on your site. No gray placeholder, no preview button to find out what you just did.</p>
 						</li>
 						<li class="feature reveal">
 							<svg class="icon feature__icon" aria-hidden="true"><use href="#wp-plugins"></use></svg>
 							<h3 class="feature__title">Open-Meteo by default, open to more</h3>
-							<p>The weather comes from Open-Meteo, with no account and no key for non-commercial use, or with the key of a subscription. Weather providers are pluggable. Elio Blocks can add more, and so can your own code, through its PHP API.</p>
+							<p>The weather data comes from Open-Meteo, with no account and no API key for non-commercial use, or with the key of a subscription. Weather providers are pluggable: Elio Blocks can add more, and so can your own code, through its PHP API.</p>
 						</li>
 					</ol>
 				</div>
@@ -170,17 +198,17 @@
 					<li class="step reveal">
 						<svg class="icon step__icon" aria-hidden="true"><use href="#wp-post"></use></svg>
 						<h3 class="step__title">Rendered on the server</h3>
-						<p>The weather is in the HTML your visitors and search engines get. No loading spinner, no layout shift.</p>
+						<p>The weather is in the HTML your visitors and search engines get, server-side rendered like any WordPress block. No loading spinner, no layout shift, no empty box waiting for a script.</p>
 					</li>
 					<li class="step reveal">
 						<svg class="icon step__icon" aria-hidden="true"><use href="icons.svg#cloud-sun-refresh"></use></svg>
 						<h3 class="step__title">Kept fresh in the browser</h3>
-						<p>The Interactivity API, WordPress’s own front-end framework, updates the data without reloading the page. No jQuery, no heavy scripts.</p>
+						<p>The Interactivity API, the front-end framework of WordPress itself, refreshes the forecast in place without reloading the page. No jQuery, no heavy script, no iframe borrowed from a weather site.</p>
 					</li>
 					<li class="step reveal">
 						<svg class="icon step__icon" aria-hidden="true"><use href="#wp-globe"></use></svg>
 						<h3 class="step__title">Cached, and private</h3>
-						<p>Forecasts are cached on your server, and your visitors’ browsers never contact the weather service, so their IP address stays with you.</p>
+						<p>Forecasts are cached on your server, and your visitors’ browsers never contact the weather service, so their IP address stays with you. Nothing new for your cookie banner.</p>
 					</li>
 				</ol>
 			</div>
@@ -193,32 +221,32 @@
 				</header>
 				<div class="faq">
 					<details open>
-						<summary>Is it free?</summary>
-						<p>Yes, totally. It is released under the GPL, like WordPress.</p>
+						<summary>Is Elio Blocks free?</summary>
+						<p>Yes, totally. Elio Blocks is free software under the GPL, like WordPress itself. No pro version, no license key, no nag screen in your dashboard.</p>
 					</details>
 					<details>
-						<summary>Do I need an API key?</summary>
-						<p>Not by default. Elio Blocks uses Open-Meteo, an open-source weather API that needs no account and no key for non-commercial use. For a commercial site, enter the API key of an Open-Meteo subscription in the plugin settings.</p>
+						<summary>Do I need a weather API key?</summary>
+						<p>Not by default. Elio Blocks uses Open-Meteo, an open-source weather API that needs no account and no key for non-commercial use. For a commercial site, enter the API key of an Open-Meteo subscription in the plugin settings, and that is the whole setup.</p>
 					</details>
 					<details>
 						<summary>Can I use another weather provider?</summary>
 						<p>Open-Meteo is the provider built in. Elio Blocks is made to welcome others. A provider is registered with a few PHP functions, the same way Open-Meteo is, so new ones can come with the plugin or from your own code.</p>
 					</details>
 					<details>
-						<summary>Can I style the blocks?</summary>
-						<p>Yes. Colors, spacing and typography come from the standard design tools of the Block Editor. Beyond that, use <code>theme.json</code>, block style variations or plain CSS.</p>
+						<summary>Can I style the weather blocks?</summary>
+						<p>Yes, like any other block. Colors, spacing and typography come from the standard design tools of the Block Editor. Beyond that, use <code>theme.json</code>, block style variations or plain CSS. No “Custom CSS” textarea hidden in a settings page.</p>
 					</details>
 					<details>
 						<summary>Can I change the weather icons?</summary>
-						<p>Yes. Every condition has its icon, by day and by night, with a stroke and a color you set like any block. Choose the icon collection for the whole site, a report or a single icon, or register your own collection in a few lines of PHP.</p>
+						<p>Yes. Every weather condition has its icon, by day and by night, with a stroke and a color you set like any block. Choose the icon collection for the whole site, a report or a single icon, or register your own collection in a few lines of PHP. No sprite of 2012 PNGs to overwrite by FTP.</p>
 					</details>
 					<details>
-						<summary>Does it work with the Classic Editor, widgets or page builders?</summary>
-						<p>No. Elio Blocks only provides blocks, for the Block Editor and the Site Editor.</p>
+						<summary>Does it work with the Classic Editor, widgets, shortcodes or page builders?</summary>
+						<p>No. Elio Blocks only provides blocks, for the Block Editor and the Site Editor. The weather widget and the <code>[weather]</code> shortcode had a good run. This is what comes after.</p>
 					</details>
 					<details>
 						<summary>What about my visitors’ privacy?</summary>
-						<p>Every request to the weather service is sent by your server, never by your visitors’ browsers, and carries no data about them.</p>
+						<p>Every request to the weather service is sent by your server, never by your visitors’ browsers, and carries no data about them. No tracking, no third-party script, nothing to declare.</p>
 					</details>
 					<details>
 						<summary>Where is the source code?</summary>
@@ -243,7 +271,7 @@
 	<footer class="site-footer">
 		<div class="container site-footer__inner">
 			<p class="brand"><img class="brand__logo" src="favicon.svg" alt="" width="24" height="24"><span class="brand__name">Elio Blocks</span></p>
-			<p>Free software, licensed under the GPLv2 or later. Weather data by <a href="https://open-meteo.com/">Open-Meteo</a>.</p>
+			<p>A weather plugin for the WordPress Block Editor. Free software, licensed under the GPLv2 or later. Weather data by <a href="https://open-meteo.com/">Open-Meteo</a>.</p>
 			<p><a href="https://github.com/alexandrebuffet/elio-blocks" target="_blank" rel="noopener">GitHub<span class="screen-reader-text"> (opens in a new tab)</span></a> · Made by <a href="https://github.com/alexandrebuffet" target="_blank" rel="noopener">Alexandre Buffet<span class="screen-reader-text"> (opens in a new tab)</span></a></p>
 		</div>
 	</footer>
