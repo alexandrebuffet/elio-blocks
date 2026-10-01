@@ -23,43 +23,45 @@
 }
 
 /*
- * Warm tones from the photo of the plugin (ember, amber, cream), and a blue
- * so desaturated it reads as black; the sky of the photo (--sky, --sky-2)
- * only as touches of light in the front end band. Contrast (WCAG 2.2 AA):
- * --ink-2 on --paper 6.9:1, --accent on --paper 5.1:1 (and --paper on the
- * count, --accent to --accent-2), --ink on --ember 4.9:1, --on-night-2 on
- * --night 6.9:1; the light shimmer stays above 3.1:1 (large text).
+ * Warm tones from the photo of the plugin (ember, amber, cream), and the
+ * golden black of its shadows; the sky of the photo (--sky, --sky-2) only as
+ * touches of light in the front end band. Contrast (WCAG 2.2 AA): --ink-2 on
+ * --paper 6.8:1, --accent on --paper 3.7:1 (large text and icons only),
+ * --paper on --accent-strong 4.7:1 (the count), --ink on --ember 5:1,
+ * --on-night-2 on --night 6.9:1; the light shimmer stays above 3.2:1 (large
+ * text).
  */
 :root {
-	--paper: #f9f7f3;
-	--paper-2: #efebe3;
-	--ink: #17191f;
-	--ink-2: #5a554d;
-	--line: rgb(23 25 31 / 14%);
-	--line-strong: rgb(23 25 31 / 40%);
-	--accent: #b8431a;
+	--paper: #fbf4e8;
+	--paper-2: #f3e9d8;
+	--ink: #1a1611;
+	--ink-2: #5e5446;
+	--line: rgb(26 22 17 / 14%);
+	--line-strong: rgb(26 22 17 / 40%);
+	--accent: #d4571c;
 	--accent-2: var(--rust);
+	--accent-strong: #c2410c;
 	--ember: #e0602a;
 	--amber: #f0a044;
 	--rust: #8f3515;
 	--gold: #f7d49a;
 	--sky: #b7cdd6;
 	--sky-2: #93a8c6;
-	--night: #15171c;
-	--night-2: #1e2027;
+	--night: #14110d;
+	--night-2: #1d1914;
 	--on-night: #eee7db;
 	--on-night-2: rgb(238 231 219 / 70%);
 	--tool: #fff;
 	--tool-line: rgb(0 0 0 / 22%);
-	--browser-tabs: #e2dcd1;
-	--browser-bar: #efebe3;
+	--browser-tabs: #ebe0cf;
+	--browser-bar: #f3e9d8;
 	--browser-field: #fff;
-	--browser-text: #3d3a35;
-	--browser-tab-text: #5a554d;
-	--browser-dot: #c9c1b4;
+	--browser-text: #3f372d;
+	--browser-tab-text: #5e5446;
+	--browser-dot: #d4c6b1;
 	--browser-hover: rgb(255 255 255 / 50%);
 	--browser-line: rgb(0 0 0 / 10%);
-	--shimmer: #d9531e, #e0602a, #c08000, #e0602a, #d9531e;
+	--shimmer: #d4571c, #e0602a, #b87300, #e0602a, #d4571c;
 	--gutter: clamp(16px, 4vw, 48px);
 
 	/*
@@ -94,22 +96,23 @@
 @media (prefers-color-scheme: dark) {
 
 	:root {
-		--paper: #15171c;
-		--paper-2: #1e2027;
+		--paper: #14110d;
+		--paper-2: #1d1914;
 		--ink: #eee7db;
 		--ink-2: #a39c91;
 		--line: rgb(238 231 219 / 14%);
 		--line-strong: rgb(238 231 219 / 40%);
 		--accent: var(--amber);
 		--accent-2: var(--ember);
+		--accent-strong: var(--amber);
 		--tool: #1e1e1e;
 		--tool-line: rgb(255 255 255 / 24%);
-		--browser-tabs: #0f1115;
-		--browser-bar: #22252d;
-		--browser-field: #15171c;
+		--browser-tabs: #0d0b08;
+		--browser-bar: #221d17;
+		--browser-field: #14110d;
 		--browser-text: #d8d1c5;
 		--browser-tab-text: #a39c91;
-		--browser-dot: #3a3d46;
+		--browser-dot: #3d362d;
 		--browser-hover: rgb(255 255 255 / 6%);
 		--browser-line: rgb(255 255 255 / 8%);
 		--shimmer: var(--amber), var(--gold), #e8703a, var(--gold), var(--amber);
@@ -937,7 +940,7 @@ a.brand:hover .brand__logo {
 	gap: var(--space-2xs);
 	margin: 0;
 	padding: var(--space-xl);
-	background: linear-gradient(150deg, var(--accent) 40%, var(--accent-2));
+	background: linear-gradient(150deg, var(--accent-strong) 40%, var(--accent-2));
 	color: var(--paper);
 }
 
@@ -1030,8 +1033,8 @@ a.brand:hover .brand__logo {
  * darkest color: --ink stays at 4.9:1 at least on all of it.
  */
 .section--inverse {
-	--band-ink: #17191f;
-	--band-line: rgb(23 25 31 / 30%);
+	--band-ink: #1a1611;
+	--band-line: rgb(26 22 17 / 30%);
 	isolation: isolate;
 	overflow: hidden;
 	background: var(--ember);
@@ -1150,7 +1153,7 @@ a.brand:hover .brand__logo {
 }
 
 .faq summary:hover {
-	color: var(--accent);
+	color: var(--accent-2);
 }
 
 .faq summary::-webkit-details-marker {
