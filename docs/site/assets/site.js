@@ -148,7 +148,6 @@ function initLiveDemo() {
 	const status = live.querySelector( '[data-live-status]' );
 	const startButton = live.querySelector( '[data-live-start]' );
 	const openLink = live.querySelector( '[data-live-open]' );
-	const snackbar = live.querySelector( '[data-live-snackbar]' );
 	const tabs = [ ...live.querySelectorAll( '[data-live-tab]' ) ];
 	[ editorScreen, frontScreen ].forEach( fitScreen );
 
@@ -164,10 +163,6 @@ function initLiveDemo() {
 			item.setAttribute( 'aria-selected', String( item === tab ) );
 			item.tabIndex = item === tab ? 0 : -1;
 		} );
-		// The notice has said its piece once the visitor uses the demo.
-		if ( changed && live.classList.contains( 'is-live' ) ) {
-			snackbar.classList.add( 'is-dismissed' );
-		}
 		const screen = name === 'front' ? frontScreen : editorScreen;
 		url.textContent = screen.dataset.url;
 		// The front end shows what the editor saved.
