@@ -398,7 +398,33 @@ function initReveal() {
 	elements.forEach( ( element ) => observer.observe( element ) );
 }
 
+/**
+ * The halo of light on a hovered button follows the pointer.
+ */
+function initButtonHalo() {
+	document.addEventListener(
+		'pointermove',
+		( event ) => {
+			const button = event.target.closest?.( '.button' );
+			if ( ! button ) {
+				return;
+			}
+			const box = button.getBoundingClientRect();
+			button.style.setProperty(
+				'--halo-x',
+				`${ event.clientX - box.left }px`
+			);
+			button.style.setProperty(
+				'--halo-y',
+				`${ event.clientY - box.top }px`
+			);
+		},
+		{ passive: true }
+	);
+}
+
 initReveal();
 initNav();
+initButtonHalo();
 initPlaygroundLinks();
 initLiveDemo();
