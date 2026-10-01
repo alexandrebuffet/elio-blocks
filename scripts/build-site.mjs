@@ -95,4 +95,44 @@ writeFileSync(
 	`<svg xmlns="http://www.w3.org/2000/svg">${ symbols.join( '' ) }</svg>\n`
 );
 
+// The FAQ as structured data (schema.org FAQPage), read from the page itself
+// so the questions and answers are written once: each <details> of the FAQ,
+// its <summary> the question, its text the answer.
+const indexPath = join( out, 'index.html' );
+const index = readFileSync( indexPath, 'utf8' );
+const text = ( html ) =>
+	html
+		.replace( /<span class="screen-reader-text">[\s\S]*?<\/span>/g, '' )
+		.replace( /<[^>]+>/g, '' )
+		.replace( /&nbsp;/g, ' ' )
+		.replace( /&amp;/g, '&' )
+		.replace( /\s+/g, ' ' )
+		.trim();
+const faq = [
+	...index
+		.match(
+			/<div class="faq">[\s\S]*?<\/div>\s*<\/div>\s*<\/section>/
+		)[ 0 ]
+		.matchAll( /<summary>([\s\S]*?)<\/summary>([\s\S]*?)<\/details>/g ),
+].map( ( [ , question, answer ] ) => ( {
+	'@type': 'Question',
+	name: text( question ),
+	acceptedAnswer: { '@type': 'Answer', text: text( answer ) },
+} ) );
+if ( faq.length === 0 ) {
+	throw new Error( 'No FAQ found in index.html' );
+}
+const faqJsonLd = JSON.stringify(
+	{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq },
+	null,
+	'\t'
+).replace( /</g, '\\u003c' );
+writeFileSync(
+	indexPath,
+	index.replace(
+		'</head>',
+		`\t<script type="application/ld+json">\n${ faqJsonLd }\n\t</script>\n</head>`
+	)
+);
+
 process.stdout.write( `Site built in ${ out }\n` );
