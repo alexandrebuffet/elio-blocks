@@ -1269,21 +1269,16 @@ a.brand:hover .brand__logo {
 	font-size: var(--text-4xl);
 }
 
-/* Footer */
+/*
+ * Footer: on the night of the closing, the brand and its title on one side,
+ * three short lists of links on the other, then the license and the credit.
+ */
 .site-footer {
-	padding: var(--space-xl) 0;
+	padding: var(--space-3xl) 0 var(--space-xl);
 	border-top: 1px solid rgb(238 231 219 / 12%);
 	background: var(--night);
 	color: var(--on-night-2);
 	font-size: var(--text-s);
-}
-
-.site-footer__inner {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: space-between;
-	gap: var(--space-m) var(--space-xl);
 }
 
 .site-footer p {
@@ -1294,14 +1289,93 @@ a.brand:hover .brand__logo {
 	text-decoration-thickness: 2px;
 }
 
+.site-footer__top {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+	gap: var(--space-2xl) var(--space-3xl);
+	padding-bottom: var(--space-3xl);
+}
+
+.site-footer__about {
+	display: grid;
+	align-content: start;
+	justify-items: start;
+	gap: var(--space-m);
+	max-width: 32ch;
+}
+
 .site-footer .brand {
+	margin-bottom: var(--space-xs);
 	color: var(--on-night);
 }
 
-.site-footer .brand__logo {
-	width: 24px;
-	height: 24px;
-	border-radius: 6px;
+.site-footer__tagline {
+	color: var(--on-night);
+	font-family: var(--serif);
+	font-size: var(--text-2xl);
+	line-height: 1.05;
+}
+
+.site-footer__tagline em {
+	color: var(--amber);
+}
+
+.site-footer__nav {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--space-xl);
+}
+
+.site-footer__title {
+	margin: 0 0 var(--space-m);
+	color: var(--on-night);
+	font-size: var(--text-xs);
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.site-footer__group ul {
+	display: grid;
+	gap: var(--space-s);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* Links in a list, set apart by their place: underlined on hover only. */
+.site-footer__group a {
+	text-decoration: none;
+	transition: color 0.2s var(--ease);
+}
+
+.site-footer__group a:hover {
+	color: var(--on-night);
+	text-decoration: underline;
+}
+
+.site-footer__bottom {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: var(--space-s) var(--space-xl);
+	padding-top: var(--space-l);
+	border-top: 1px solid rgb(238 231 219 / 12%);
+	font-size: var(--text-xs);
+}
+
+@media (max-width: 860px) {
+
+	.site-footer__top {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+@media (max-width: 420px) {
+
+	.site-footer__nav {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
