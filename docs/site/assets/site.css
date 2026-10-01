@@ -1270,7 +1270,7 @@ a.brand:hover .brand__logo {
 }
 
 /*
- * Footer: on the night of the closing, the brand and its title on one side,
+ * Footer: on the night of the closing, the brand and one line on one side,
  * three short lists of links on the other, then the license and the credit.
  */
 .site-footer {
@@ -1309,17 +1309,6 @@ a.brand:hover .brand__logo {
 	color: var(--on-night);
 }
 
-.site-footer__tagline {
-	color: var(--on-night);
-	font-family: var(--serif);
-	font-size: var(--text-2xl);
-	line-height: 1.05;
-}
-
-.site-footer__tagline em {
-	color: var(--amber);
-}
-
 .site-footer__nav {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1352,6 +1341,14 @@ a.brand:hover .brand__logo {
 .site-footer__group a:hover {
 	color: var(--on-night);
 	text-decoration: underline;
+}
+
+/*
+ * The arrow of the links that open a new tab, as on the buttons: inline and
+ * after a no-break space, so it never goes alone to the next line.
+ */
+.site-footer__external {
+	font-size: 0.9em;
 }
 
 .site-footer__bottom {
