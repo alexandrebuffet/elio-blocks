@@ -225,7 +225,7 @@ function initLiveDemo() {
 			progress( 0.3 );
 			const editor = liveFrame(
 				editorScreen,
-				'Live demo: the post editor, with the Weather block'
+				'Live demo of the post editor, with the Weather block'
 			);
 			const playground = await client.startPlaygroundWeb( {
 				iframe: editor,
@@ -260,7 +260,7 @@ function initLiveDemo() {
 			);
 			const front = liveFrame(
 				frontScreen,
-				'Live demo: the post on the front end'
+				'Live demo of the post on the front end'
 			);
 			// The page the front end tab shows: the post, or what a link of
 			// the editor opened.
