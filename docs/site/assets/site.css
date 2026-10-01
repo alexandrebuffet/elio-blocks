@@ -55,6 +55,7 @@
 	--amber: #f0a044;
 	--rust: #8f3515;
 	--gold: #f7d49a;
+	--cream: #fff1d6;
 	--sky: #b7cdd6;
 	--sky-2: #93a8c6;
 	--night: #14110d;
@@ -389,7 +390,26 @@ pre code {
 	line-height: 1;
 	text-decoration: none;
 	cursor: pointer;
-	transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+	transition: border-color 0.25s ease, color 0.25s ease;
+	position: relative;
+	isolation: isolate;
+}
+
+/*
+ * Hovered, a button lights up like the sun of the closing: ember, amber and
+ * gold, a halo of cream where the pointer is (--halo-x, --halo-y, set by
+ * site.js; the middle without it). --night on it keeps 5.2:1 at least.
+ */
+.button::before {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	inset: -1px;
+	background:
+		radial-gradient(circle 72px at var(--halo-x, 50%) var(--halo-y, 50%), var(--cream), rgb(255 241 214 / 0%)),
+		linear-gradient(100deg, var(--ember), var(--amber) 55%, var(--gold));
+	opacity: 0;
+	transition: opacity 0.3s var(--ease);
 }
 
 .button__icon {
@@ -404,9 +424,14 @@ pre code {
 	height: 22px;
 }
 
-/* The arrow moves and a flat shadow lifts the button: not only a color. */
+/* The light and the arrow that moves: not only a color. */
 .button:hover {
-	box-shadow: 4px 4px 0 var(--ember);
+	border-color: transparent;
+	color: var(--night);
+}
+
+.button:hover::before {
+	opacity: 1;
 }
 
 .button:hover .button__icon {
@@ -445,10 +470,6 @@ pre code {
 	color: var(--on-night);
 }
 
-.button--light:hover,
-.button--secondary-light:hover {
-	box-shadow: 4px 4px 0 var(--amber);
-}
 
 /* Header */
 .site-header {
@@ -1252,7 +1273,7 @@ a.brand:hover .brand__sun {
 	aspect-ratio: 1;
 	translate: -50% 0;
 	border-radius: 50%;
-	background: radial-gradient(circle at 45% 38%, #fff1d6 0%, var(--gold) 18%, var(--amber) 44%, var(--ember) 76%, var(--rust) 100%);
+	background: radial-gradient(circle at 45% 38%, var(--cream) 0%, var(--gold) 18%, var(--amber) 44%, var(--ember) 76%, var(--rust) 100%);
 	animation: glow 6s ease-in-out infinite;
 }
 
