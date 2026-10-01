@@ -166,10 +166,42 @@ a {
 	text-decoration-thickness: 1px;
 }
 
+/*
+ * Code in the sans (no monospace on this site), on a tint of the text color,
+ * so it reads on paper, ember and night alike.
+ */
 code {
-	font-size: 0.92em;
+	padding: 0.1em 0.35em;
+	border: 1px solid color-mix(in srgb, currentcolor 16%, transparent);
+	background: color-mix(in srgb, currentcolor 7%, transparent);
+	font-size: 0.9em;
 	font-family: var(--sans);
 	font-weight: 500;
+	-webkit-box-decoration-break: clone;
+	box-decoration-break: clone;
+}
+
+/*
+ * A block of code: the same tint, a line of accent, scrolled sideways (give
+ * it tabindex="0" so a keyboard can scroll it too).
+ */
+pre {
+	overflow-x: auto;
+	tab-size: 4;
+	margin: 0;
+	padding: var(--space-m) var(--space-l);
+	border-left: 2px solid var(--accent);
+	background: color-mix(in srgb, currentcolor 7%, transparent);
+	font-size: var(--text-s);
+	line-height: 1.6;
+}
+
+pre code {
+	padding: 0;
+	border: 0;
+	background: none;
+	font-size: inherit;
+	white-space: pre;
 }
 
 /* The color of the text, so the ring shows on paper, ember and night alike. */
