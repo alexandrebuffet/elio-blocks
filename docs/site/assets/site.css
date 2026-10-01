@@ -390,23 +390,36 @@ pre code {
 	line-height: 1;
 	text-decoration: none;
 	cursor: pointer;
-	transition: border-color 0.25s ease, color 0.25s ease;
+	transition: border-color 0.25s ease, color 0.25s ease, --halo-x 0.8s var(--ease), --halo-y 0.8s var(--ease);
 	position: relative;
 	isolation: isolate;
 }
 
 /*
  * Hovered, a button lights up like the sun of the closing: ember, amber and
- * gold, a halo of cream where the pointer is (--halo-x, --halo-y, set by
- * site.js; the middle without it). --night on it keeps 5.2:1 at least.
+ * gold, a large halo of cream drawn halfway to the pointer and gliding after
+ * it (--halo-x, --halo-y, set by site.js, registered so they transition; the
+ * middle without them). --night on it keeps 5.2:1 at least.
  */
+@property --halo-x {
+	syntax: "<length-percentage>";
+	inherits: true;
+	initial-value: 50%;
+}
+
+@property --halo-y {
+	syntax: "<length-percentage>";
+	inherits: true;
+	initial-value: 50%;
+}
+
 .button::before {
 	content: "";
 	position: absolute;
 	z-index: -1;
 	inset: -1px;
 	background:
-		radial-gradient(circle 72px at var(--halo-x, 50%) var(--halo-y, 50%), var(--cream), rgb(255 241 214 / 0%)),
+		radial-gradient(circle 128px at var(--halo-x, 50%) var(--halo-y, 50%), var(--cream), rgb(255 241 214 / 0%)),
 		linear-gradient(100deg, var(--ember), var(--amber) 55%, var(--gold));
 	opacity: 0;
 	transition: opacity 0.3s var(--ease);
@@ -605,6 +618,36 @@ a.brand:hover .brand__sun {
 	position: relative;
 	isolation: isolate;
 	padding-bottom: var(--space-3xl);
+}
+
+/*
+ * A test: one glow of amber rising from behind the demo window where it
+ * stands over the paper, so the window stands out.
+ */
+.scene::before {
+	content: "";
+	position: absolute;
+	z-index: -2;
+	top: calc(var(--lift) * -0.7);
+	right: 0;
+	left: 0;
+	height: calc(var(--lift) * 1.7);
+	background: radial-gradient(46% 100% at 50% 100%, rgb(240 160 68 / 40%), rgb(240 160 68 / 0%));
+	transform-origin: 50% 100%;
+	pointer-events: none;
+	animation: rise 12s ease-in-out infinite alternate;
+}
+
+/* The glow breathes, a little higher, a little brighter. */
+@keyframes rise {
+
+	from {
+		opacity: 0.75;
+	}
+
+	to {
+		transform: scaleY(1.12);
+	}
 }
 
 .scene__photo {
@@ -1127,14 +1170,14 @@ a.brand:hover .brand__sun {
 
 .section--inverse::before {
 	background:
-		radial-gradient(16% 20% at 33% 43%, rgb(183 205 214 / 85%), rgb(183 205 214 / 0%)),
+		radial-gradient(24% 30% at 33% 43%, rgb(183 205 214 / 95%), rgb(183 205 214 / 0%)),
 		radial-gradient(closest-side at 30% 40%, var(--gold), rgb(247 212 154 / 0%)),
 		radial-gradient(closest-side at 72% 62%, var(--amber), rgb(240 160 68 / 0%));
 }
 
 .section--inverse::after {
 	background:
-		radial-gradient(10% 13% at 40% 70%, rgb(147 168 198 / 60%), rgb(147 168 198 / 0%)),
+		radial-gradient(17% 22% at 40% 70%, rgb(147 168 198 / 80%), rgb(147 168 198 / 0%)),
 		radial-gradient(closest-side at 62% 34%, #e8703a, rgb(232 112 58 / 0%)),
 		radial-gradient(closest-side at 38% 72%, rgb(247 212 154 / 70%), rgb(247 212 154 / 0%));
 	animation-duration: 34s;
