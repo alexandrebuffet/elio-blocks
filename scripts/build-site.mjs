@@ -11,9 +11,11 @@
  * - blueprint.json: the Playground blueprint of the WordPress.org Live
  *   Preview, which the "Try it live" links load with the plugin zip of the
  *   site in place of the WordPress.org slug.
- * - icons.svg: the Elio collection (src/icons/) as one sprite of symbols
- *   stroked in currentColor (the page sets their width), and the plain logo
- *   of the admin menu (RegisterOptionsPage::MENU_ICON) as `elio-menu`.
+ * - icons.svg: the Elio collection (src/icons/) and the icons of the editor
+ *   alone (src/icons/block-editor/, weather-condition-description…) as one
+ *   sprite of symbols stroked in currentColor (the page sets their width),
+ *   and the plain logo of the admin menu (RegisterOptionsPage::MENU_ICON) as
+ *   `elio-menu`.
  *
  * The deploy workflow adds elio-blocks.zip, the package of the plugin, next to
  * index.html. Preview locally with `npm run build:site`, then serve _site/.
@@ -56,13 +58,21 @@ copyFileSync(
 const manifest = JSON.parse(
 	readFileSync( join( root, 'src/icons/manifest.json' ), 'utf8' )
 );
-const symbols = manifest.icons.map( ( { slug } ) => {
-	const svg = readFileSync(
-		join( root, 'src/icons/svg', `${ slug }.svg` ),
-		'utf8'
-	);
-	// The Figma frame (clipPath) goes, the strokes take the color of the text
-	// and the width the page gives them (the icon block has a stroke width).
+// The icons of the collection, then those the editor alone has
+// (src/icons/block-editor/ files that are not a variant of a collection icon).
+const slugs = new Set( manifest.icons.map( ( { slug } ) => slug ) );
+const files = [
+	...[ ...slugs ].map( ( slug ) => [ slug, `src/icons/svg/${ slug }.svg` ] ),
+	...readdirSync( join( root, 'src/icons/block-editor' ) )
+		.filter( ( file ) => file.endsWith( '.svg' ) )
+		.map( ( file ) => file.slice( 0, -4 ) )
+		.filter( ( slug ) => ! slugs.has( slug ) )
+		.map( ( slug ) => [ slug, `src/icons/block-editor/${ slug }.svg` ] ),
+];
+const symbols = files.map( ( [ slug, path ] ) => {
+	const svg = readFileSync( join( root, path ), 'utf8' );
+	// The Figma frame (clipPath) goes, the strokes and fills take the color of
+	// the text and the strokes the width the page gives them.
 	const body = svg
 		.replace( /^[\s\S]*?<svg[^>]*>/, '' )
 		.replace( /<\/svg>\s*$/, '' )
