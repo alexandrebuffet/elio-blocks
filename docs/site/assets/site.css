@@ -113,7 +113,6 @@
 		--browser-hover: rgb(255 255 255 / 6%);
 		--browser-line: rgb(255 255 255 / 8%);
 		--shimmer: var(--amber), var(--gold), #e8703a, var(--gold), var(--amber);
-		--snackbar-edge: rgb(238 231 219 / 16%);
 	}
 }
 
@@ -804,42 +803,18 @@ a.brand:hover .brand__logo {
 	animation: spin 12s linear infinite;
 }
 
-/* What the demo is doing, in a notice as the editor shows them. */
-.snackbar {
-	position: absolute;
-	bottom: 40px;
-	left: 24px;
-	z-index: 1;
+/* What the demo is doing, above its window. */
+.live__status {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: var(--space-s) var(--space-l);
-	max-width: min(600px, calc(100% - 48px));
-	padding: var(--space-s) var(--space-m) var(--space-s) var(--space-l);
-	border-radius: 4px;
-	background: var(--night);
-	color: var(--on-night);
-	box-shadow: 0 0 0 1px var(--snackbar-edge, transparent), 0 16px 40px -12px rgb(0 0 0 / 50%);
+	margin-bottom: var(--space-m);
+	color: var(--ink-2);
 	font-size: var(--text-s);
-	animation: snackbar-in 0.5s var(--ease) both;
 }
 
-.snackbar.is-dismissed {
-	visibility: hidden;
-	opacity: 0;
-	transform: translateY(8px);
-	transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
-}
-
-@keyframes snackbar-in {
-
-	from {
-		opacity: 0;
-		transform: translateY(12px);
-	}
-}
-
-.snackbar__text {
+.live__status-text {
 	display: flex;
 	align-items: center;
 	gap: var(--space-s);
@@ -847,7 +822,7 @@ a.brand:hover .brand__logo {
 }
 
 /* The sun of the demo, rising while WordPress starts. */
-.snackbar__text::before {
+.live__status-text::before {
 	content: "" / "";
 	flex: none;
 	width: 8px;
@@ -857,7 +832,7 @@ a.brand:hover .brand__logo {
 	box-shadow: 0 0 12px 2px rgb(240 160 68 / 60%);
 }
 
-.live.is-starting .snackbar__text::before {
+.live.is-starting .live__status-text::before {
 	animation: pulse 2s ease-out infinite;
 }
 
@@ -885,13 +860,6 @@ a.brand:hover .brand__logo {
 
 	.browser__dots {
 		display: none;
-	}
-
-	.snackbar {
-		right: 12px;
-		bottom: 12px;
-		left: 12px;
-		max-width: none;
 	}
 }
 
