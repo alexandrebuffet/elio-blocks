@@ -28,8 +28,9 @@
  * touches of light in the front end band. Contrast (WCAG 2.2 AA): --ink-2 on
  * --paper 6.8:1, --accent on --paper 3.5:1 (large text and icons only),
  * --accent-2 on --paper 4.7:1, --night on --ember 5.2:1 (the count, the
- * band), --on-night-2 on --night 6.9:1; the light shimmer stays above 3.4:1
- * (large text).
+ * band), --on-night-2 on --night 6.9:1. The light shimmer goes down to
+ * 2.4:1 where it is gold, by choice: the yellow of the photo in the title of
+ * the hero, a display size.
  */
 :root {
 	--paper: #fbf4e8;
@@ -60,7 +61,7 @@
 	--browser-dot: #d4c6b1;
 	--browser-hover: rgb(255 255 255 / 50%);
 	--browser-line: rgb(0 0 0 / 10%);
-	--shimmer: #c46200, #cc6400, #b87300, #cc6400, #c46200;
+	--shimmer: #cc5a00, #d09400, #cc6400, #d09400, #cc5a00;
 	--gutter: clamp(16px, 4vw, 48px);
 
 	/*
