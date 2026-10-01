@@ -961,11 +961,13 @@ a.brand:hover .brand__logo {
 
 /*
  * Features: an editorial grid of cards, each in a light rule, and the count
- * of blocks in a block of warm, muted light, from sand to clay.
+ * of blocks in a block of warm, muted light, from sand to clay. Every row as
+ * tall as the tallest card, so the cards all have one height.
  */
 .features {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-auto-rows: 1fr;
 	gap: var(--space-l);
 }
 
@@ -1064,8 +1066,10 @@ a.brand:hover .brand__logo {
 
 @media (max-width: 600px) {
 
+	/* One column: each card its own height, a long one would stretch them all. */
 	.features {
 		grid-template-columns: minmax(0, 1fr);
+		grid-auto-rows: auto;
 	}
 }
 
