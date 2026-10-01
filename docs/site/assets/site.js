@@ -399,7 +399,8 @@ function initReveal() {
 }
 
 /**
- * The halo of light on a hovered button follows the pointer.
+ * The halo of light on a hovered button follows the pointer, halfway from the
+ * middle of the button: the stylesheet makes it glide there.
  */
 function initButtonHalo() {
 	document.addEventListener(
@@ -410,14 +411,14 @@ function initButtonHalo() {
 				return;
 			}
 			const box = button.getBoundingClientRect();
-			button.style.setProperty(
-				'--halo-x',
-				`${ event.clientX - box.left }px`
-			);
-			button.style.setProperty(
-				'--halo-y',
-				`${ event.clientY - box.top }px`
-			);
+			const x =
+				box.width / 2 +
+				( event.clientX - box.left - box.width / 2 ) / 2;
+			const y =
+				box.height / 2 +
+				( event.clientY - box.top - box.height / 2 ) / 2;
+			button.style.setProperty( '--halo-x', `${ x }px` );
+			button.style.setProperty( '--halo-y', `${ y }px` );
 		},
 		{ passive: true }
 	);
