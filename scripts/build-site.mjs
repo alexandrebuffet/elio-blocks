@@ -105,11 +105,43 @@ writeFileSync(
 	`<svg xmlns="http://www.w3.org/2000/svg">${ symbols.join( '' ) }</svg>\n`
 );
 
+// The logo of the plugin in the sprite of the page, its tile and its sun as two
+// symbols, so the sun can turn on its own (an <img> cannot be animated inside).
+const logo = readFileSync(
+	join( root, 'src/icons/brand/svg/elio-logo.svg' ),
+	'utf8'
+);
+const logoGradient = logo.match(
+	/<linearGradient id="([^"]+)"[\s\S]*?<\/linearGradient>/
+);
+const logoTile = logo.match( /<rect[^>]*\/>/g );
+const logoSun = logo.match( /<path[^>]*\/>/ );
+if ( ! logoGradient || ! logoTile || ! logoSun ) {
+	throw new Error( 'The logo has no gradient, tile or sun' );
+}
+const logoSymbols =
+	`<defs>${ logoGradient[ 0 ].replace(
+		logoGradient[ 1 ],
+		'elio-logo-gradient'
+	) }</defs>` +
+	`<symbol id="elio-logo-tile" viewBox="0 0 128 128">${ logoTile
+		.join( '' )
+		.replace(
+			`url(#${ logoGradient[ 1 ] })`,
+			'url(#elio-logo-gradient)'
+		) }</symbol>` +
+	`<symbol id="elio-logo-sun" viewBox="0 0 128 128">${ logoSun[ 0 ] }</symbol>`;
+
 // The FAQ as structured data (schema.org FAQPage), read from the page itself
 // so the questions and answers are written once: each <details> of the FAQ,
 // its <summary> the question, its text the answer.
 const indexPath = join( out, 'index.html' );
-const index = readFileSync( indexPath, 'utf8' );
+const sprite = '<svg class="sprite" aria-hidden="true" focusable="false">';
+const page = readFileSync( indexPath, 'utf8' );
+if ( ! page.includes( sprite ) ) {
+	throw new Error( 'No sprite in index.html' );
+}
+const index = page.replace( sprite, sprite + logoSymbols );
 const text = ( html ) =>
 	html
 		.replace( /<span class="screen-reader-text">[\s\S]*?<\/span>/g, '' )
