@@ -106,7 +106,8 @@ writeFileSync(
 );
 
 // The logo of the plugin in the sprite of the page, its tile and its sun as two
-// symbols, so the sun can turn on its own (an <img> cannot be animated inside).
+// symbols, so the sun can turn on its own (an <img> cannot be animated inside);
+// the fill="none" of its root goes on the sun, its circle is a stroke.
 const logo = readFileSync(
 	join( root, 'src/icons/brand/svg/elio-logo.svg' ),
 	'utf8'
@@ -130,7 +131,7 @@ const logoSymbols =
 			`url(#${ logoGradient[ 1 ] })`,
 			'url(#elio-logo-gradient)'
 		) }</symbol>` +
-	`<symbol id="elio-logo-sun" viewBox="0 0 128 128">${ logoSun[ 0 ] }</symbol>`;
+	`<symbol id="elio-logo-sun" viewBox="0 0 128 128" fill="none">${ logoSun[ 0 ] }</symbol>`;
 
 // The FAQ as structured data (schema.org FAQPage), read from the page itself
 // so the questions and answers are written once: each <details> of the FAQ,
