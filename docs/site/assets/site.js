@@ -424,8 +424,44 @@ function initButtonHalo() {
 	);
 }
 
+/**
+ * The sun of the closing rises with the scroll where the stylesheet cannot tie
+ * it to the scroll itself (Firefox): --sunrise goes from 0, the top of the
+ * footer at the bottom of the screen, to 1, the footer all in sight.
+ */
+function initSunrise() {
+	const closing = document.querySelector( '.closing' );
+	const footer = document.querySelector( '.site-footer' );
+	if (
+		! closing ||
+		! footer ||
+		window.CSS?.supports( 'animation-timeline: view()' ) ||
+		window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches
+	) {
+		return;
+	}
+	let frame = 0;
+	const update = () => {
+		frame = 0;
+		const box = footer.getBoundingClientRect();
+		const course = Math.min( box.height, window.innerHeight );
+		const progress = ( window.innerHeight - box.top ) / course;
+		closing.style.setProperty(
+			'--sunrise',
+			String( Math.min( 1, Math.max( 0, progress ) ) )
+		);
+	};
+	const schedule = () => {
+		frame ||= window.requestAnimationFrame( update );
+	};
+	window.addEventListener( 'scroll', schedule, { passive: true } );
+	window.addEventListener( 'resize', schedule );
+	update();
+}
+
 initReveal();
 initNav();
 initButtonHalo();
+initSunrise();
 initPlaygroundLinks();
 initLiveDemo();
