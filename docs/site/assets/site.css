@@ -1323,6 +1323,18 @@ a.brand:hover .brand__sun {
 	animation: glow 6s ease-in-out infinite;
 }
 
+@keyframes glow {
+
+	0%,
+	100% {
+		box-shadow: 0 0 80px 10px rgb(240 160 68 / 30%), 0 0 200px 60px rgb(224 96 42 / 18%);
+	}
+
+	50% {
+		box-shadow: 0 0 120px 24px rgb(240 160 68 / 45%), 0 0 320px 110px rgb(224 96 42 / 28%);
+	}
+}
+
 /*
  * The sun rises with the scroll, and sets again when the page goes back up:
  * from the moment the horizon of the section, the top of the footer, comes on
@@ -1339,16 +1351,27 @@ a.brand:hover .brand__sun {
 	}
 
 	.closing__sun {
-		animation: glow 6s ease-in-out infinite, rise linear both;
+		animation: glow 6s ease-in-out infinite, sunrise linear both;
 		animation-timeline: auto, --horizon;
 		animation-range: normal, entry 0% entry 100%;
 	}
 }
 
-@keyframes rise {
+@keyframes sunrise {
 
 	from {
 		translate: -50% 40%;
+	}
+}
+
+/*
+ * Where an animation cannot follow the scroll (Firefox), site.js gives the
+ * same course as --sunrise, from 0 to 1; without it, the sun stays up.
+ */
+@supports not (animation-timeline: view()) {
+
+	.closing__sun {
+		translate: -50% calc(40% - var(--sunrise, 1) * 40%);
 	}
 }
 
