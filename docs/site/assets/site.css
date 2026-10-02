@@ -1303,7 +1303,8 @@ a.brand:hover .brand__sun {
 	position: relative;
 	isolation: isolate;
 	overflow: hidden;
-	padding: var(--space-section) 0 clamp(220px, 28vw, 360px);
+	--closing-sun: min(640px, 72vw);
+	padding: var(--space-section) 0 clamp(160px, 28vw, 360px);
 	background: var(--night);
 	color: var(--on-night);
 	text-align: center;
@@ -1313,13 +1314,38 @@ a.brand:hover .brand__sun {
 	position: absolute;
 	z-index: -1;
 	left: 50%;
-	bottom: calc(min(640px, 104vw) * -0.58);
-	width: min(640px, 104vw);
+	bottom: calc(var(--closing-sun) * -0.58);
+	width: var(--closing-sun);
 	aspect-ratio: 1;
 	translate: -50% 0;
 	border-radius: 50%;
 	background: radial-gradient(circle at 45% 38%, var(--cream) 0%, var(--gold) 18%, var(--amber) 44%, var(--ember) 76%, var(--rust) 100%);
 	animation: glow 6s ease-in-out infinite;
+}
+
+/*
+ * The sun rises with the scroll, from below the horizon of the section, and
+ * sets again when the page goes back up: from the moment its place comes on
+ * screen to the moment the section stands a little above the footer.
+ */
+@supports (animation-timeline: view()) {
+
+	.closing {
+		view-timeline: --closing block;
+	}
+
+	.closing__sun {
+		animation: glow 6s ease-in-out infinite, rise ease-out both;
+		animation-timeline: auto, --closing;
+		animation-range: normal, entry calc(100% - var(--closing-sun) * 0.42) entry calc(100% + var(--closing-sun) * 0.4);
+	}
+}
+
+@keyframes rise {
+
+	from {
+		translate: -50% 72%;
+	}
 }
 
 @keyframes glow {
