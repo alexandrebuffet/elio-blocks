@@ -921,11 +921,12 @@ a.brand:hover .brand__sun {
 	animation: spin 12s linear infinite;
 }
 
-/* What the demo is doing, above its window. */
+/* What the demo is doing, centered above its window. */
 .live__status {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
+	justify-content: center;
 	gap: var(--space-s) var(--space-l);
 	margin-bottom: var(--space-m);
 	color: var(--ink-2);
