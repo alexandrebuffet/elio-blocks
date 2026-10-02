@@ -1324,39 +1324,31 @@ a.brand:hover .brand__sun {
 }
 
 /*
- * The sun rises with the scroll, from below the horizon of the section, and
- * sets again when the page goes back up: from the moment its place comes on
- * screen to the moment the section stands a little above the footer.
+ * The sun rises with the scroll, and sets again when the page goes back up:
+ * from the moment the horizon of the section, the top of the footer, comes on
+ * screen to the end of the page, so it climbs while the horizon is in sight.
  */
 @supports (animation-timeline: view()) {
 
-	.closing {
-		view-timeline: --closing block;
+	body {
+		timeline-scope: --horizon;
+	}
+
+	.site-footer {
+		view-timeline: --horizon block;
 	}
 
 	.closing__sun {
-		animation: glow 6s ease-in-out infinite, rise ease-out both;
-		animation-timeline: auto, --closing;
-		animation-range: normal, entry calc(100% - var(--closing-sun) * 0.42) entry calc(100% + var(--closing-sun) * 0.4);
+		animation: glow 6s ease-in-out infinite, rise linear both;
+		animation-timeline: auto, --horizon;
+		animation-range: normal, entry 0% entry 100%;
 	}
 }
 
 @keyframes rise {
 
 	from {
-		translate: -50% 72%;
-	}
-}
-
-@keyframes glow {
-
-	0%,
-	100% {
-		box-shadow: 0 0 80px 10px rgb(240 160 68 / 30%), 0 0 200px 60px rgb(224 96 42 / 18%);
-	}
-
-	50% {
-		box-shadow: 0 0 120px 24px rgb(240 160 68 / 45%), 0 0 320px 110px rgb(224 96 42 / 28%);
+		translate: -50% 40%;
 	}
 }
 
