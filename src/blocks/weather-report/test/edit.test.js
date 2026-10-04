@@ -23,7 +23,6 @@ vi.mock( '@wordpress/block-editor', () => ( {
 	} ),
 } ) );
 vi.mock( '@wordpress/components', () => ( {
-	Spinner: () => <span data-testid="spinner" />,
 	Notice: ( { status, children } ) => (
 		<div data-testid="notice" data-status={ status }>
 			{ children }
@@ -67,35 +66,33 @@ const has = ( container, testId ) =>
 	container.querySelector( `[data-testid="${ testId }"]` ) !== null;
 
 describe( 'weather-report edit', () => {
-	it( 'keeps its inner blocks in place while the weather forecast loads', () => {
+	it( 'shows nothing but its inner blocks while the weather forecast loads', () => {
 		useWeatherForecastQuery.mockReturnValue( {
-			data: null,
+			data: { current: {} },
 			isLoading: true,
 			error: null,
 		} );
 
-		const container = renderEdit();
+		const report = renderEdit().firstElementChild;
 
 		// Unmounting them loses the selection and the undo history of what is being edited.
-		expect( has( container, 'inner-blocks' ) ).toBe( true );
-		expect( has( container, 'spinner' ) ).toBe( true );
-		expect( container.firstElementChild.getAttribute( 'aria-busy' ) ).toBe(
-			'true'
-		);
+		expect( report.children ).toHaveLength( 1 );
+		expect( has( report, 'inner-blocks' ) ).toBe( true );
+		expect( report.getAttribute( 'aria-busy' ) ).toBe( 'true' );
 	} );
 
-	it( 'shows no spinner once the weather forecast is there', () => {
+	it( 'is no longer busy once the weather forecast is there', () => {
 		useWeatherForecastQuery.mockReturnValue( {
 			data: { current: {} },
 			isLoading: false,
 			error: null,
 		} );
 
-		const container = renderEdit();
+		const report = renderEdit().firstElementChild;
 
-		expect( has( container, 'inner-blocks' ) ).toBe( true );
-		expect( has( container, 'spinner' ) ).toBe( false );
-		expect( has( container, 'notice' ) ).toBe( false );
+		expect( report.children ).toHaveLength( 1 );
+		expect( has( report, 'inner-blocks' ) ).toBe( true );
+		expect( report.getAttribute( 'aria-busy' ) ).toBe( 'false' );
 	} );
 
 	it( 'tells the editor when the weather forecast could not be loaded', () => {

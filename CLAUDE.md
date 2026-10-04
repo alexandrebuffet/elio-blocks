@@ -92,7 +92,7 @@ All blocks are under the `elio/` namespace:
 - `src/blocks/` — One directory per block: `block.json`, `index.js`, `edit.js`, `save.js`, optional `render.php`, `view.js`, `inspector.js`, SCSS.
 - `src/block-editor/` — Shared editor code:
   - `components/` — Reusable editor UI (location search, geolocation toggle, coordinate inputs), `icon-collection-control/` (collection buttons of the inspectors)
-  - `hooks/` — `useWeatherForecastQuery` / `useWeatherReport` (weather forecast from the `elio/data` store resolver, never fetched in components), `useLocationSearch` (debounced, cancellable), `use-condition-icon-collections.js` (registered collections, same store)
+  - `hooks/` — `useWeatherForecastQuery` / `useWeatherReport` (weather forecast from the `elio/data` store resolver, never fetched in components; the one shown stays until the next one is there, so the report shows no spinner: its inner blocks stay mounted and fill in place, `aria-busy` meanwhile), `useLocationSearch` (debounced, cancellable), `use-condition-icon-collections.js` (registered collections, same store)
   - `components/weather-value-edit/` — generic edit component of the leaf blocks (prefix, value, unit)
   - `utils/` — Helpers, `condition-icon-collection.js` (JS twin of `ConditionIconCollectionResolver`)
   - `block-collection.js` — Registers the "Elio" collection, with the plugin logo as its icon

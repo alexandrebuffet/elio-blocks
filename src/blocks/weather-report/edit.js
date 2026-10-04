@@ -3,7 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
-import { Notice, Spinner } from '@wordpress/components';
+import { Notice } from '@wordpress/components';
 
 /**
  * Internal dependencies.
@@ -81,6 +81,8 @@ export default function ReportEdit( props ) {
 
 	// Inner blocks stay mounted whatever the request does: replacing them with a
 	// spinner dropped the selection and re-created every block on each refresh.
+	// No spinner over them either: they keep the weather forecast shown until
+	// the next one is there and fill in place, as core blocks bound to data do.
 	return (
 		<>
 			{ isSelected && (
@@ -93,7 +95,6 @@ export default function ReportEdit( props ) {
 				</>
 			) }
 			<TagName { ...restInnerBlocksProps } aria-busy={ !! isLoading }>
-				{ isLoading && <Spinner /> }
 				{ error && (
 					<Notice status="error" isDismissible={ false }>
 						{ error }

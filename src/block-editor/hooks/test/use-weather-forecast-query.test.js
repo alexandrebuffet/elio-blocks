@@ -128,6 +128,59 @@ describe( 'useWeatherForecastQuery', () => {
 		expect( result.current.isLoading ).toBe( false );
 	} );
 
+	it( 'keeps the weather forecast shown until the next one is there', async () => {
+		const { result, rerender } = renderHook(
+			makeRegistry(),
+			useWeatherForecastQuery,
+			PARIS
+		);
+		await advance( 1000 );
+
+		let answer;
+		apiFetch.mockImplementation(
+			() => new Promise( ( resolve ) => ( answer = resolve ) )
+		);
+		rerender( { ...PARIS, latitude: 45.76, longitude: 4.84 } );
+		await advance( 1000 );
+
+		expect( requestedLatitudes() ).toEqual( [ '48.8566', '45.76' ] );
+		expect( result.current ).toEqual( {
+			data: { current: { temperature: 21 } },
+			isLoading: true,
+			error: null,
+		} );
+
+		answer( { current: { temperature: 18 } } );
+		await advance( 1 );
+
+		expect( result.current ).toEqual( {
+			data: { current: { temperature: 18 } },
+			isLoading: false,
+			error: null,
+		} );
+	} );
+
+	it( 'does not keep the weather forecast of another location when the request fails', async () => {
+		const { result, rerender } = renderHook(
+			makeRegistry(),
+			useWeatherForecastQuery,
+			PARIS
+		);
+		await advance( 1000 );
+
+		apiFetch.mockRejectedValue(
+			new Error( 'Unable to fetch weather forecast data.' )
+		);
+		rerender( { ...PARIS, latitude: 45.76, longitude: 4.84 } );
+		await advance( 1000 );
+
+		expect( result.current ).toEqual( {
+			data: null,
+			isLoading: false,
+			error: 'Unable to fetch weather forecast data.',
+		} );
+	} );
+
 	it( 'reports a failed request', async () => {
 		apiFetch.mockRejectedValue(
 			new Error( 'Unable to fetch weather forecast data.' )
