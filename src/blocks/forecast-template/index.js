@@ -12,6 +12,13 @@ import save from './save';
 import variations from './variations';
 import metadata from './block.json';
 import cloudSunLayout from '../../icons/components/cloud-sun-layout';
+import { DAILY_WEATHER_FORECAST_INNER_BLOCKS } from '../forecast/variations';
+import { getBlockExampleFromTemplate } from '../../block-editor/utils';
+
+// The template of the Daily Forecast, its days in a grid.
+const { attributes, innerBlocks } = getBlockExampleFromTemplate(
+	DAILY_WEATHER_FORECAST_INNER_BLOCKS
+);
 
 /**
  * Registers the block type.
@@ -32,4 +39,5 @@ registerBlockType( metadata.name, {
 	 * @see ./variations.js
 	 */
 	variations,
+	example: { attributes, innerBlocks },
 } );

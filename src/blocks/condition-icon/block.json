@@ -7,6 +7,16 @@
 	"category": "elio-weather",
 	"icon": "star-fill",
 	"description": "Displays the weather condition.",
+	"example": {
+		"attributes": {
+			"style": {
+				"dimensions": {
+					"width": "48px"
+				}
+			}
+		},
+		"viewportWidth": 350
+	},
 	"ancestor": ["elio/weather-report"],
 	"attributes": {
 		"isDecorative": {

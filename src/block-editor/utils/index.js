@@ -11,3 +11,4 @@ export {
 	DEFAULT_CONDITION_ICON_STROKE_WIDTH,
 } from './condition-icon-collection';
 export { getIconCollectionPreviewDocument } from './icon-collection-preview';
+export { getBlockExampleFromTemplate } from './block-example';

@@ -7,6 +7,9 @@
 	"category": "elio-weather",
 	"icon": "chart-bar",
 	"description": "Displays the wind direction as cardinal point or degrees.",
+	"example": {
+		"viewportWidth": 350
+	},
 	"ancestor": ["elio/weather-report"],
 	"attributes": {
 		"displayFormat": {

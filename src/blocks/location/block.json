@@ -7,6 +7,9 @@
 	"category": "elio-weather",
 	"icon": "location",
 	"description": "Displays the weather location name or coordinates.",
+	"example": {
+		"viewportWidth": 350
+	},
 	"ancestor": ["elio/weather-report"],
 	"usesContext": ["elio/reportLocation"],
 	"attributes": {

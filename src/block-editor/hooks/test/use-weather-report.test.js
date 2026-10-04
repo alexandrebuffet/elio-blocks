@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 /**
  * WordPress dependencies
  */
-import { createRegistry } from '@wordpress/data';
+import { createRegistry, createReduxStore } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -22,15 +22,23 @@ const PARIS = { latitude: 48.8566, longitude: 2.3522, name: 'Paris' };
 const TOKYO = { latitude: 35.6895, longitude: 139.6917, name: 'Tokyo' };
 
 /**
- * Creates a registry with the elio/data store only. No block editor store: the hook
- * does not need one, and the block previews of a Forecast Template have one
- * without the report in it.
+ * Creates a registry with the elio/data store and the settings of a block
+ * editor store. A block preview has a block editor store of its own, which
+ * holds neither the report nor its parents (the rows of a Forecast Template,
+ * the block alone in the inserter): the hook reads its settings only.
  *
+ * @param {Object} [settings] Block editor settings.
  * @return {Object} Registry.
  */
-function makeRegistry() {
+function makeRegistry( settings = { isPreviewMode: false } ) {
 	const registry = createRegistry();
 	registry.register( store );
+	registry.register(
+		createReduxStore( 'core/block-editor', {
+			reducer: ( state = {} ) => state,
+			selectors: { getSettings: () => settings },
+		} )
+	);
 	return registry;
 }
 
@@ -113,6 +121,46 @@ describe( 'useWeatherReport', () => {
 		await advance( 1000 );
 
 		rerender( { context: reportContext( { location: TOKYO } ) } );
+		await advance( 1000 );
+
+		expect( result.current.item ).toEqual( { temperature: 28 } );
+	} );
+
+	it( 'shows the weather of the report example in a preview out of any report', async () => {
+		const { result } = renderHook(
+			makeRegistry( { isPreviewMode: true } ),
+			useHook,
+			{ context: {} }
+		);
+		await advance( 1000 );
+
+		expect( result.current.item ).toEqual( { temperature: 15 } );
+		expect(
+			apiFetch.mock.calls
+				.map( ( [ { path } ] ) => path )
+				.find( ( path ) =>
+					path.startsWith( '/elio/v1/weather-forecast' )
+				)
+		).toContain( `longitude=${ PARIS.longitude }` );
+	} );
+
+	it( 'reads the preview mode under its WordPress 6.7 name too', async () => {
+		const { result } = renderHook(
+			makeRegistry( { __unstableIsPreviewMode: true } ),
+			useHook,
+			{ context: {} }
+		);
+		await advance( 1000 );
+
+		expect( result.current.item ).toEqual( { temperature: 15 } );
+	} );
+
+	it( 'keeps the location of the report in a preview inside it', async () => {
+		const { result } = renderHook(
+			makeRegistry( { isPreviewMode: true } ),
+			useHook,
+			{ context: reportContext( { location: TOKYO } ) }
+		);
 		await advance( 1000 );
 
 		expect( result.current.item ).toEqual( { temperature: 28 } );

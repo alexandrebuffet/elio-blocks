@@ -27,6 +27,7 @@ import clsx from 'clsx';
 import './editor.scss';
 import Inspector from './inspector';
 import SearchLocationModal from '../../block-editor/components/search-location-modal';
+import { useReportContext } from '../../block-editor/hooks';
 import {
 	formatCoordinates,
 	formatCoordinatesPrecise,
@@ -62,7 +63,8 @@ function isFiniteCoordinate( value ) {
 }
 
 /**
- * Renders the Location block in the editor. Displays the report location from context.
+ * Renders the Location block in the editor. Displays the report location from
+ * context, the one of the report example in a preview out of any report.
  *
  * @param {Object}                       props                 Block props.
  * @param {string}                       props.clientId        Block client id.
@@ -79,7 +81,8 @@ export default function LocationEdit( {
 	setAttributes,
 	isSelected,
 } ) {
-	const location = context?.[ 'elio/reportLocation' ] ?? {};
+	const location =
+		useReportContext( context )?.[ 'elio/reportLocation' ] ?? {};
 
 	const { level = 2, levelOptions, displayType = '' } = attributes;
 

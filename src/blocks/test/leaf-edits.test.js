@@ -233,6 +233,20 @@ describe( 'leaf blocks in the editor', () => {
 		}
 	);
 
+	it( 'gives the daily temperatures of today out of a row, as in their preview', () => {
+		useWeatherReport.mockReturnValue( {
+			data: { ...WEATHER_FORECAST, daily: [ DAY ] },
+			item: CURRENT,
+		} );
+
+		expect( shown( DailyTemperatureEdit ) ).toBe( '11°C' );
+		expect(
+			shown( DailyTemperatureEdit, {
+				attributes: { displayType: 'max' },
+			} )
+		).toBe( '24.5°C' );
+	} );
+
 	it( 'follows the unit system of the site when nothing overrides it', () => {
 		useWeatherReport.mockReturnValue( {
 			data: { meta: { units: 'imperial' }, current: CURRENT },

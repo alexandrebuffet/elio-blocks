@@ -7,6 +7,9 @@
 	"category": "elio-weather",
 	"icon": "thermometer",
 	"description": "Displays a daily weather forecast temperature (min, max, or feels like).",
+	"example": {
+		"viewportWidth": 350
+	},
 	"ancestor": ["elio/forecast-template"],
 	"attributes": {
 		"displayType": {

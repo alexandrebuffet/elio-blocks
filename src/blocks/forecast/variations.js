@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import cloudSunCalendar from '../../icons/components/cloud-sun-calendar';
 import cloudSunClock from '../../icons/components/cloud-sun-clock';
+import { getBlockExampleFromTemplate } from '../../block-editor/utils';
 
 /**
  * Inner blocks of the forecast template in the weather forecast variations
@@ -89,6 +90,13 @@ const variations = [
 			count: 7,
 		},
 		innerBlocks: [ DAILY_WEATHER_FORECAST_INNER_BLOCKS ],
+		example: {
+			innerBlocks: [
+				getBlockExampleFromTemplate(
+					DAILY_WEATHER_FORECAST_INNER_BLOCKS
+				),
+			],
+		},
 		isActive: [ 'type' ],
 		scope: [ 'transform', 'inserter' ],
 		isDefault: true,
@@ -103,6 +111,15 @@ const variations = [
 			count: 7,
 		},
 		innerBlocks: [ HOURLY_WEATHER_FORECAST_INNER_BLOCKS ],
+		example: {
+			innerBlocks: [
+				getBlockExampleFromTemplate(
+					HOURLY_WEATHER_FORECAST_INNER_BLOCKS
+				),
+			],
+			// Wide enough for the seven hours side by side.
+			viewportWidth: 700,
+		},
 		isActive: [ 'type' ],
 		scope: [ 'transform', 'inserter' ],
 	},

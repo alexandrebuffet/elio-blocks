@@ -7,6 +7,9 @@
 	"category": "elio-weather",
 	"icon": "thermometer",
 	"description": "Displays the weather temperature.",
+	"example": {
+		"viewportWidth": 350
+	},
 	"ancestor": ["elio/weather-report"],
 	"attributes": {
 		"displayType": {
