@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,14 +17,14 @@ import cloudSunGrid from '../../icons/components/cloud-sun-grid';
  * Mirrors the core/group pattern: variations set the layout attribute,
  * isActive uses dot-notation paths so Gutenberg can detect the active variation.
  * Order matters for isActive resolution — more specific variations (stack) must
- * come after less specific ones (row) so that the last match wins.
+ * come after less specific ones (row) so that the last match wins. Each has its
+ * own title, as core's Row, Stack and Grid: the buttons of the block toolbar
+ * that switch layouts are named after them ("Transform to Row").
  */
-const BLOCK_TITLE = __( 'Forecast Template', 'elio-blocks' );
-
 const variations = [
 	{
 		name: 'elio/forecast-template-default',
-		title: BLOCK_TITLE,
+		title: __( 'Forecast Template', 'elio-blocks' ),
 		description: __(
 			'Display forecast items in a flow layout.',
 			'elio-blocks'
@@ -36,7 +36,7 @@ const variations = [
 	},
 	{
 		name: 'elio/forecast-template-row',
-		title: BLOCK_TITLE,
+		title: _x( 'Row', 'single horizontal line', 'elio-blocks' ),
 		description: __(
 			'Arrange forecast items horizontally.',
 			'elio-blocks'
@@ -48,7 +48,7 @@ const variations = [
 	},
 	{
 		name: 'elio/forecast-template-stack',
-		title: BLOCK_TITLE,
+		title: __( 'Stack', 'elio-blocks' ),
 		description: __( 'Arrange forecast items vertically.', 'elio-blocks' ),
 		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
 		isActive: [ 'layout.type', 'layout.orientation' ],
@@ -57,7 +57,7 @@ const variations = [
 	},
 	{
 		name: 'elio/forecast-template-grid',
-		title: BLOCK_TITLE,
+		title: __( 'Grid', 'elio-blocks' ),
 		description: __( 'Arrange forecast items in a grid.', 'elio-blocks' ),
 		attributes: { layout: { type: 'grid' } },
 		isActive: [ 'layout.type' ],
