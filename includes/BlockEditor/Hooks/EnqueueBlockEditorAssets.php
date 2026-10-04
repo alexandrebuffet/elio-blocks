@@ -110,5 +110,7 @@ class EnqueueBlockEditorAssets implements HookInterface
             array(),
             $asset['version']
         );
+        // The build has its right-to-left copy (style-index-rtl.css).
+        wp_style_add_data('elio-blocks-block-editor', 'rtl', 'replace');
     }
 }

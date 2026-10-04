@@ -21,6 +21,9 @@ class RegisterOptionsPageTest extends TestCase
     /** @var array<int, array<int, mixed>> Arguments of each wp_enqueue_style() call. */
     private array $styles = [];
 
+    /** @var array<int, array<int, mixed>> Arguments of each wp_style_add_data() call. */
+    private array $styleData = [];
+
     /** @var array<int, array<int, mixed>> Arguments of each wp_set_script_translations() call. */
     private array $translations = [];
 
@@ -37,6 +40,11 @@ class RegisterOptionsPageTest extends TestCase
         });
         Functions\when('wp_enqueue_style')->alias(function (...$args): void {
             $this->styles[] = $args;
+        });
+        Functions\when('wp_style_add_data')->alias(function (...$args): bool {
+            $this->styleData[] = $args;
+
+            return true;
         });
         Functions\when('wp_set_script_translations')->alias(function (...$args): bool {
             $this->translations[] = $args;
@@ -62,6 +70,7 @@ class RegisterOptionsPageTest extends TestCase
         unset($GLOBALS['elio_blocks_test_asset_reads']);
         $this->scripts      = [];
         $this->styles       = [];
+        $this->styleData    = [];
         $this->translations = [];
 
         Monkey\tearDown();
@@ -83,6 +92,16 @@ class RegisterOptionsPageTest extends TestCase
             ]],
             $this->styles
         );
+    }
+
+    public function test_loads_the_right_to_left_copy_of_the_stylesheet(): void
+    {
+        $this->writeAssetFile();
+
+        $this->hook()->enqueueAssets(self::SETTINGS_PAGE);
+
+        // style-index-rtl.css, built next to it, in place of it on a right-to-left admin.
+        $this->assertSame([['elio-blocks-settings-style', 'rtl', 'replace']], $this->styleData);
     }
 
     public function test_reads_the_asset_file_once_for_the_script_and_the_stylesheet(): void

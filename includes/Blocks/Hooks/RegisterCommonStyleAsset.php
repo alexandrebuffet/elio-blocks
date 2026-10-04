@@ -44,5 +44,8 @@ class RegisterCommonStyleAsset implements HookInterface
             array(),
             $asset['version']
         );
+        // The build has its right-to-left copy (common-rtl.css), as WordPress
+        // loads for the stylesheets a block.json declares as files.
+        wp_style_add_data('elio-common-style', 'rtl', 'replace');
     }
 }

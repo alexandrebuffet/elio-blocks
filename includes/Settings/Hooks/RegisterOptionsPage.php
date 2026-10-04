@@ -168,6 +168,9 @@ class RegisterOptionsPage implements HookInterface
             array( 'wp-components' ),
             $version
         );
+        // The build has its right-to-left copy (style-index-rtl.css), which also
+        // holds the bundled @wordpress/components styles.
+        wp_style_add_data('elio-blocks-settings-style', 'rtl', 'replace');
     }
 
     /**
