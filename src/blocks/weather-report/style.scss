@@ -12,6 +12,10 @@
 	overflow: hidden;
 }
 
-.wp-block-elio-weather-report__condition-icons-sprite + * {
+// The first block after it has no block gap above it, as the first child of a
+// layout. Two classes: the layout rules of global styles and block supports
+// (`:root :where(.is-layout-flow) > *`, `.wp-container-… > * + *`) have one,
+// and are printed after this stylesheet.
+.wp-block-elio-weather-report > .wp-block-elio-weather-report__condition-icons-sprite + * {
 	margin-block-start: 0;
 }
