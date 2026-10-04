@@ -36,7 +36,9 @@ body.toplevel_page_elio-blocks-settings {
 
 .elio-blocks-settings {
 	display: grid;
-	min-height: calc(100vh - var(--wp-admin--admin-bar--height, 32px));
+	// The height on screen: 100vh is the one with the browser toolbars of a
+	// phone hidden, taller than the screen while they show.
+	min-height: calc(100dvh - var(--wp-admin--admin-bar--height, 32px));
 }
 
 .elio-blocks-settings__snackbar {
