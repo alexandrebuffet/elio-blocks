@@ -6,7 +6,7 @@
 	"title": "Hourly Temperature",
 	"category": "elio-weather",
 	"icon": "thermometer",
-	"description": "Displays an hourly weather forecast temperature (current or feels like).",
+	"description": "Display the temperature or feels like temperature of a forecast hour.",
 	"example": {
 		"viewportWidth": 350
 	},

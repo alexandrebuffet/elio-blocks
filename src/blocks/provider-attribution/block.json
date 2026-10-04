@@ -5,7 +5,7 @@
 	"version": "1.0.0",
 	"title": "Provider Attribution",
 	"category": "elio-weather",
-	"description": "Credits the provider of the weather data, as its license requires.",
+	"description": "Credit the provider of the weather data, as its license requires.",
 	"example": {
 		"viewportWidth": 350
 	},

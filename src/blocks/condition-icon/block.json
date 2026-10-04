@@ -6,7 +6,7 @@
 	"title": "Condition Icon",
 	"category": "elio-weather",
 	"icon": "star-fill",
-	"description": "Displays the weather condition.",
+	"description": "Display an icon of the weather condition.",
 	"example": {
 		"attributes": {
 			"style": {

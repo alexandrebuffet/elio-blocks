@@ -6,7 +6,7 @@
 	"title": "Date & Time",
 	"category": "elio-weather",
 	"icon": "calendar-alt",
-	"description": "Displays the weather date or time.",
+	"description": "Display the date or time of the current conditions or of a forecast item.",
 	"example": {
 		"viewportWidth": 350
 	},

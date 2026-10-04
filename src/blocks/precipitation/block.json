@@ -6,7 +6,7 @@
 	"title": "Precipitation",
 	"category": "elio-weather",
 	"icon": "cloud",
-	"description": "Displays the precipitation amount.",
+	"description": "Display the precipitation amount.",
 	"example": {
 		"viewportWidth": 350
 	},

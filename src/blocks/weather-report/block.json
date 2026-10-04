@@ -6,7 +6,7 @@
 	"title": "Weather",
 	"category": "widgets",
 	"icon": "cloud",
-	"description": "Display weather from a location.",
+	"description": "Display the current weather and forecast for a location.",
 	"example": {
 		"attributes": {
 			"location": {

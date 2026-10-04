@@ -6,7 +6,7 @@
 	"title": "Wind Speed",
 	"category": "elio-weather",
 	"icon": "chart-bar",
-	"description": "Displays the wind speed or wind gusts.",
+	"description": "Display the wind speed or wind gusts.",
 	"example": {
 		"viewportWidth": 350
 	},

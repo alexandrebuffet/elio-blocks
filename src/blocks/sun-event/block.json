@@ -6,7 +6,7 @@
 	"title": "Sun Event",
 	"category": "elio-weather",
 	"icon": "sunrise",
-	"description": "Displays the sunrise or sunset time.",
+	"description": "Display the sunrise or sunset time.",
 	"example": {
 		"viewportWidth": 350
 	},

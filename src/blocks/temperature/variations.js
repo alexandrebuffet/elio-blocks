@@ -13,10 +13,7 @@ const variations = [
 	{
 		name: 'elio/current-temperature',
 		title: __( 'Current Temperature', 'elio-blocks' ),
-		description: __(
-			'Display the current weather temperature.',
-			'elio-blocks'
-		),
+		description: __( 'Display the current temperature.', 'elio-blocks' ),
 		icon: temperature,
 		attributes: {
 			displayType: 'current',
@@ -29,7 +26,7 @@ const variations = [
 		name: 'elio/feels-like-temperature',
 		title: __( 'Current Feels Like Temperature', 'elio-blocks' ),
 		description: __(
-			'Display the current feels like (apparent) temperature.',
+			'Display the current feels like temperature.',
 			'elio-blocks'
 		),
 		icon: temperatureFeelsLike,

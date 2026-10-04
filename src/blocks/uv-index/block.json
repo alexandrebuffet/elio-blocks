@@ -6,7 +6,7 @@
 	"title": "UV Index",
 	"category": "elio-weather",
 	"icon": "chart-bar",
-	"description": "Displays the UV index.",
+	"description": "Display the UV index.",
 	"example": {
 		"viewportWidth": 350
 	},

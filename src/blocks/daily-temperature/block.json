@@ -6,7 +6,7 @@
 	"title": "Daily Temperature",
 	"category": "elio-weather",
 	"icon": "thermometer",
-	"description": "Displays a daily weather forecast temperature (min, max, or feels like).",
+	"description": "Display the minimum or maximum temperature, or feels like temperature, of a forecast day.",
 	"example": {
 		"viewportWidth": 350
 	},

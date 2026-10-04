@@ -139,7 +139,7 @@ const variations = [
 		name: 'elio/current-weather',
 		title: __( 'Default', 'elio-blocks' ),
 		description: __(
-			'Displays current weather location name, temperature, condition icon and description.',
+			'Display the location with its current temperature and weather condition.',
 			'elio-blocks'
 		),
 		icon: variationWeatherDefault,
@@ -154,7 +154,7 @@ const variations = [
 		name: 'elio/current-weather-minimalist',
 		title: __( 'Minimal', 'elio-blocks' ),
 		description: __(
-			'Displays current weather condition icon and temperature.',
+			'Display the current weather condition icon and temperature.',
 			'elio-blocks'
 		),
 		icon: variationWeatherMinimal,
@@ -175,7 +175,7 @@ const variations = [
 		name: 'elio/current-weather-hourly-forecast',
 		title: __( 'Hourly Forecast', 'elio-blocks' ),
 		description: __(
-			'Displays current weather location name, temperature, condition icon and description plus an hourly weather forecast list.',
+			'Display the current weather and an hourly forecast.',
 			'elio-blocks'
 		),
 		icon: variationWeatherForecast,
@@ -190,7 +190,7 @@ const variations = [
 		name: 'elio/current-weather-daily-forecast',
 		title: __( 'Daily Forecast', 'elio-blocks' ),
 		description: __(
-			'Displays current weather location name, temperature, condition icon and description plus a daily weather forecast list.',
+			'Display the current weather and a daily forecast.',
 			'elio-blocks'
 		),
 		icon: variationWeatherForecast,

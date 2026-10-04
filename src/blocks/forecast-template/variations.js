@@ -38,7 +38,7 @@ const variations = [
 		name: 'elio/forecast-template-row',
 		title: BLOCK_TITLE,
 		description: __(
-			'Display forecast items side by side.',
+			'Arrange forecast items horizontally.',
 			'elio-blocks'
 		),
 		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
@@ -49,10 +49,7 @@ const variations = [
 	{
 		name: 'elio/forecast-template-stack',
 		title: BLOCK_TITLE,
-		description: __(
-			'Display forecast items one above the other.',
-			'elio-blocks'
-		),
+		description: __( 'Arrange forecast items vertically.', 'elio-blocks' ),
 		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
 		isActive: [ 'layout.type', 'layout.orientation' ],
 		scope: [ 'block', 'transform' ],
@@ -61,7 +58,7 @@ const variations = [
 	{
 		name: 'elio/forecast-template-grid',
 		title: BLOCK_TITLE,
-		description: __( 'Display forecast items in a grid.', 'elio-blocks' ),
+		description: __( 'Arrange forecast items in a grid.', 'elio-blocks' ),
 		attributes: { layout: { type: 'grid' } },
 		isActive: [ 'layout.type' ],
 		scope: [ 'block', 'transform' ],

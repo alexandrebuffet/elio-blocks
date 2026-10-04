@@ -6,7 +6,7 @@
 	"title": "Humidity",
 	"category": "elio-weather",
 	"icon": "chart-bar",
-	"description": "Displays the relative humidity.",
+	"description": "Display the relative humidity.",
 	"example": {
 		"viewportWidth": 350
 	},

@@ -6,7 +6,7 @@
 	"title": "Last Updated",
 	"category": "elio-weather",
 	"icon": "update",
-	"description": "Displays when the weather data was last updated.",
+	"description": "Display when the weather data was last updated.",
 	"example": {
 		"viewportWidth": 350
 	},
