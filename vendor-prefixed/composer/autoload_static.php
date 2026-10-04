@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit03f8d2ac0f4152986f33e110a36041de
+class ComposerStaticInita290f8a20224bc4fa5de04a2107c9135
 {
     public static $files = array (
         '66cfd3a7190309803b5cc0fea03a4cdc' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -92,6 +92,7 @@ class ComposerStaticInit03f8d2ac0f4152986f33e110a36041de
         'ElioBlocks\\Vendor\\Symfony\\Component\\DependencyInjection\\Compiler\\CheckCircularReferencesPass' => __DIR__ . '/..' . '/symfony/dependency-injection/Compiler/CheckCircularReferencesPass.php',
         'ElioBlocks\\Vendor\\Symfony\\Component\\DependencyInjection\\Compiler\\CheckDefinitionValidityPass' => __DIR__ . '/..' . '/symfony/dependency-injection/Compiler/CheckDefinitionValidityPass.php',
         'ElioBlocks\\Vendor\\Symfony\\Component\\DependencyInjection\\Compiler\\CheckExceptionOnInvalidReferenceBehaviorPass' => __DIR__ . '/..' . '/symfony/dependency-injection/Compiler/CheckExceptionOnInvalidReferenceBehaviorPass.php',
+        'ElioBlocks\\Vendor\\Symfony\\Component\\DependencyInjection\\Compiler\\CheckFactoryBuilderCircularReferencePass' => __DIR__ . '/..' . '/symfony/dependency-injection/Compiler/CheckFactoryBuilderCircularReferencePass.php',
         'ElioBlocks\\Vendor\\Symfony\\Component\\DependencyInjection\\Compiler\\CheckReferenceValidityPass' => __DIR__ . '/..' . '/symfony/dependency-injection/Compiler/CheckReferenceValidityPass.php',
         'ElioBlocks\\Vendor\\Symfony\\Component\\DependencyInjection\\Compiler\\CheckTypeDeclarationsPass' => __DIR__ . '/..' . '/symfony/dependency-injection/Compiler/CheckTypeDeclarationsPass.php',
         'ElioBlocks\\Vendor\\Symfony\\Component\\DependencyInjection\\Compiler\\Compiler' => __DIR__ . '/..' . '/symfony/dependency-injection/Compiler/Compiler.php',
@@ -264,6 +265,8 @@ class ComposerStaticInit03f8d2ac0f4152986f33e110a36041de
         'ElioBlocks\\Vendor\\Symfony\\Component\\VarExporter\\VarExporter' => __DIR__ . '/..' . '/symfony/var-exporter/VarExporter.php',
         'ElioBlocks\\Vendor\\Symfony\\Contracts\\Service\\Attribute\\Required' => __DIR__ . '/..' . '/symfony/service-contracts/Attribute/Required.php',
         'ElioBlocks\\Vendor\\Symfony\\Contracts\\Service\\Attribute\\SubscribedService' => __DIR__ . '/..' . '/symfony/service-contracts/Attribute/SubscribedService.php',
+        'ElioBlocks\\Vendor\\Symfony\\Contracts\\Service\\ContainerAwareInterface' => __DIR__ . '/..' . '/symfony/service-contracts/ContainerAwareInterface.php',
+        'ElioBlocks\\Vendor\\Symfony\\Contracts\\Service\\ContainerProviderInterface' => __DIR__ . '/..' . '/symfony/service-contracts/ContainerProviderInterface.php',
         'ElioBlocks\\Vendor\\Symfony\\Contracts\\Service\\ResetInterface' => __DIR__ . '/..' . '/symfony/service-contracts/ResetInterface.php',
         'ElioBlocks\\Vendor\\Symfony\\Contracts\\Service\\ServiceCollectionInterface' => __DIR__ . '/..' . '/symfony/service-contracts/ServiceCollectionInterface.php',
         'ElioBlocks\\Vendor\\Symfony\\Contracts\\Service\\ServiceLocatorTrait' => __DIR__ . '/..' . '/symfony/service-contracts/ServiceLocatorTrait.php',
@@ -278,9 +281,9 @@ class ComposerStaticInit03f8d2ac0f4152986f33e110a36041de
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit03f8d2ac0f4152986f33e110a36041de::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit03f8d2ac0f4152986f33e110a36041de::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit03f8d2ac0f4152986f33e110a36041de::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInita290f8a20224bc4fa5de04a2107c9135::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInita290f8a20224bc4fa5de04a2107c9135::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInita290f8a20224bc4fa5de04a2107c9135::$classMap;
 
         }, null, ClassLoader::class);
     }

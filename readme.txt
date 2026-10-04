@@ -1,4 +1,4 @@
-=== Elio Blocks — Live weather for the Block Editor ===
+=== Elio Blocks ===
 Contributors: alexandrebuffet
 Tags: weather, forecast, block-editor, blocks, location
 Requires at least: 6.7
@@ -22,7 +22,7 @@ No coding required. No widgets, no shortcodes, no iframe either.
 
 * **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
 * **Forecasts that work like the Query Loop.** The hourly and daily forecast lists repeat a template you design once, just like the Post Template of the Query Loop block.
-* **Start from a layout.** Pick one of the ready-made variations (Default, Minimal, Hourly Weather Forecast, Daily Weather Forecast), or start blank and build your own.
+* **Start from a layout.** Pick one of the ready-made variations (Default, Minimal, Hourly Forecast, Daily Forecast), or start blank and build your own.
 * **Every design tool you expect.** Colors, typography, spacing, borders and layout come from the standard block supports, so they appear in the same panels as those of core blocks, follow your theme's presets, and can be set for the whole site in `theme.json` or the Styles of the Site Editor.
 * **Your site's settings, respected.** Dates and times use your site's language and date formats, in the timezone of the location. Units are metric or imperial, site-wide or per block.
 * **What you see is what you get.** The editor shows the real forecast of your location, styled as it will be on your site.
@@ -113,7 +113,7 @@ The icons of the plugin come from [Tabler Icons](https://tabler.io/icons), Copyr
 2. A daily forecast on the front end.
 3. Start blank and choose a layout for the Weather block.
 4. Search for a location by name.
-5. The settings page: weather forecast provider, units and data refresh.
+5. The General section of the settings page: units and data refresh.
 
 == Changelog ==
 

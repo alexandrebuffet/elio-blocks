@@ -19,7 +19,7 @@ namespace ElioBlocks\Vendor\Symfony\Component\DependencyInjection\Compiler;
  */
 class ServiceReferenceGraphEdge
 {
-    public function __construct(private ServiceReferenceGraphNode $sourceNode, private ServiceReferenceGraphNode $destNode, private mixed $value = null, private bool $lazy = \false, private bool $weak = \false, private bool $byConstructor = \false, private bool $byMultiUseArgument = \false)
+    public function __construct(private ServiceReferenceGraphNode $sourceNode, private ServiceReferenceGraphNode $destNode, private mixed $value = null, private bool $lazy = \false, private bool $weak = \false, private bool $byConstructor = \false, private bool $byMultiUseArgument = \false, private bool $fromExpression = \false)
     {
     }
     /**
@@ -67,5 +67,12 @@ class ServiceReferenceGraphEdge
     public function isFromMultiUseArgument(): bool
     {
         return $this->byMultiUseArgument;
+    }
+    /**
+     * Returns true if the edge comes from an expression, which compiles to a container lookup.
+     */
+    public function isFromExpression(): bool
+    {
+        return $this->fromExpression;
     }
 }

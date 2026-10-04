@@ -142,7 +142,7 @@ const variations = [
 	},
 	{
 		name: 'elio/current-weather-hourly-forecast',
-		title: __( 'Hourly Weather Forecast', 'elio-blocks' ),
+		title: __( 'Hourly Forecast', 'elio-blocks' ),
 		description: __(
 			'Displays current weather location name, temperature, condition icon and description plus an hourly weather forecast list.',
 			'elio-blocks'
@@ -154,7 +154,7 @@ const variations = [
 	},
 	{
 		name: 'elio/current-weather-daily-forecast',
-		title: __( 'Daily Weather Forecast', 'elio-blocks' ),
+		title: __( 'Daily Forecast', 'elio-blocks' ),
 		description: __(
 			'Displays current weather location name, temperature, condition icon and description plus a daily weather forecast list.',
 			'elio-blocks'

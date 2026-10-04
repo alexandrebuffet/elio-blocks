@@ -8,11 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace ElioBlocks\Vendor\Symfony\Contracts\Service\Test;
+namespace ElioBlocks\Vendor\Symfony\Contracts\Service;
 
 /**
- * @deprecated since PHPUnit 9.6
+ * @deprecated use ContainerProviderInterface instead
  */
-class ServiceLocatorTest extends ServiceLocatorTestCase
+interface ContainerAwareInterface extends ContainerProviderInterface
 {
 }
