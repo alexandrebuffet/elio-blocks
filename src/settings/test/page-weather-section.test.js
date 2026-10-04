@@ -14,6 +14,7 @@ import { SlotFillProvider } from '@wordpress/components';
  * Internal dependencies
  */
 import SettingsPage from '../page';
+import { store as elioDataStore } from '../../stores/elio-data';
 import { renderWithRegistry } from '../../test-utils/render-hook';
 import { useConditionIconCollections } from '../../block-editor/hooks';
 
@@ -55,10 +56,12 @@ const COLLECTIONS = [
 
 /**
  * Creates a registry with a `core` store that answers the site record and the
- * dispatch actions the page calls, without going through the real REST client.
+ * dispatch actions the page calls, without going through the real REST client,
+ * and the elio/data store the page reads the providers from.
  */
 function makeRegistry() {
 	const registry = createRegistry();
+	registry.register( elioDataStore );
 	registry.register(
 		createReduxStore( 'core', {
 			reducer: ( state = {} ) => state,

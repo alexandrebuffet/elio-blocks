@@ -269,6 +269,77 @@ describe( 'elio/data store: weather forecast providers', () => {
 	} );
 } );
 
+describe( 'elio/data store: providers', () => {
+	const PROVIDERS = [
+		{ slug: 'open-meteo', label: 'Open-Meteo', credentials: [] },
+		{
+			slug: 'acme-weather',
+			label: 'Acme Weather',
+			credentials: [ { name: 'api_key', secret: true, isSet: false } ],
+		},
+	];
+
+	beforeEach( () => {
+		apiFetch.mockReset();
+	} );
+
+	it( 'lists every provider with its credentials, fetched once', async () => {
+		apiFetch.mockResolvedValue( PROVIDERS );
+		const registry = makeRegistry();
+
+		expect( registry.select( store ).getProviders() ).toBeNull();
+		await Promise.all( [
+			registry.resolveSelect( store ).getProviders(),
+			registry.resolveSelect( store ).getProviders(),
+		] );
+
+		expect( registry.select( store ).getProviders() ).toEqual( PROVIDERS );
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/elio/v1/providers',
+		} );
+	} );
+
+	it( 'keeps the providers while they are fetched again once the resolution is invalidated', async () => {
+		apiFetch.mockResolvedValue( PROVIDERS );
+		const registry = makeRegistry();
+		await registry.resolveSelect( store ).getProviders();
+
+		let answer;
+		apiFetch.mockReturnValue(
+			new Promise( ( resolve ) => ( answer = resolve ) )
+		);
+		registry.dispatch( store ).invalidateResolution( 'getProviders' );
+		const refetch = registry.resolveSelect( store ).getProviders();
+		await vi.waitFor( () => expect( apiFetch ).toHaveBeenCalledTimes( 2 ) );
+
+		expect( registry.select( store ).getProviders() ).toEqual( PROVIDERS );
+
+		const saved = structuredClone( PROVIDERS );
+		saved[ 1 ].credentials[ 0 ].isSet = true;
+		answer( saved );
+		await refetch;
+
+		expect( registry.select( store ).getProviders() ).toEqual( saved );
+	} );
+
+	it( 'reports a failed request', async () => {
+		apiFetch.mockRejectedValue(
+			new Error( 'Sorry, you are not allowed.' )
+		);
+		const registry = makeRegistry();
+
+		await expect(
+			registry.resolveSelect( store ).getProviders()
+		).rejects.toThrow( 'Sorry, you are not allowed.' );
+		expect(
+			registry.select( store ).getResolutionError( 'getProviders' )
+				.message
+		).toBe( 'Sorry, you are not allowed.' );
+		expect( registry.select( store ).getProviders() ).toBeNull();
+	} );
+} );
+
 describe( 'elio/data store: condition icon collections', () => {
 	beforeEach( () => {
 		apiFetch.mockReset();

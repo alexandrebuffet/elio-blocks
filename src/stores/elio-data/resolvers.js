@@ -82,3 +82,15 @@ export const getWeatherForecastProviders =
 
 		dispatch.receiveWeatherForecastProviders( providers );
 	};
+
+/**
+ * Fetches every registered provider, whatever it serves, with the credentials
+ * it declares.
+ */
+export const getProviders =
+	() =>
+	async ( { dispatch } ) => {
+		const providers = await apiFetch( { path: '/elio/v1/providers' } );
+
+		dispatch.receiveProviders( providers );
+	};

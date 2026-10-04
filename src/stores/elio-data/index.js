@@ -14,7 +14,8 @@ import { STORE_NAME } from './constants';
 
 /**
  * Store descriptor for elio/data: the weather forecasts shown in the editor,
- * and the providers the report block offers (getWeatherForecastProviders()).
+ * the providers the report block offers (getWeatherForecastProviders()), and
+ * every provider with its credentials, for the settings page (getProviders()).
  *
  * Blocks select getWeatherForecast() with the location, provider and units of
  * their report block; the resolver fetches it once for all of them.
