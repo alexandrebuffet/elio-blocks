@@ -1,7 +1,8 @@
 /**
  * Editor-only: static “no location” line styled like a RichText
- * placeholder (no extra nodes).
+ * placeholder (no extra nodes): its text color, faded as WordPress fades
+ * placeholders, so it shows on a dark background too.
  */
 .wp-block-elio-location.elio-location__editor-placeholder {
-	color: rgba(30, 30, 30, 0.62);
+	color: color-mix(in srgb, currentcolor, transparent 38%);
 }
