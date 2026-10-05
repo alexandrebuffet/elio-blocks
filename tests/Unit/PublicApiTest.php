@@ -30,7 +30,8 @@ class PublicApiTest extends TestCase
 {
     private const WEATHER_FORECAST = [
         'current' => ['temperature' => 20.0, 'condition_icons' => ['elio' => 'elio/sun']],
-        'daily'   => [['timestamp' => '2026-07-01T00:00:00+02:00'], ['timestamp' => '2026-07-02T00:00:00+02:00']],
+        // Days ahead whenever the test runs: a list skips the days that have ended.
+        'daily'   => [['timestamp' => '2099-07-01T00:00:00+02:00'], ['timestamp' => '2099-07-02T00:00:00+02:00']],
         'icons'   => ['elio/sun' => ['content' => '<svg></svg>', 'style' => 'fill']],
     ];
 
