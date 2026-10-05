@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { act } from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -60,6 +60,14 @@ describe( 'forecast-template edit', () => {
 	beforeEach( () => {
 		mockContexts.length = 0;
 		useWeatherReport.mockReturnValue( { data: FORECAST } );
+		// The morning of 1 July in Paris: the rows start at the day in progress.
+		vi.useFakeTimers( { toFake: [ 'Date' ] } ).setSystemTime(
+			new Date( '2026-07-01T10:00:00+02:00' )
+		);
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
 	} );
 
 	it( 'repeats its inner blocks for as many rows as the forecast block asks', () => {

@@ -366,6 +366,13 @@ describe( 'weather-report view: forecast rows', () => {
 	const sync = () => store().callbacks.syncForecastItems();
 	const day = ( n ) => ( { timestamp: `2026-07-0${ n }T00:00:00+02:00` } );
 
+	beforeEach( () => {
+		// The morning of 1 July in Paris: the rows start at the day in progress.
+		vi.useFakeTimers( { toFake: [ 'Date' ] } ).setSystemTime(
+			new Date( '2026-07-01T10:00:00+02:00' )
+		);
+	} );
+
 	afterEach( () => {
 		vi.useRealTimers();
 	} );

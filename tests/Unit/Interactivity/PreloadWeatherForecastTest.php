@@ -34,7 +34,8 @@ class PreloadWeatherForecastTest extends TestCase
         Functions\stubEscapeFunctions();
 
         $this->provider      = new StubWeatherForecastProvider(array( 'current' => array( 'temperature' => 68.0 ) ));
-        $this->reportContext = new ReportContext();
+        // The morning of the days of the weather forecasts below: a list skips the days that have ended.
+        $this->reportContext = new ReportContext(static fn(): int => (int) strtotime('2026-07-01T10:00:00+02:00'));
         $this->icons         = new ConditionIconsRegistry();
     }
 
