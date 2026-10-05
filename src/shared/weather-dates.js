@@ -65,6 +65,24 @@ export function withWeatherForecastTimezone( settings, weatherForecast ) {
 }
 
 /**
+ * Every hour and every day starts at a quarter hour in every timezone: UTC
+ * offsets are multiples of 15 minutes (+05:30 in India, +05:45 in Nepal).
+ */
+const QUARTER_HOUR_IN_MS = 900000;
+
+/**
+ * Returns when the next quarter hour starts: bringing "now" up to date then
+ * moves the forecast lists and the "Now"/"Today" labels as soon as the hour or
+ * the day in progress changes, wherever the location is.
+ *
+ * @param {number} now Milliseconds since the epoch.
+ * @return {number} Milliseconds since the epoch.
+ */
+export function getNextQuarterHour( now ) {
+	return ( Math.floor( now / QUARTER_HOUR_IN_MS ) + 1 ) * QUARTER_HOUR_IN_MS;
+}
+
+/**
  * Format of the date format picker for a relative date ("5 minutes ago"), as
  * the Date block of WordPress reads it. PHP date() has no such format: the
  * server prints the date in the site format, the browser words it relative

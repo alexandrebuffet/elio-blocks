@@ -44,6 +44,7 @@ vi.mock( '@wordpress/components', () => ( {
 	ToggleControl: () => null,
 } ) );
 vi.mock( '../../block-editor/hooks', () => ( {
+	useNow: () => Date.now(),
 	useWeatherReport: vi.fn(),
 } ) );
 vi.mock( '../temperature/inspector', () => ( { default: () => null } ) );

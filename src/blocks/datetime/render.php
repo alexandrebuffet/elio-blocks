@@ -40,8 +40,11 @@ $extra_wrapper_attributes = array(
 );
 
 // A relative date ("5 minutes ago") is worded in the browser, kept current by the clock of the report.
+// The "Now" and "Today" labels move to the next row as the hour or the day in progress ends.
 if ('human-diff' === $format) {
     $extra_wrapper_attributes['data-wp-watch'] = 'callbacks.startRelativeDateClock';
+} elseif ($current_as_label) {
+    $extra_wrapper_attributes['data-wp-watch'] = 'callbacks.startQuarterHourClock';
 }
 ?>
 <p <?php echo wp_kses_data(get_block_wrapper_attributes($extra_wrapper_attributes)); ?>>

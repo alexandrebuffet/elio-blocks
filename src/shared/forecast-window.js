@@ -44,7 +44,9 @@ export function getForecastItemEnd( items, index, type ) {
  * @param {Object|null} forecast Forecast: meta, current, hourly, daily.
  * @param {string}      type     'daily' or 'hourly'.
  * @param {number}      count    Number of rows.
- * @param {number}      now      Current time in ms. Defaults to Date.now().
+ * @param {number}      now      Current time in ms, the one the "Now" and
+ *                               "Today" labels count from (state.now on the
+ *                               front, useNow() in the editor).
  * @return {Array|null} Rows, empty when every item has ended, or null when the
  *                      forecast has no such section (the page only holds the
  *                      current conditions until the first fetch).

@@ -11,8 +11,12 @@ import {
 /**
  * Internal dependencies
  */
-import { selectForecastItems } from '../../shared/forecast-window';
+import {
+	getForecastItemEnd,
+	selectForecastItems,
+} from '../../shared/forecast-window';
 import { defineIcons } from '../../shared/icon-sprite';
+import { getNextQuarterHour } from '../../shared/weather-dates';
 
 const FALLBACK_ERROR = 'Failed to fetch weather data.';
 
@@ -43,6 +47,12 @@ const RELATIVE_DATE_TICK = 30000;
  * showing a relative date that keep it running.
  */
 const relativeDateClock = { blocks: 0, timer: 0 };
+
+/**
+ * The one timer of the page that brings state.now up to date at each quarter
+ * hour, and the number of blocks that keep it running.
+ */
+const quarterHourClock = { blocks: 0, timer: 0 };
 
 /**
  * Checks whether a coordinate is usable. 0 is valid (equator, prime meridian).
@@ -88,8 +98,11 @@ const { state, actions } = store( 'elio/weather-report', {
 	state: {
 		/**
 		 * Milliseconds since the epoch: now, which the date blocks count
-		 * relative dates from. Kept current by callbacks.startRelativeDateClock
-		 * while a block shows one.
+		 * relative dates and their "Now"/"Today" labels from, and the forecast
+		 * lists their rows. Kept current by callbacks.startRelativeDateClock
+		 * while a block shows a relative date, by
+		 * callbacks.startQuarterHourClock while a list or a label is on the
+		 * page.
 		 */
 		now: Date.now(),
 		/**
@@ -101,6 +114,9 @@ const { state, actions } = store( 'elio/weather-report', {
 		 * already rendered), the hourly/daily sections arrive with the first
 		 * fetch. See selectForecastItems(), mirrored server-side by
 		 * ForecastWindow.
+		 *
+		 * Counted from state.now, like the "Now" and "Today" labels of the
+		 * date blocks: the rows move with them.
 		 */
 		get forecastItems() {
 			const context = getContext();
@@ -108,7 +124,8 @@ const { state, actions } = store( 'elio/weather-report', {
 			return selectForecastItems(
 				context.query?.data,
 				context.forecastType || 'daily',
-				context.forecastCount || 7
+				context.forecastCount || 7,
+				state.now
 			);
 		},
 		/**
@@ -232,12 +249,50 @@ const { state, actions } = store( 'elio/weather-report', {
 			};
 		},
 		/**
+		 * Brings state.now up to date at each quarter hour while a forecast
+		 * list or a date labelled "Now"/"Today" is on the page (data-wp-watch
+		 * on the forecast-template block and on the datetime blocks with
+		 * currentAsLabel): the rows of a list and those labels move together,
+		 * as soon as the hour or the day in progress changes at the location
+		 * (getNextQuarterHour()). One timer for the page, however many blocks:
+		 * the first one starts it, the last one to leave the page stops it.
+		 *
+		 * @return {() => void} Cleanup.
+		 */
+		startQuarterHourClock() {
+			if ( quarterHourClock.blocks++ === 0 ) {
+				// Never reads state.now: the watch would run again on each tick.
+				const tick = () => {
+					const now = Date.now();
+
+					state.now = now;
+					quarterHourClock.timer = setTimeout(
+						tick,
+						getNextQuarterHour( now ) - now
+					);
+				};
+
+				// From now: the page may have been open for a while before
+				// (client-side navigation).
+				tick();
+			}
+
+			return () => {
+				if ( --quarterHourClock.blocks === 0 ) {
+					clearTimeout( quarterHourClock.timer );
+				}
+			};
+		},
+		/**
 		 * Syncs the computed forecastItems into the nearest forecast-template
 		 * context so that data-wp-each can use a plain context array (SSR-safe).
 		 * Called via data-wp-watch on the forecast-template wrapper.
 		 *
 		 * The rows rendered by the server stay in place until a fetched weather
-		 * forecast brings the hourly/daily sections to rebuild them from.
+		 * forecast brings the hourly/daily sections to rebuild them from. Once
+		 * the first of them has ended, the report fetches the weather forecast,
+		 * even if the server would send the copy the page was rendered from:
+		 * it answers from its cache, and the page gets the sections.
 		 */
 		syncForecastItems() {
 			const ctx = getContext();
@@ -245,6 +300,19 @@ const { state, actions } = store( 'elio/weather-report', {
 
 			if ( items !== null ) {
 				ctx.forecastItems = items;
+				return;
+			}
+
+			const firstRowEnd = getForecastItemEnd(
+				ctx.forecastItems ?? [],
+				0,
+				ctx.forecastType || 'daily'
+			);
+
+			if ( firstRowEnd <= state.now ) {
+				getElement()
+					.ref?.closest( '.wp-block-elio-weather-report' )
+					?.dispatchEvent( new CustomEvent( 'weather-refresh' ) );
 			}
 		},
 	},
