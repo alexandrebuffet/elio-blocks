@@ -82,4 +82,12 @@ class ForecastTemplateRenderTest extends TestCase
             $html
         );
     }
+
+    public function test_the_rows_move_with_the_clock_of_the_page(): void
+    {
+        $html = $this->renderBlock('forecast-template', [], ['elio/forecastType' => 'hourly', 'elio/forecastCount' => 24]);
+
+        $this->assertStringContainsString('data-wp-watch="callbacks.syncForecastItems"', $html);
+        $this->assertStringContainsString('data-wp-watch--clock="callbacks.startQuarterHourClock"', $html);
+    }
 }

@@ -28,14 +28,16 @@ $forecast_count = isset($block->context['elio/forecastCount']) ? absint($block->
 
 $wrapper_attributes = get_block_wrapper_attributes(
     array(
-        'data-wp-context' => wp_json_encode(
+        'data-wp-context'      => wp_json_encode(
             array(
                 'forecastType'  => $forecast_type,
                 'forecastCount' => $forecast_count,
                 'forecastItems' => elio_blocks_get_forecast_items($forecast_type, $forecast_count),
             )
         ),
-        'data-wp-watch'   => 'callbacks.syncForecastItems',
+        'data-wp-watch'        => 'callbacks.syncForecastItems',
+        // The rows move as the hour or the day in progress ends.
+        'data-wp-watch--clock' => 'callbacks.startQuarterHourClock',
     )
 );
 ?>

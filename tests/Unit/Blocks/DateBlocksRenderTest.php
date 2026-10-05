@@ -83,4 +83,17 @@ class DateBlocksRenderTest extends TestCase
         $this->assertStringNotContainsString($clock, $this->renderBlock($name, ['format' => 'H:i']));
         $this->assertStringNotContainsString($clock, $this->renderBlock($name));
     }
+
+    public function test_moves_the_now_and_today_labels_with_the_hour_and_the_day_in_progress(): void
+    {
+        $clock = 'data-wp-watch="callbacks.startQuarterHourClock"';
+
+        $this->assertStringContainsString($clock, $this->renderBlock('datetime', ['currentAsLabel' => true]));
+        $this->assertStringNotContainsString($clock, $this->renderBlock('datetime'));
+        // The clock of relative dates, every 30 seconds, moves the labels too.
+        $this->assertStringNotContainsString(
+            $clock,
+            $this->renderBlock('datetime', ['currentAsLabel' => true, 'format' => 'human-diff'])
+        );
+    }
 }

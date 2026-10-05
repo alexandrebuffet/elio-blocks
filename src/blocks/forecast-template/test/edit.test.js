@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { act } from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { createRegistry, createReduxStore } from '@wordpress/data';
  * Internal dependencies
  */
 import ForecastTemplateEdit from '../edit';
-import { useWeatherReport } from '../../../block-editor/hooks';
+import { useNow, useWeatherReport } from '../../../block-editor/hooks';
 import { renderWithRegistry } from '../../../test-utils/render-hook';
 
 // vi.mock() factories run before the module body: share the array through vi.hoisted().
@@ -29,6 +29,7 @@ vi.mock( '@wordpress/block-editor', () => ( {
 	useInnerBlocksProps: ( props ) => ( { ...props, 'data-editable': '' } ),
 } ) );
 vi.mock( '../../../block-editor/hooks', () => ( {
+	useNow: vi.fn(),
 	useWeatherReport: vi.fn(),
 } ) );
 
@@ -60,14 +61,8 @@ describe( 'forecast-template edit', () => {
 	beforeEach( () => {
 		mockContexts.length = 0;
 		useWeatherReport.mockReturnValue( { data: FORECAST } );
-		// The morning of 1 July in Paris: the rows start at the day in progress.
-		vi.useFakeTimers( { toFake: [ 'Date' ] } ).setSystemTime(
-			new Date( '2026-07-01T10:00:00+02:00' )
-		);
-	} );
-
-	afterEach( () => {
-		vi.useRealTimers();
+		// The morning of 1 July in Paris.
+		useNow.mockReturnValue( Date.parse( '2026-07-01T10:00:00+02:00' ) );
 	} );
 
 	it( 'repeats its inner blocks for as many rows as the forecast block asks', () => {
@@ -81,6 +76,19 @@ describe( 'forecast-template edit', () => {
 			{ 'elio/forecastItem': day( 2 ), 'elio/forecastItemIndex': 1 },
 			{ 'elio/forecastItem': day( 3 ), 'elio/forecastItemIndex': 2 },
 		] );
+	} );
+
+	it( 'starts at the day in progress on the clock the date blocks of the rows count from', () => {
+		useNow.mockReturnValue( Date.parse( '2026-07-02T00:10:00+02:00' ) );
+
+		renderWithRegistry(
+			makeRegistry(),
+			<ForecastTemplateEdit clientId="template" />
+		);
+
+		expect( mockContexts.map( ( c ) => c[ 'elio/forecastItem' ] ) ).toEqual(
+			[ day( 2 ), day( 3 ), day( 4 ) ]
+		);
 	} );
 
 	it( 'stays editable, with an empty row, while there is no weather forecast', () => {
