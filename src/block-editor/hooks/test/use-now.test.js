@@ -53,10 +53,13 @@ describe( 'useNow', () => {
 		unmount();
 	} );
 
-	it( 'moves a block rendered later in the same quarter hour at the same time', () => {
+	it( 'gives a block rendered later in the same quarter hour the same time, from one timer', () => {
 		const first = renderHook( createRegistry(), useNow );
 		act( () => vi.advanceTimersByTime( 4 * MINUTE ) );
 		const second = renderHook( createRegistry(), useNow );
+
+		expect( second.result.current ).toBe( first.result.current );
+		expect( vi.getTimerCount() ).toBe( 1 );
 
 		act( () => vi.advanceTimersByTime( 6 * MINUTE ) );
 
@@ -66,5 +69,6 @@ describe( 'useNow', () => {
 		expect( second.result.current ).toBe( first.result.current );
 		first.unmount();
 		second.unmount();
+		expect( vi.getTimerCount() ).toBe( 0 );
 	} );
 } );
