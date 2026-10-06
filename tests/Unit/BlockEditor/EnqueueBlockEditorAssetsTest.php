@@ -34,7 +34,12 @@ class EnqueueBlockEditorAssetsTest extends TestCase
 
         Functions\when('get_option')->returnArg(2);
         Functions\when('get_locale')->justReturn('ru_RU');
-        Functions\when('_x')->alias(fn(string $text, string $context): string => 'decline months names: on or off' === $context ? 'on' : $text);
+        Functions\when('get_translations_for_domain')->justReturn(new class {
+            public function translate(string $text, ?string $context = null): string
+            {
+                return 'decline months names: on or off' === $context ? 'on' : $text;
+            }
+        });
         Functions\when('wp_json_encode')->alias('json_encode');
         Functions\when('untrailingslashit')->alias(fn(string $value): string => rtrim($value, '/\\'));
         Functions\when('wp_enqueue_script')->alias(function (...$args): void {
