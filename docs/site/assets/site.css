@@ -518,7 +518,7 @@ pre code {
 	border-radius: 7px;
 }
 
-/* On hover, the rays of the sun turn around its e. */
+/* On hover, the sun turns in its tile. */
 .brand__sun {
 	transform-box: view-box;
 	transform-origin: center;
