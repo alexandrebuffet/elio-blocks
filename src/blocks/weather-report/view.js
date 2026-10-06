@@ -258,6 +258,12 @@ const { state, actions } = store( 'elio/weather-report', {
 		 * the first of them has ended, the report fetches the weather forecast,
 		 * even if the server would send the copy the page was rendered from:
 		 * it answers from its cache, and the page gets the sections.
+		 *
+		 * Once per ended row: the watch runs again at each tick of state.now
+		 * (every 30 seconds with a relative date on the page), and while the
+		 * provider is down every request would reach it, the server caching
+		 * no failure. A failed request is retried at the pace of the
+		 * auto-refresh (startAutoRefresh).
 		 */
 		syncForecastItems() {
 			const ctx = getContext();
@@ -274,7 +280,10 @@ const { state, actions } = store( 'elio/weather-report', {
 				ctx.forecastType || 'daily'
 			);
 
-			if ( firstRowEnd <= state.now ) {
+			if (
+				firstRowEnd <= state.now &&
+				( ctx.query?.requestedAt ?? 0 ) < firstRowEnd
+			) {
 				getElement()
 					.ref?.closest( '.wp-block-elio-weather-report' )
 					?.dispatchEvent( new CustomEvent( 'weather-refresh' ) );
