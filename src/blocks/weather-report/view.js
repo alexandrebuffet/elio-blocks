@@ -19,18 +19,12 @@ import { defineIcons } from '../../shared/icon-sprite';
 import {
 	getExpiresAt,
 	getRefreshTime,
+	getRequestTimeoutSignal,
 	setTimeoutAt,
 } from '../../shared/refresh';
 import { getNextQuarterHour } from '../../shared/weather-dates';
 
 const FALLBACK_ERROR = 'Failed to fetch weather data.';
-
-/**
- * Time after which a request is given up: one that never settles (sent as the
- * computer went to sleep) would keep query.isLoading, and every next request
- * of the block would wait for it.
- */
-const REQUEST_TIMEOUT = 30000;
 
 /**
  * How often relative dates ("5 minutes ago") are brought up to date.
@@ -343,7 +337,7 @@ const { state, actions } = store( 'elio/weather-report', {
 
 			try {
 				const response = yield fetch( url, {
-					signal: AbortSignal.timeout( REQUEST_TIMEOUT ),
+					signal: getRequestTimeoutSignal(),
 				} );
 
 				if ( ! response.ok ) {
