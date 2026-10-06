@@ -131,6 +131,11 @@ export function whenVisible( callback ) {
  * @return {() => void} Cancels it.
  */
 export function setTimeoutAt( callback, time ) {
+	// Never for a time that is not one: the clock would be read in a loop.
+	if ( ! Number.isFinite( time ) ) {
+		return () => {};
+	}
+
 	let timeoutId;
 
 	function check() {
