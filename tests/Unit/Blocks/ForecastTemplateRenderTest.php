@@ -88,6 +88,7 @@ class ForecastTemplateRenderTest extends TestCase
         $html = $this->renderBlock('forecast-template', [], ['elio/forecastType' => 'hourly', 'elio/forecastCount' => 24]);
 
         $this->assertStringContainsString('data-wp-watch="callbacks.syncForecastItems"', $html);
-        $this->assertStringContainsString('data-wp-watch--clock="callbacks.startQuarterHourClock"', $html);
+        // Three hyphens: two for a unique ID are deprecated since WordPress 7.0.
+        $this->assertStringContainsString('data-wp-watch---clock="callbacks.startQuarterHourClock"', $html);
     }
 }
