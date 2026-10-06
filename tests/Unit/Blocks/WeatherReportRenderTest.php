@@ -91,7 +91,8 @@ class WeatherReportRenderTest extends TestCase
         $this->assertStringContainsString('data-wp-init="actions.init"', $html);
         $this->assertStringContainsString('data-wp-watch="callbacks.startAutoRefresh"', $html);
         $this->assertStringContainsString('data-wp-on--weather-refresh="actions.fetch"', $html);
-        $this->assertStringContainsString('data-wp-on-document--visibilitychange="actions.handleVisibilityChange"', $html);
+        $this->assertStringContainsString('data-wp-on-document--visibilitychange="actions.catchUp"', $html);
+        $this->assertStringContainsString('data-wp-on-window--online="actions.catchUp"', $html);
     }
 
     public function test_prints_the_tag_name_chosen_in_the_editor(): void

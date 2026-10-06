@@ -12,6 +12,7 @@ import {
 	getRefreshTime,
 	getRequestTimeoutSignal,
 	setTimeoutAt,
+	whenVisible,
 } from '../../shared/refresh';
 
 /**
@@ -83,8 +84,9 @@ export const getWeatherForecast =
 			);
 		} finally {
 			// Asked again when the front asks again (getRefreshSettings(), the
-			// settings the front gets): the blocks still showing it resolve it
-			// again, keeping the one they have meanwhile.
+			// settings the front gets), once the editor is shown: the blocks
+			// still showing it resolve it again, keeping the one they have
+			// meanwhile.
 			const refreshAt = getRefreshTime(
 				weatherForecast,
 				requestedAt,
@@ -94,12 +96,12 @@ export const getWeatherForecast =
 			if ( refreshAt !== null ) {
 				setTimeoutAt(
 					() =>
-						dispatch.invalidateResolution( 'getWeatherForecast', [
-							latitude,
-							longitude,
-							provider,
-							units,
-						] ),
+						whenVisible( () =>
+							dispatch.invalidateResolution(
+								'getWeatherForecast',
+								[ latitude, longitude, provider, units ]
+							)
+						),
 					refreshAt
 				);
 			}

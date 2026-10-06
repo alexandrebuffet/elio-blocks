@@ -10,6 +10,7 @@ import {
 	getRefreshTime,
 	getRequestTimeoutSignal,
 	setTimeoutAt,
+	whenVisible,
 } from '../refresh';
 
 const MINUTE = 60000;
@@ -62,6 +63,36 @@ describe( 'setTimeoutAt', () => {
 
 		expect( callback ).not.toHaveBeenCalled();
 		expect( vi.getTimerCount() ).toBe( 0 );
+	} );
+} );
+
+describe( 'whenVisible', () => {
+	afterEach( () => {
+		vi.restoreAllMocks();
+	} );
+
+	it( 'calls back at once on a page that is shown', () => {
+		const callback = vi.fn();
+
+		whenVisible( callback );
+
+		expect( callback ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'waits for a hidden page to be shown again, and calls back once', () => {
+		const hidden = vi
+			.spyOn( document, 'hidden', 'get' )
+			.mockReturnValue( true );
+		const callback = vi.fn();
+
+		whenVisible( callback );
+		document.dispatchEvent( new Event( 'visibilitychange' ) );
+		expect( callback ).not.toHaveBeenCalled();
+
+		hidden.mockReturnValue( false );
+		document.dispatchEvent( new Event( 'visibilitychange' ) );
+		document.dispatchEvent( new Event( 'visibilitychange' ) );
+		expect( callback ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
 

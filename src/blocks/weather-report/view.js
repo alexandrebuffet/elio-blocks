@@ -297,12 +297,14 @@ const { state, actions } = store( 'elio/weather-report', {
 			}
 		},
 		/**
-		 * Handles data-wp-on-document--visibilitychange.
-		 * Refreshes weather data when the user returns to the page (timers of
-		 * hidden tabs may be frozen), unless the server would send the same
-		 * weather forecast again, and brings relative dates up to date.
+		 * Catches up when the page is shown again
+		 * (data-wp-on-document--visibilitychange) or the network is back
+		 * (data-wp-on-window--online): a hidden page asks for nothing, and a
+		 * request sent while the network was down failed. Brings relative
+		 * dates up to date, and refreshes the weather forecast unless the
+		 * server would send the same one again.
 		 */
-		*handleVisibilityChange() {
+		*catchUp() {
 			if ( document.hidden ) {
 				return;
 			}
@@ -327,8 +329,9 @@ const { state, actions } = store( 'elio/weather-report', {
 			const url = state.weatherForecastRequestUrl;
 
 			// One request at a time per block: init, the refresh interval and
-			// a tab coming back to the foreground can overlap.
-			if ( ! url || context.query.isLoading ) {
+			// a tab coming back to the foreground can overlap. None for a page
+			// nobody looks at: it catches up when shown again (actions.catchUp).
+			if ( ! url || context.query.isLoading || document.hidden ) {
 				return;
 			}
 
