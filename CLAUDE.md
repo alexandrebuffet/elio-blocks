@@ -29,7 +29,7 @@ Run all plugin commands from `web/app/plugins/elio-blocks/` (or `ddev ssh` then 
 | Command                        | Description                                          |
 | ------------------------------ | ---------------------------------------------------- |
 | `npm start`                    | Dev mode with file watching and blocks manifest      |
-| `npm run build`                | Production build (includes icon pre-build steps)     |
+| `npm run build`                | Production build (includes icon pre-build steps), then `scripts/guard-build-php.mjs` adds the ABSPATH guard WordPress.org asks of every PHP file to `blocks-manifest.php` and the `*.asset.php` files |
 | `npm run build:icons`          | The three outputs of `src/icons/` (`scripts/build-icons.mjs`), then the SVGR components |
 | `npm run lint:js`              | ESLint via `@wordpress/scripts`                      |
 | `npm run lint:css`             | Stylelint via `@wordpress/scripts`                   |

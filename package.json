@@ -21,7 +21,7 @@
 		"node": "^22.22.2 || ^24.15.0 || >=26.0.0"
 	},
 	"scripts": {
-		"build": "npm run build:icons && wp-scripts build --blocks-manifest --experimental-modules",
+		"build": "npm run build:icons && wp-scripts build --blocks-manifest --experimental-modules && node scripts/guard-build-php.mjs",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
