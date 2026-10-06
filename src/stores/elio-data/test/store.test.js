@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -202,6 +202,72 @@ describe( 'elio/data store: weather forecasts', () => {
 			registry.select( store ).getWeatherForecast( ...PARIS ).current
 				.temperature
 		).toBe( 21 );
+	} );
+} );
+
+describe( 'elio/data store: weather forecast refresh', () => {
+	const MINUTE = 60000;
+
+	beforeEach( () => {
+		apiFetch.mockReset();
+		vi.useFakeTimers().setSystemTime( new Date( '2026-10-05T21:10:00Z' ) );
+		vi.spyOn( Math, 'random' ).mockReturnValue( 0 );
+		// What the server prints for the editor: the settings of the front.
+		window.elioBlocksRefreshSettings = {
+			dataTtl: 30 * MINUTE,
+			refreshInterval: 15 * MINUTE,
+		};
+	} );
+
+	afterEach( () => {
+		delete window.elioBlocksRefreshSettings;
+		vi.restoreAllMocks();
+		vi.useRealTimers();
+	} );
+
+	const resolve = async ( registry ) => {
+		const resolved = registry
+			.resolveSelect( store )
+			.getWeatherForecast( ...PARIS );
+		// `@wordpress/data` starts each resolver on a timer of its own.
+		await vi.advanceTimersByTimeAsync( 10 );
+		return resolved;
+	};
+
+	it( 'asks again when the front does, once the server copy expires, even after the computer slept', async () => {
+		respondWith( {
+			meta: { fetched_at: '2026-10-05T21:00:00+00:00' },
+			current: { temperature: 12 },
+		} );
+		const registry = makeRegistry();
+		await resolve( registry );
+
+		respondWith( {
+			meta: { fetched_at: '2026-10-06T08:30:00+00:00' },
+			current: { temperature: 21 },
+		} );
+		// Asleep all night: the clock moves on, the timers do not.
+		vi.setSystemTime( new Date( '2026-10-06T08:30:00Z' ) );
+		await vi.advanceTimersByTimeAsync( MINUTE );
+		await resolve( registry );
+
+		expect( forecastCalls() ).toHaveLength( 2 );
+		expect(
+			registry.select( store ).getWeatherForecast( ...PARIS ).current
+				.temperature
+		).toBe( 21 );
+	} );
+
+	it( 'keeps the weather forecast while auto-refresh is off', async () => {
+		window.elioBlocksRefreshSettings.refreshInterval = 0;
+		respondWith( { current: { temperature: 12 } } );
+		const registry = makeRegistry();
+		await resolve( registry );
+
+		await vi.advanceTimersByTimeAsync( 24 * 60 * MINUTE );
+		await resolve( registry );
+
+		expect( forecastCalls() ).toHaveLength( 1 );
 	} );
 } );
 

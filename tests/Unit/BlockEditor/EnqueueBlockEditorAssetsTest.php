@@ -6,6 +6,7 @@ use Brain\Monkey;
 use Brain\Monkey\Functions;
 use ElioBlocks\BlockEditor\Hooks\EnqueueBlockEditorAssets;
 use ElioBlocks\Interactivity\Blocks\Report\DateSettings;
+use ElioBlocks\Settings\PluginSettings;
 use PHPUnit\Framework\TestCase;
 
 class EnqueueBlockEditorAssetsTest extends TestCase
@@ -113,6 +114,26 @@ class EnqueueBlockEditorAssetsTest extends TestCase
         );
     }
 
+    public function test_gives_the_editor_the_refresh_settings_of_the_front(): void
+    {
+        $inline = [];
+        Functions\when('wp_add_inline_script')->alias(
+            function (string $handle, string $script, string $position) use (&$inline): bool {
+                $inline[] = [$handle, $script, $position];
+
+                return true;
+            }
+        );
+
+        $this->hook()->addRefreshSettings();
+
+        // The defaults: a 30 minutes cache, auto-refresh every 15 minutes.
+        $this->assertSame(
+            [['elio-blocks-block-editor', 'window.elioBlocksRefreshSettings = {"dataTtl":1800000,"refreshInterval":900000};', 'before']],
+            $inline
+        );
+    }
+
     public function test_loads_the_script_translations_from_the_language_packs(): void
     {
         $this->writeAssetFile();
@@ -167,7 +188,7 @@ class EnqueueBlockEditorAssetsTest extends TestCase
 
     private function hook(): EnqueueBlockEditorAssets
     {
-        return new EnqueueBlockEditorAssets($this->pluginPath, self::PLUGIN_URL);
+        return new EnqueueBlockEditorAssets($this->pluginPath, self::PLUGIN_URL, new PluginSettings());
     }
 
     private function writeAssetFile(): void

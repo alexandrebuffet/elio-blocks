@@ -4,6 +4,7 @@ namespace ElioBlocks\BlockEditor\Hooks;
 
 use ElioBlocks\Contracts\HookInterface;
 use ElioBlocks\Interactivity\Blocks\Report\DateSettings;
+use ElioBlocks\Settings\PluginSettings;
 
 // Exit if called directly.
 if (! defined('ABSPATH')) {
@@ -18,12 +19,14 @@ class EnqueueBlockEditorAssets implements HookInterface
     /**
      * Constructor.
      *
-     * @param string $pluginPath Absolute path to the plugin directory.
-     * @param string $pluginUrl  Public URL of the plugin directory.
+     * @param string         $pluginPath Absolute path to the plugin directory.
+     * @param string         $pluginUrl  Public URL of the plugin directory.
+     * @param PluginSettings $settings   Plugin settings.
      */
     public function __construct(
         private string $pluginPath,
-        private string $pluginUrl
+        private string $pluginUrl,
+        private PluginSettings $settings
     ) {
     }
 
@@ -42,6 +45,7 @@ class EnqueueBlockEditorAssets implements HookInterface
     {
         $this->enqueueBlockEditorScript();
         $this->addDateSettings();
+        $this->addRefreshSettings();
         $this->enqueueBlockEditorStyle();
     }
 
@@ -82,6 +86,19 @@ class EnqueueBlockEditorAssets implements HookInterface
 
         if (false !== $settings) {
             wp_add_inline_script('elio-blocks-block-editor', 'window.elioBlocksDateSettings = ' . $settings . ';', 'before');
+        }
+    }
+
+    /**
+     * Gives the editor the refresh settings the front gets, so the elio/data
+     * store asks for a weather forecast again when the front does.
+     */
+    public function addRefreshSettings(): void
+    {
+        $settings = wp_json_encode($this->settings->getRefreshSettings());
+
+        if (false !== $settings) {
+            wp_add_inline_script('elio-blocks-block-editor', 'window.elioBlocksRefreshSettings = ' . $settings . ';', 'before');
         }
     }
 

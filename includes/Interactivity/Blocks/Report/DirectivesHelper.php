@@ -58,12 +58,8 @@ class DirectivesHelper
      */
     public function getState(): array
     {
-        return $this->derivedState->getters() + array(
+        return $this->derivedState->getters() + $this->settings->getRefreshSettings() + array(
             'weatherForecastUrl' => rest_url('elio/v1/weather-forecast'),
-            'dataTtl'            => $this->settings->isCacheEnabled()
-                ? $this->settings->getCacheTime() * 1000
-                : 0,
-            'refreshInterval'    => $this->settings->getEffectiveRefreshIntervalSeconds() * 1000, // in milliseconds
         );
     }
 
