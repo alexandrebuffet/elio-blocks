@@ -96,8 +96,9 @@ writeFileSync(
 );
 
 // The logo of the plugin in the sprite of the page, its tile and its sun as two
-// symbols, so the sun can turn on its own (an <img> cannot be animated inside);
-// the fill="none" of its root goes on the sun, its circle is a stroke.
+// symbols, so the sun can turn on its own (an <img> cannot be animated inside):
+// the sun is the rays, its first path, the tile keeps the e; the fill="none" of
+// its root goes on both, the rays and the e are strokes.
 const logo = readFileSync(
 	join( root, 'src/icons/brand/svg/elio-logo.svg' ),
 	'utf8'
@@ -106,22 +107,22 @@ const logoGradient = logo.match(
 	/<linearGradient id="([^"]+)"[\s\S]*?<\/linearGradient>/
 );
 const logoTile = logo.match( /<rect[^>]*\/>/g );
-const logoSun = logo.match( /<path[^>]*\/>/ );
-if ( ! logoGradient || ! logoTile || ! logoSun ) {
-	throw new Error( 'The logo has no gradient, tile or sun' );
+const [ logoSun, ...logoLetter ] = logo.match( /<path[^>]*\/>/g ) ?? [];
+if ( ! logoGradient || ! logoTile || ! logoSun || ! logoLetter.length ) {
+	throw new Error( 'The logo has no gradient, tile, sun or e' );
 }
 const logoSymbols =
 	`<defs>${ logoGradient[ 0 ].replace(
 		logoGradient[ 1 ],
 		'elio-logo-gradient'
 	) }</defs>` +
-	`<symbol id="elio-logo-tile" viewBox="0 0 128 128">${ logoTile
+	`<symbol id="elio-logo-tile" viewBox="0 0 128 128" fill="none">${ logoTile
 		.join( '' )
 		.replace(
 			`url(#${ logoGradient[ 1 ] })`,
 			'url(#elio-logo-gradient)'
-		) }</symbol>` +
-	`<symbol id="elio-logo-sun" viewBox="0 0 128 128" fill="none">${ logoSun[ 0 ] }</symbol>`;
+		) }${ logoLetter.join( '' ) }</symbol>` +
+	`<symbol id="elio-logo-sun" viewBox="0 0 128 128" fill="none">${ logoSun }</symbol>`;
 
 // The FAQ as structured data (schema.org FAQPage), read from the page itself
 // so the questions and answers are written once: each <details> of the FAQ,
