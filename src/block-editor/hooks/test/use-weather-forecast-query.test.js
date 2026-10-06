@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
@@ -178,6 +179,41 @@ describe( 'useWeatherForecastQuery', () => {
 			data: null,
 			isLoading: false,
 			error: 'Unable to fetch weather forecast data.',
+		} );
+	} );
+
+	it( 'keeps the weather forecast shown, without an error, when a refresh fails', async () => {
+		const registry = makeRegistry();
+		const { result } = renderHook(
+			registry,
+			useWeatherForecastQuery,
+			PARIS
+		);
+		await advance( 1000 );
+
+		// Asked again (the store refreshes it), before the network is back.
+		apiFetch.mockRejectedValue(
+			new Error(
+				'Unable to connect. Please check your Internet connection.'
+			)
+		);
+		act( () => {
+			registry
+				.dispatch( store )
+				.invalidateResolution( 'getWeatherForecast', [
+					PARIS.latitude,
+					PARIS.longitude,
+					PARIS.provider,
+					PARIS.units,
+				] );
+		} );
+		await advance( 1000 );
+
+		expect( forecastCalls() ).toHaveLength( 2 );
+		expect( result.current ).toEqual( {
+			data: { current: { temperature: 21 } },
+			isLoading: false,
+			error: null,
 		} );
 	} );
 

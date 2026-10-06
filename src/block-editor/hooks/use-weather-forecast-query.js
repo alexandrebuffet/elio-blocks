@@ -92,15 +92,21 @@ export function useWeatherForecastQuery( {
 				getResolutionError,
 			} = select( elioDataStore );
 
+			const data = getWeatherForecast( ...args );
+
 			return {
-				data: getWeatherForecast( ...args ),
+				data,
 				isLoading: ! hasFinishedResolution(
 					'getWeatherForecast',
 					args
 				),
-				error:
-					getResolutionError( 'getWeatherForecast', args )?.message ??
-					null,
+				// A refresh that failed leaves the weather forecast shown, as
+				// on the front: no error over blocks still showing one, the
+				// next refresh tries again. An error says there is none.
+				error: data
+					? null
+					: ( getResolutionError( 'getWeatherForecast', args )
+							?.message ?? null ),
 			};
 		},
 		[ settledQuery ]
