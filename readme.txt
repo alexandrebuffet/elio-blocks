@@ -4,7 +4,7 @@ Tags: weather, forecast, block-editor, blocks, location
 Requires at least: 6.7
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,18 @@ The icons of the plugin were drawn for it. The layout illustrations of the Weath
 5. The General section of the settings page: units and data refresh.
 
 == Changelog ==
+
+= 0.2.0 =
+
+-   New Last Updated block: when the weather data was last fetched.
+-   New Provider Attribution block: the credit the license of the weather data asks for, added at the bottom of each Weather block, with an option to open its links in a new tab.
+-   Relative dates ("5 minutes ago") in the date format picker.
+-   New icons drawn for the plugin, also available to the Icon block of WordPress 7.1.
+-   The settings page previews six icons of each condition icon collection.
+-   A preview of each block in the inserter, and a description for each block and variation.
+-   Daily forecasts start at the day in progress, and a forecast list moves on to the next hour or day on time.
+-   The blocks fill in place while the weather forecast loads.
+-   Fixes for right-to-left languages, dark backgrounds and the settings page on small screens.
 
 = 0.1.0 =
 
