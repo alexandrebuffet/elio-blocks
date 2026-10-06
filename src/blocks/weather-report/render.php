@@ -29,7 +29,8 @@ $directives = array(
     // No suffix: the unique ID syntax changed in WordPress 7.0 (two hyphens, then three).
     'data-wp-watch'                         => 'callbacks.startAutoRefresh',
     'data-wp-on--weather-refresh'           => 'actions.fetch',
-    'data-wp-on-document--visibilitychange' => 'actions.handleVisibilityChange',
+    'data-wp-on-document--visibilitychange' => 'actions.catchUp',
+    'data-wp-on-window--online'             => 'actions.catchUp',
 );
 
 $extra_wrapper_attributes = array();

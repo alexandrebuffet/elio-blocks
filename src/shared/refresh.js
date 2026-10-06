@@ -97,6 +97,28 @@ export function getRequestTimeoutSignal() {
 }
 
 /**
+ * Calls back now, or once the page is shown again: a page nobody looks at
+ * asks for nothing, it catches up when it is shown.
+ *
+ * @param {() => void} callback Called once.
+ */
+export function whenVisible( callback ) {
+	if ( ! document.hidden ) {
+		callback();
+		return;
+	}
+
+	const onChange = () => {
+		if ( ! document.hidden ) {
+			document.removeEventListener( 'visibilitychange', onChange );
+			callback();
+		}
+	};
+
+	document.addEventListener( 'visibilitychange', onChange );
+}
+
+/**
  * Calls back once the clock reaches a time, even after the computer slept.
  *
  * A timeout counts no time while the computer sleeps: one set for 30 minutes

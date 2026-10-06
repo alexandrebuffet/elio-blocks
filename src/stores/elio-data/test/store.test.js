@@ -298,6 +298,36 @@ describe( 'elio/data store: weather forecast refresh', () => {
 		).toBe( 21 );
 	} );
 
+	it( 'asks nothing while the editor is hidden, and catches up once it is shown', async () => {
+		respondWith( {
+			meta: { fetched_at: '2026-10-05T21:00:00+00:00' },
+			current: { temperature: 12 },
+		} );
+		const registry = makeRegistry();
+		await resolve( registry );
+
+		const hidden = vi
+			.spyOn( document, 'hidden', 'get' )
+			.mockReturnValue( true );
+		respondWith( {
+			meta: { fetched_at: '2026-10-05T21:40:00+00:00' },
+			current: { temperature: 21 },
+		} );
+		await vi.advanceTimersByTimeAsync( 30 * MINUTE );
+		await resolve( registry );
+		expect( forecastCalls() ).toHaveLength( 1 );
+
+		hidden.mockReturnValue( false );
+		document.dispatchEvent( new Event( 'visibilitychange' ) );
+		await resolve( registry );
+
+		expect( forecastCalls() ).toHaveLength( 2 );
+		expect(
+			registry.select( store ).getWeatherForecast( ...PARIS ).current
+				.temperature
+		).toBe( 21 );
+	} );
+
 	it( 'keeps the weather forecast while auto-refresh is off', async () => {
 		window.elioBlocksRefreshSettings.refreshInterval = 0;
 		respondWith( { current: { temperature: 12 } } );

@@ -123,6 +123,20 @@ describe( 'weather-report view: fetch', () => {
 		timeoutSpy.mockRestore();
 	} );
 
+	it( 'asks nothing for a hidden page, which catches up when it is shown again', async () => {
+		const hidden = vi.spyOn( document, 'hidden', 'get' );
+		hidden.mockReturnValue( true );
+		respondWith( { current: { temperature: 21 } } );
+		setContext( contextWith( { age: 40 * MINUTE } ) );
+
+		await runAction( store().actions.fetch() );
+		expect( global.fetch ).not.toHaveBeenCalled();
+
+		hidden.mockReturnValue( false );
+		await runAction( store().actions.catchUp() );
+		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'refreshes the current item that leaf blocks read, not only query.data', async () => {
 		const context = makeContext();
 		setContext( context );
@@ -304,7 +318,7 @@ describe( 'weather-report view: refresh policy', () => {
 		visibility.mockReturnValue( false );
 		setContext( contextWith( { age: MINUTE, requestedAgo: MINUTE } ) );
 
-		await runAction( store().actions.handleVisibilityChange() );
+		await runAction( store().actions.catchUp() );
 
 		expect( global.fetch ).not.toHaveBeenCalled();
 	} );
@@ -313,7 +327,7 @@ describe( 'weather-report view: refresh policy', () => {
 		visibility.mockReturnValue( false );
 		setContext( contextWith( { age: 31 * MINUTE, requestedAgo: MINUTE } ) );
 
-		await runAction( store().actions.handleVisibilityChange() );
+		await runAction( store().actions.catchUp() );
 
 		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -382,7 +396,7 @@ describe( 'weather-report view: relative date clock', () => {
 		setContext( { query: {} } );
 		vi.setSystemTime( new Date( '2026-09-21T15:00:00Z' ) );
 
-		await runAction( store().actions.handleVisibilityChange() );
+		await runAction( store().actions.catchUp() );
 
 		expect( store().state.now ).toBe(
 			Date.parse( '2026-09-21T15:00:00Z' )
