@@ -611,6 +611,24 @@ describe( 'weather-report view: forecast rows', () => {
 			expect( refreshes ).toBe( 1 );
 		} );
 
+		it( 'asks once per ended row: a failed request is retried at the pace of the auto-refresh, not at each tick of the clock', () => {
+			const context = serverRows();
+			setContext( context );
+			store().state.now = Date.parse( '2026-07-01T15:00:00+02:00' );
+			sync();
+
+			// The request failed: still no sections, and the clock ticks on.
+			context.query.requestedAt = Date.parse(
+				'2026-07-01T15:00:01+02:00'
+			);
+			store().state.now = Date.parse( '2026-07-01T15:00:30+02:00' );
+			sync();
+			store().state.now = Date.parse( '2026-07-01T15:01:00+02:00' );
+			sync();
+
+			expect( refreshes ).toBe( 1 );
+		} );
+
 		it( 'does the same for a day that has ended (daily rows rendered before midnight)', () => {
 			setContext( {
 				...serverRows(),
