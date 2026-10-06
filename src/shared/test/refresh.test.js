@@ -50,6 +50,16 @@ describe( 'setTimeoutAt', () => {
 		expect( callback ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'never calls back for a time that is not one, rather than reading the clock in a loop', () => {
+		const callback = vi.fn();
+
+		setTimeoutAt( callback, NaN );
+		vi.advanceTimersByTime( MINUTE );
+
+		expect( callback ).not.toHaveBeenCalled();
+		expect( vi.getTimerCount() ).toBe( 0 );
+	} );
+
 	it( 'can be cancelled', () => {
 		const callback = vi.fn();
 		const cancel = setTimeoutAt(
