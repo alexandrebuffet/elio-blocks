@@ -24,7 +24,7 @@ const settings = ( overrides = {} ) => ( {
 describe( 'getAutoRefreshHelp', () => {
 	it( 'tells the pace set by the cache duration, when the server copy expires', () => {
 		expect( getAutoRefreshHelp( settings() ) ).toBe(
-			'Update the data in the visitor’s browser, without reloading the page, every 30m: when the server cache expires (Cache Duration, in the Advanced section).'
+			'Update the data shown on the site and in the editor, without reloading the page, every 30m: when the server cache expires (Cache Duration, in the Advanced section).'
 		);
 	} );
 
@@ -40,7 +40,7 @@ describe( 'getAutoRefreshHelp', () => {
 				settings( { elio_blocks_cache_enabled: false } )
 			)
 		).toBe(
-			'Update the data in the visitor’s browser, without reloading the page, at the interval below.'
+			'Update the data shown on the site and in the editor, without reloading the page, at the interval below.'
 		);
 	} );
 } );

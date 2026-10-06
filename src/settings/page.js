@@ -103,7 +103,7 @@ const advancedFields = [
 				help={ sprintf(
 					/* translators: %s: Short duration label (e.g. "30m"). */
 					__(
-						'Length of time weather API responses are kept in the server cache before refetching. Fewer requests improve performance. Auto-refresh updates the blocks in the visitor’s browser at the same pace. Default: %s.',
+						'Length of time weather API responses are kept in the server cache before refetching. Fewer requests improve performance. Auto-refresh updates the blocks on the site and in the editor at the same pace. Default: %s.',
 						'elio-blocks'
 					),
 					CACHE_DURATION_PRESETS.find(
@@ -430,7 +430,7 @@ const generalFields = [
 				help={ sprintf(
 					/* translators: %s: Short duration label (e.g. "15m"). */
 					__(
-						'Time between two updates of the data in the visitor’s browser. With the cache off, each update asks the data provider. Default: %s.',
+						'Time between two updates of the data shown on the site and in the editor. With the cache off, each update asks the data provider. Default: %s.',
 						'elio-blocks'
 					),
 					DEFAULT_INTERVAL_PRESETS.find(

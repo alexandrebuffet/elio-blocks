@@ -85,7 +85,7 @@ All requests are sent by your WordPress server, through the plugin's REST API. V
 * **Endpoint:** `https://api.open-meteo.com/v1/forecast`, or `https://customer-api.open-meteo.com/v1/forecast` once the API key of an Open-Meteo subscription is set in the plugin settings.
 * **Used for:** the current conditions and the hourly and daily weather forecasts of the location chosen in a Weather block.
 * **Data sent:** the latitude and longitude of that location (rounded to 2 decimals), the unit system (metric or imperial), the list of requested weather variables, the number of forecast days and, with a subscription, its API key. No data about your visitors or your content is sent.
-* **When:** when a page containing a Weather block is displayed, when the block refreshes its data in the visitor's browser, and when the block is edited in the Block Editor. Answers are cached in a transient, 30 minutes by default (see **Elio** in the admin menu), so Open-Meteo is only called again once the cached copy has expired, unless you turn the cache off.
+* **When:** when a page containing a Weather block is displayed, when the block refreshes its data, in the visitor's browser or in the Block Editor while it is open, and when the block is edited in the Block Editor. Answers are cached in a transient, 30 minutes by default (see **Elio** in the admin menu), so Open-Meteo is only called again once the cached copy has expired, unless you turn the cache off.
 
 = Open-Meteo Geocoding API =
 
