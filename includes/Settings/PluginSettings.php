@@ -239,6 +239,23 @@ class PluginSettings
     }
 
     /**
+     * Returns what the browser refreshes a weather forecast by, in milliseconds
+     * (getRefreshTime() in src/shared/refresh.js): on the front and in the
+     * editor alike, so both show the same one.
+     *
+     * @return array{dataTtl: int, refreshInterval: int} Cache duration (0 with
+     *                                                   the cache off) and refresh
+     *                                                   interval (0 with auto-refresh off).
+     */
+    public function getRefreshSettings(): array
+    {
+        return array(
+            'dataTtl'         => $this->isCacheEnabled() ? $this->getCacheTime() * 1000 : 0,
+            'refreshInterval' => $this->getEffectiveRefreshIntervalSeconds() * 1000,
+        );
+    }
+
+    /**
      * Retrieves the slug of the default weather forecast provider.
      * Falls back to the built-in default if not configured.
      *

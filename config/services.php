@@ -277,7 +277,7 @@ return static function ( ContainerBuilder $container ): void {
 		->setPublic( true );
 
 	$container->register( EnqueueBlockEditorAssets::class )
-		->setArguments( array( ELIO_BLOCKS_PLUGIN_PATH, ELIO_BLOCKS_PLUGIN_URL ) )
+		->setArguments( array( ELIO_BLOCKS_PLUGIN_PATH, ELIO_BLOCKS_PLUGIN_URL, new Reference( PluginSettings::class ) ) )
 		->addTag( 'elio_blocks.hookable' )
 		->setPublic( true );
 

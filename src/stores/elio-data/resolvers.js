@@ -8,6 +8,7 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { getWeatherForecastKey } from './utils';
+import { getRefreshTime, setTimeoutAt } from '../../shared/refresh';
 
 /**
  * Fetches the registered condition icon collections, for the pickers and for
@@ -53,20 +54,49 @@ export const getWeatherForecast =
 			// The collections endpoint answered an error: no icon in the editor.
 		}
 
-		const weatherForecast = await apiFetch( {
-			path: addQueryArgs( '/elio/v1/weather-forecast', {
-				latitude,
-				longitude,
-				provider: provider || '',
-				units: units || '',
-				icon_collections: ( collections ?? [] ).map( ( c ) => c.slug ),
-			} ),
-		} );
+		const requestedAt = Date.now();
+		let weatherForecast = null;
 
-		dispatch.receiveWeatherForecast(
-			getWeatherForecastKey( latitude, longitude, provider, units ),
-			weatherForecast
-		);
+		try {
+			weatherForecast = await apiFetch( {
+				path: addQueryArgs( '/elio/v1/weather-forecast', {
+					latitude,
+					longitude,
+					provider: provider || '',
+					units: units || '',
+					icon_collections: ( collections ?? [] ).map(
+						( c ) => c.slug
+					),
+				} ),
+			} );
+
+			dispatch.receiveWeatherForecast(
+				getWeatherForecastKey( latitude, longitude, provider, units ),
+				weatherForecast
+			);
+		} finally {
+			// Asked again when the front asks again (window.elioBlocksRefreshSettings,
+			// the settings the front gets): the blocks still showing it resolve
+			// it again, keeping the one they have meanwhile.
+			const refreshAt = getRefreshTime(
+				weatherForecast,
+				requestedAt,
+				window.elioBlocksRefreshSettings
+			);
+
+			if ( refreshAt !== null ) {
+				setTimeoutAt(
+					() =>
+						dispatch.invalidateResolution( 'getWeatherForecast', [
+							latitude,
+							longitude,
+							provider,
+							units,
+						] ),
+					refreshAt
+				);
+			}
+		}
 	};
 
 /**
