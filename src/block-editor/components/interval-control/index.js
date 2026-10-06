@@ -169,13 +169,7 @@ export default function IntervalControl( {
 		<VStack spacing={ 2 }>
 			{ label && (
 				<HStack justify="space-between" alignment="center">
-					<span
-						style={ {
-							fontSize: '11px',
-							fontWeight: 500,
-							textTransform: 'uppercase',
-						} }
-					>
+					<span className="elio-interval-control__label">
 						{ label }
 					</span>
 					{ value !== resetValue && (
@@ -197,7 +191,7 @@ export default function IntervalControl( {
 						value={ effectiveValue }
 						min={ 0 }
 						step={ 1 }
-						style={ { width: '104px' } }
+						className="elio-interval-control__seconds"
 						onChange={ ( v ) =>
 							onChange( v ? parseInt( v, 10 ) : 0 )
 						}
@@ -205,7 +199,7 @@ export default function IntervalControl( {
 				) : (
 					<Icon icon={ scheduled } />
 				) }
-				<div style={ { flex: 1 } }>
+				<div className="elio-interval-control__slider">
 					{ showCustom ? (
 						<RangeControl
 							hideLabelFromVision
@@ -251,11 +245,7 @@ export default function IntervalControl( {
 					onClick={ handleCustomToggle }
 				/>
 			</HStack>
-			{ help && (
-				<p style={ { fontSize: '12px', color: '#757575', margin: 0 } }>
-					{ help }
-				</p>
-			) }
+			{ help && <p className="elio-interval-control__help">{ help }</p> }
 		</VStack>
 	);
 }

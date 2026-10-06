@@ -1,0 +1,4 @@
+# The ignores of @wordpress/scripts (node_modules always), plus the built site.
+build
+vendor
+_site

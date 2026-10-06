@@ -53,7 +53,7 @@ export function getAutoRefreshHelp( settings ) {
 
 	if ( ! cacheEnabled ) {
 		return __(
-			'Update the data in the visitor’s browser, without reloading the page, at the interval below.',
+			'Update the data shown on the site and in the editor, without reloading the page, at the interval below.',
 			'elio-blocks'
 		);
 	}
@@ -61,7 +61,7 @@ export function getAutoRefreshHelp( settings ) {
 	return sprintf(
 		/* translators: %s: Cache duration (e.g. "30m"). */
 		__(
-			'Update the data in the visitor’s browser, without reloading the page, every %s: when the server cache expires (Cache Duration, in the Advanced section).',
+			'Update the data shown on the site and in the editor, without reloading the page, every %s: when the server cache expires (Cache Duration, in the Advanced section).',
 			'elio-blocks'
 		),
 		formatDuration( cacheTime )

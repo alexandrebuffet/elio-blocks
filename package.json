@@ -1,6 +1,6 @@
 {
 	"name": "@alexandrebuffet/elio-blocks",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Displays current weather and weather forecasts from any location with blocks.",
 	"author": "Alexandre Buffet",
 	"license": "GPL-2.0-or-later",
@@ -21,7 +21,7 @@
 		"node": "^22.22.2 || ^24.15.0 || >=26.0.0"
 	},
 	"scripts": {
-		"build": "npm run build:icons && npm run build:weather-condition-icons && wp-scripts build --blocks-manifest --experimental-modules",
+		"build": "npm run build:icons && wp-scripts build --blocks-manifest --experimental-modules && node scripts/guard-build-php.mjs",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
@@ -29,8 +29,8 @@
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip --root-folder=elio-blocks",
 		"start": "wp-scripts start --blocks-manifest --experimental-modules",
-		"build:weather-condition-icons": "node scripts/build-weather-condition-icons.mjs",
-		"build:icons": "svgr src/icons/svg --out-dir src/icons/components && svgr src/blocks/weather-report/icons/svg --out-dir src/blocks/weather-report/icons/components --config-file svgr.weather-report-variation-icons.config.js && svgr src/icons/brand/svg --out-dir src/icons/brand/components --config-file svgr.brand-icons.config.js"
+		"build:site": "node scripts/build-site.mjs",
+		"build:icons": "node scripts/build-icons.mjs && svgr build/icons/block-editor --out-dir src/icons/components && svgr src/blocks/weather-report/icons/svg --out-dir src/blocks/weather-report/icons/components --config-file svgr.weather-report-variation-icons.config.js && svgr src/icons/brand/svg --out-dir src/icons/brand/components --config-file svgr.brand-icons.config.js"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.4.1",
@@ -61,6 +61,7 @@
 		"@svgr/core": "^8.1.0",
 		"@svgr/plugin-jsx": "^8.1.0",
 		"@wordpress/scripts": "^36.0.0",
+		"canvaskit-wasm": "^0.42.0",
 		"jsdom": "^30.1.1",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",

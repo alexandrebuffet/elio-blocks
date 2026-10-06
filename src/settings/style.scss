@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "../block-editor/components/interval-control/style.scss" as *;
 @import "@wordpress/theme/prebuilt/css/design-tokens.css";
 @import "@wordpress/components/build-style/style.css";
 @import "@wordpress/dataviews/build-style/style.css";
@@ -35,28 +37,25 @@ body.toplevel_page_elio-blocks-settings {
 
 .elio-blocks-settings {
 	display: grid;
-	min-height: calc(100vh - var(--wp-admin--admin-bar--height, 32px));
+	// The height on screen: 100vh is the one with the browser toolbars of a
+	// phone hidden, taller than the screen while they show.
+	min-height: calc(100dvh - var(--wp-admin--admin-bar--height, 32px));
 }
 
 .elio-blocks-settings__snackbar {
 	position: fixed;
 	bottom: 0;
-	left: 160px;
 	right: 0;
 	padding: var(--wpds-dimension-padding-2xl);
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
 	pointer-events: none;
-
-	body.folded & {
-		left: 36px;
-	}
-
-	@media (max-width: 960px) {
-		left: 0;
-	}
 }
+
+// Beside the admin menu, whatever its width: folded by the user, folded on
+// its own under 960px, hidden under 782px. The positions of the editor bars.
+@include editor-left(".elio-blocks-settings__snackbar");
 
 .elio-blocks-settings-page__content {
 	box-sizing: border-box;

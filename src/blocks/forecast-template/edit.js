@@ -13,7 +13,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useWeatherReport } from '../../block-editor/hooks';
+import { useNow, useWeatherReport } from '../../block-editor/hooks';
 import { selectForecastItems } from '../../shared/forecast-window';
 
 const EMPTY_ROW_CONTEXT = {
@@ -119,18 +119,20 @@ export default function ForecastTemplateEdit( {
 	);
 
 	const { data } = useWeatherReport( context );
+	// The time the date blocks of the rows label "Now" and "Today" from.
+	const now = useNow();
 
 	// One context object per row, kept between renders: BlockContextProvider
 	// re-renders every inner block when its value changes identity.
 	const rowContexts = useMemo(
 		() =>
-			( selectForecastItems( data, type, count ) ?? [] ).map(
+			( selectForecastItems( data, type, count, now ) ?? [] ).map(
 				( item, index ) => ( {
 					'elio/forecastItem': item,
 					'elio/forecastItemIndex': index,
 				} )
 			),
-		[ data, type, count ]
+		[ data, type, count, now ]
 	);
 
 	const blockProps = useBlockProps( {

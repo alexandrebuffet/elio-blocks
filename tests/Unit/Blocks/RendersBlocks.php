@@ -47,6 +47,7 @@ trait RendersBlocks
         Functions\when('elio_blocks_get_current_conditions')->alias($report->getCurrentItem(...));
         Functions\when('elio_blocks_get_forecast_items')->alias($report->getForecastItems(...));
         Functions\when('elio_blocks_get_condition_icon')->alias($report->getIcon(...));
+        Functions\when('elio_blocks_get_condition_icon_stroke_width')->alias(static fn(string $collection): float => 1.5);
         Functions\when('elio_blocks_get_condition_icon_collection')->alias(
             static fn(?string $block, ?string $report): string => $block ?? $report ?? 'elio'
         );

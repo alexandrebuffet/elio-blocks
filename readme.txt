@@ -4,7 +4,7 @@ Tags: weather, forecast, block-editor, blocks, location
 Requires at least: 6.7
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,8 @@ No coding required. No widgets, no shortcodes, no iframe either.
 
 = Feels native, because it is =
 
-* **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
+* **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon, time of the last update and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
+* **Icons for the rest of your page.** The icons of Elio, weather conditions included, are an icon collection of WordPress 7.1: pick one in the Icon block, anywhere on your site.
 * **Forecasts that work like the Query Loop.** The hourly and daily forecast lists repeat a template you design once, just like the Post Template of the Query Loop block.
 * **Start from a layout.** Pick one of the ready-made variations (Default, Minimal, Hourly Forecast, Daily Forecast), or start blank and build your own.
 * **Every design tool you expect.** Colors, typography, spacing, borders and layout come from the standard block supports, so they appear in the same panels as those of core blocks, follow your theme's presets, and can be set for the whole site in `theme.json` or the Styles of the Site Editor.
@@ -84,7 +85,7 @@ All requests are sent by your WordPress server, through the plugin's REST API. V
 * **Endpoint:** `https://api.open-meteo.com/v1/forecast`, or `https://customer-api.open-meteo.com/v1/forecast` once the API key of an Open-Meteo subscription is set in the plugin settings.
 * **Used for:** the current conditions and the hourly and daily weather forecasts of the location chosen in a Weather block.
 * **Data sent:** the latitude and longitude of that location (rounded to 2 decimals), the unit system (metric or imperial), the list of requested weather variables, the number of forecast days and, with a subscription, its API key. No data about your visitors or your content is sent.
-* **When:** when a page containing a Weather block is displayed, when the block refreshes its data in the visitor's browser, and when the block is edited in the Block Editor. Answers are cached in a transient, 30 minutes by default (see **Elio** in the admin menu), so Open-Meteo is only called again once the cached copy has expired, unless you turn the cache off.
+* **When:** when a page containing a Weather block is displayed, when the block refreshes its data, in the visitor's browser or in the Block Editor while it is open, and when the block is edited in the Block Editor. Answers are cached in a transient, 30 minutes by default (see **Elio** in the admin menu), so Open-Meteo is only called again once the cached copy has expired, unless you turn the cache off.
 
 = Open-Meteo Geocoding API =
 
@@ -95,7 +96,7 @@ All requests are sent by your WordPress server, through the plugin's REST API. V
 
 = Terms, privacy and licence =
 
-The free Open-Meteo API, which this plugin uses, is for non-commercial use only and has daily request limits. Commercial use requires a paid Open-Meteo subscription. Open-Meteo weather data is licensed under CC BY 4.0: credit Open-Meteo where its data is shown, for example with a "Weather data by Open-Meteo.com" link.
+The free Open-Meteo API, which this plugin uses, is for non-commercial use only and has daily request limits. Commercial use requires a paid Open-Meteo subscription. Open-Meteo weather data is licensed under CC BY 4.0: credit Open-Meteo where its data is shown. The Provider Attribution block does it at the bottom of every Weather block, ("Weather data by Open-Meteo, licensed under CC BY 4.0", both names linked): keep it, or credit Open-Meteo elsewhere on the page if you remove it.
 
 * Open-Meteo website: [https://open-meteo.com/](https://open-meteo.com/)
 * Terms of use: [https://open-meteo.com/en/terms#terms](https://open-meteo.com/en/terms#terms)
@@ -105,7 +106,7 @@ The free Open-Meteo API, which this plugin uses, is for non-commercial use only 
 
 == Credits ==
 
-The icons of the plugin come from [Tabler Icons](https://tabler.io/icons), Copyright (c) 2020-2026 Paweł Kuna, released under the [MIT License](https://github.com/tabler/tabler-icons/blob/main/LICENSE), which is compatible with the GPL. Some icons were made for this plugin in the same style.
+The icons of the plugin were drawn for it. The layout illustrations of the Weather block variations include a sun from [Tabler Icons](https://tabler.io/icons), Copyright (c) 2020-2026 Paweł Kuna, released under the [MIT License](https://github.com/tabler/tabler-icons/blob/main/LICENSE), which is compatible with the GPL.
 
 == Screenshots ==
 
@@ -116,6 +117,18 @@ The icons of the plugin come from [Tabler Icons](https://tabler.io/icons), Copyr
 5. The General section of the settings page: units and data refresh.
 
 == Changelog ==
+
+= 0.2.0 =
+
+-   New Last Updated block: when the weather data was last fetched.
+-   New Provider Attribution block: the credit the license of the weather data asks for, added at the bottom of each Weather block, with an option to open its links in a new tab.
+-   Relative dates ("5 minutes ago") in the date format picker.
+-   New icons drawn for the plugin, also available to the Icon block of WordPress 7.1.
+-   The settings page previews six icons of each condition icon collection.
+-   A preview of each block in the inserter, and a description for each block and variation.
+-   Daily forecasts start at the day in progress, and a forecast list moves on to the next hour or day on time.
+-   The blocks fill in place while the weather forecast loads.
+-   Fixes for right-to-left languages, dark backgrounds and the settings page on small screens.
 
 = 0.1.0 =
 

@@ -26,6 +26,11 @@ final class DerivedState
 
     private const NBSP = "\u{00A0}";
 
+    /**
+     * Format of the date format picker for a relative date, as the Date block of WordPress reads it.
+     */
+    private const RELATIVE_DATE_FORMAT = 'human-diff';
+
     private const CARDINALS = array( 'N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW' );
 
     /**
@@ -110,6 +115,12 @@ final class DerivedState
             'sunEventDatetime'             => fn(): string => $this->text($this->sunEvent()),
             'formattedSunEvent'            => fn(): string => $this->formatDate(
                 $this->toDate($this->sunEvent()),
+                'time'
+            ),
+            // last-updated: when the provider was asked, which each refresh changes.
+            'lastUpdatedDatetime'          => fn(): string => $this->text($this->fetchedAt()),
+            'formattedLastUpdated'         => fn(): string => $this->formatDate(
+                $this->toDate($this->fetchedAt()),
                 'time'
             ),
 
@@ -311,6 +322,14 @@ final class DerivedState
         return $this->item($event) ?? $context['query']['data']['current'][ $event ] ?? null;
     }
 
+    /**
+     * Returns when the provider was asked for the weather forecast of the report.
+     */
+    private function fetchedAt(): mixed
+    {
+        return $this->context()['query']['data']['meta']['fetched_at'] ?? null;
+    }
+
     private function formattedDateTime(): string
     {
         $context     = $this->context();
@@ -339,6 +358,7 @@ final class DerivedState
 
     /**
      * Formats a date in the format of the block, in the timezone of the location.
+     * A relative one ("human-diff") in the site format.
      *
      * @param string $kind 'date' or 'time': picks the site format when the block sets none.
      */
@@ -350,7 +370,9 @@ final class DerivedState
 
         $format = $this->context()['format'] ?? '';
 
-        if (! is_string($format) || '' === $format) {
+        // A relative date ("5 minutes ago") would be stale in a cached page: the
+        // server prints the date in the site format, the view script words it.
+        if (! is_string($format) || '' === $format || self::RELATIVE_DATE_FORMAT === $format) {
             $format = (string) get_option('time' === $kind ? 'time_format' : 'date_format');
         }
 

@@ -6,9 +6,11 @@ use ElioBlocks\BlockEditor\Hooks\EnqueueBlockEditorAssets;
 use ElioBlocks\Blocks\Hooks\RegisterCommonStyleAsset;
 use ElioBlocks\Blocks\Hooks\RegisterBlockCategories;
 use ElioBlocks\Blocks\Hooks\RegisterBlockTypes;
+use ElioBlocks\Blocks\Hooks\StyleHookedProviderAttribution;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconCollectionResolver;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 use ElioBlocks\Weather\Condition\Icons\Hooks\RegisterConditionIcons;
+use ElioBlocks\Icons\Hooks\RegisterIconCollection;
 use ElioBlocks\Contracts\Cache\CacheInterface;
 use ElioBlocks\Contracts\Http\HttpClientInterface;
 use ElioBlocks\Contracts\Security\SecretInterface;
@@ -91,6 +93,11 @@ return static function ( ContainerBuilder $container ): void {
 				ELIO_BLOCKS_PLUGIN_PATH . 'build/weather-condition-icons/',
 			)
 		)
+		->addTag( 'elio_blocks.hookable' )
+		->setPublic( true );
+
+	$container->register( RegisterIconCollection::class )
+		->setArguments( array( ELIO_BLOCKS_PLUGIN_PATH . 'build/icons/' ) )
 		->addTag( 'elio_blocks.hookable' )
 		->setPublic( true );
 
@@ -270,7 +277,7 @@ return static function ( ContainerBuilder $container ): void {
 		->setPublic( true );
 
 	$container->register( EnqueueBlockEditorAssets::class )
-		->setArguments( array( ELIO_BLOCKS_PLUGIN_PATH, ELIO_BLOCKS_PLUGIN_URL ) )
+		->setArguments( array( ELIO_BLOCKS_PLUGIN_PATH, ELIO_BLOCKS_PLUGIN_URL, new Reference( PluginSettings::class ) ) )
 		->addTag( 'elio_blocks.hookable' )
 		->setPublic( true );
 
@@ -279,6 +286,10 @@ return static function ( ContainerBuilder $container ): void {
 		->setPublic( true );
 
 	$container->register( RegisterBlockTypes::class )
+		->addTag( 'elio_blocks.hookable' )
+		->setPublic( true );
+
+	$container->register( StyleHookedProviderAttribution::class )
 		->addTag( 'elio_blocks.hookable' )
 		->setPublic( true );
 };

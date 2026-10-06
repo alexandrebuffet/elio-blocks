@@ -26,7 +26,7 @@ class DateSettingsTest extends TestCase
         Functions\when('get_option')->alias(fn(string $name, mixed $default = false): mixed => $this->options[$name] ?? $default);
         Functions\when('get_locale')->justReturn('fr_FR');
         // French does not decline month names: the core translation of this setting stays 'off'.
-        Functions\when('_x')->returnArg();
+        $this->coreTranslationOfDeclineMonths('off');
 
         // What WP_Locale holds for a French site: wp_date() takes its names from there.
         $GLOBALS['wp_locale'] = (object) [
@@ -61,7 +61,7 @@ class DateSettingsTest extends TestCase
     {
         // What WordPress holds for a Russian site: "5 января", not "5 Январь".
         Functions\when('get_locale')->justReturn('ru_RU');
-        Functions\when('_x')->alias(fn(string $text, string $context): string => 'decline months names: on or off' === $context ? 'on' : $text);
+        $this->coreTranslationOfDeclineMonths('on');
         $GLOBALS['wp_locale']->month          = ['01' => 'Январь', '02' => 'Февраль', '12' => 'Декабрь'];
         $GLOBALS['wp_locale']->month_genitive = ['01' => 'января', '02' => 'февраля', '12' => 'декабря'];
 
@@ -94,6 +94,32 @@ class DateSettingsTest extends TestCase
         $this->options['gmt_offset']      = '5.5';
 
         $this->assertSame(['string' => '', 'offset' => 5.5], DateSettings::fromSite()['timezone']);
+    }
+
+    /**
+     * Sets what the core translations say of the setting wp_maybe_decline_date() reads.
+     */
+    private function coreTranslationOfDeclineMonths(string $setting): void
+    {
+        $translations = new class ($setting) {
+            public function __construct(private string $setting)
+            {
+            }
+
+            public function translate(string $text, ?string $context = null): string
+            {
+                return 'off' === $text && 'decline months names: on or off' === $context ? $this->setting : $text;
+            }
+        };
+
+        Functions\when('get_translations_for_domain')->alias(
+            fn(string $domain): object => 'default' === $domain ? $translations : new class {
+                public function translate(string $text): string
+                {
+                    return $text;
+                }
+            }
+        );
     }
 
     public function test_english_names_without_a_locale(): void

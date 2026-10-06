@@ -6,7 +6,17 @@
 	"title": "Condition Icon",
 	"category": "elio-weather",
 	"icon": "star-fill",
-	"description": "Displays the weather condition.",
+	"description": "Display an icon of the weather condition.",
+	"example": {
+		"attributes": {
+			"style": {
+				"dimensions": {
+					"width": "48px"
+				}
+			}
+		},
+		"viewportWidth": 350
+	},
 	"ancestor": ["elio/weather-report"],
 	"attributes": {
 		"isDecorative": {
@@ -14,8 +24,7 @@
 			"default": false
 		},
 		"strokeWidth": {
-			"type": "number",
-			"default": 1.5
+			"type": "number"
 		},
 		"iconCollection": {
 			"type": "string"

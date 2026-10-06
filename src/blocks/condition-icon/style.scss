@@ -4,12 +4,18 @@
 
 .wp-block-elio-condition-icon__symbol {
 	box-sizing: border-box;
-	width: 24px;
-	height: auto;
 
 	&:is(svg) {
 		fill: currentcolor;
 	}
+}
+
+// The size of an icon given none, without specificity: a width set on the
+// block, in theme.json or by a theme replaces it in whatever order the
+// stylesheets come.
+:where(.wp-block-elio-condition-icon__symbol) {
+	width: 24px;
+	height: auto;
 }
 
 // No icon for the item (no weather forecast yet): the <svg><use> takes no room.
@@ -17,10 +23,9 @@
 	display: none;
 }
 
-.wp-block-elio-condition-icon.has-svg-symbol.has-stroke-svg-symbol {
-
-	.wp-block-elio-condition-icon__symbol:is(svg) {
-		fill: none;
-		stroke: currentcolor;
-	}
+// An icon drawn with strokes: as easy to repaint as the fill above, which it
+// follows.
+:where(.wp-block-elio-condition-icon.has-stroke-svg-symbol) .wp-block-elio-condition-icon__symbol:is(svg) {
+	fill: none;
+	stroke: currentcolor;
 }

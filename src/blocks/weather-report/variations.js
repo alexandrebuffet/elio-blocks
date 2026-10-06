@@ -9,10 +9,35 @@ import { __ } from '@wordpress/i18n';
 import variationWeatherDefault from './icons/components/variation-weather-default';
 import variationWeatherMinimal from './icons/components/variation-weather-minimal';
 import variationWeatherForecast from './icons/components/variation-weather-forecast';
+import providerAttributionMetadata from '../provider-attribution/block.json';
 import {
 	DAILY_WEATHER_FORECAST_INNER_BLOCKS,
 	HOURLY_WEATHER_FORECAST_INNER_BLOCKS,
 } from '../forecast/variations';
+
+/**
+ * Credit of the provider, last in every variation. Block Hooks add it to the
+ * reports of templates, patterns and posts saved before it existed, but a
+ * report saved without it counts as one it was removed from (its metadata
+ * ignores it from then on): a report made in the editor gets it here. Its size
+ * and alignment are the default of its style attribute.
+ */
+export const PROVIDER_ATTRIBUTION_BLOCK = [ 'elio/provider-attribution' ];
+
+/**
+ * Credit of the provider in a report laid out as a flex row: on a line of its
+ * own, as StyleHookedProviderAttribution places it in such a report. A style
+ * given replaces the default one: it starts from it.
+ */
+const PROVIDER_ATTRIBUTION_ROW_BLOCK = [
+	'elio/provider-attribution',
+	{
+		style: {
+			...providerAttributionMetadata.attributes.style.default,
+			layout: { selfStretch: 'fixed', flexSize: '100%' },
+		},
+	},
+];
 
 /**
  * Current weather inner blocks.
@@ -114,54 +139,66 @@ const variations = [
 		name: 'elio/current-weather',
 		title: __( 'Default', 'elio-blocks' ),
 		description: __(
-			'Displays current weather location name, temperature, condition icon and description.',
+			'Display the location with its current temperature and weather condition.',
 			'elio-blocks'
 		),
 		icon: variationWeatherDefault,
 		attributes: {},
-		innerBlocks: CURRENT_WEATHER_INNER_BLOCKS,
+		innerBlocks: [
+			...CURRENT_WEATHER_INNER_BLOCKS,
+			PROVIDER_ATTRIBUTION_BLOCK,
+		],
 		scope: [ 'block' ],
 	},
 	{
 		name: 'elio/current-weather-minimalist',
 		title: __( 'Minimal', 'elio-blocks' ),
 		description: __(
-			'Displays current weather condition icon and temperature.',
+			'Display the current weather condition icon and temperature.',
 			'elio-blocks'
 		),
 		icon: variationWeatherMinimal,
 		attributes: {
 			layout: {
 				type: 'flex',
-				flexWrap: 'nowrap',
+				flexWrap: 'wrap',
 				justifyContent: 'center',
 			},
 		},
-		innerBlocks: CURRENT_WEATHER_MINIMAL_INNER_BLOCKS,
+		innerBlocks: [
+			...CURRENT_WEATHER_MINIMAL_INNER_BLOCKS,
+			PROVIDER_ATTRIBUTION_ROW_BLOCK,
+		],
 		scope: [ 'block' ],
 	},
 	{
 		name: 'elio/current-weather-hourly-forecast',
 		title: __( 'Hourly Forecast', 'elio-blocks' ),
 		description: __(
-			'Displays current weather location name, temperature, condition icon and description plus an hourly weather forecast list.',
+			'Display the current weather and an hourly forecast.',
 			'elio-blocks'
 		),
 		icon: variationWeatherForecast,
 		attributes: FORECAST_ATTRIBUTES,
-		innerBlocks: CURRENT_WEATHER_HOURLY_FORECAST_INNER_BLOCKS,
+		innerBlocks: [
+			...CURRENT_WEATHER_HOURLY_FORECAST_INNER_BLOCKS,
+			PROVIDER_ATTRIBUTION_BLOCK,
+		],
 		scope: [ 'block' ],
 	},
 	{
 		name: 'elio/current-weather-daily-forecast',
 		title: __( 'Daily Forecast', 'elio-blocks' ),
 		description: __(
-			'Displays current weather location name, temperature, condition icon and description plus a daily weather forecast list.',
+			'Display the current weather and a daily forecast.',
 			'elio-blocks'
 		),
 		icon: variationWeatherForecast,
 		attributes: FORECAST_ATTRIBUTES,
-		innerBlocks: CURRENT_WEATHER_DAILY_FORECAST_INNER_BLOCKS,
+		innerBlocks: [
+			...CURRENT_WEATHER_DAILY_FORECAST_INNER_BLOCKS,
+			PROVIDER_ATTRIBUTION_BLOCK,
+		],
 		scope: [ 'block' ],
 	},
 ];

@@ -6,7 +6,10 @@
 	"title": "Temperature",
 	"category": "elio-weather",
 	"icon": "thermometer",
-	"description": "Displays the weather temperature.",
+	"description": "Display the current temperature or feels like temperature.",
+	"example": {
+		"viewportWidth": 350
+	},
 	"ancestor": ["elio/weather-report"],
 	"attributes": {
 		"displayType": {

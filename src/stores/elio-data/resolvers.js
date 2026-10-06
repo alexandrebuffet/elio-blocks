@@ -7,7 +7,13 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { getWeatherForecastKey } from './utils';
+import { getRefreshSettings, getWeatherForecastKey } from './utils';
+import {
+	getRefreshTime,
+	getRequestTimeoutSignal,
+	setTimeoutAt,
+	whenVisible,
+} from '../../shared/refresh';
 
 /**
  * Fetches the registered condition icon collections, for the pickers and for
@@ -53,20 +59,53 @@ export const getWeatherForecast =
 			// The collections endpoint answered an error: no icon in the editor.
 		}
 
-		const weatherForecast = await apiFetch( {
-			path: addQueryArgs( '/elio/v1/weather-forecast', {
-				latitude,
-				longitude,
-				provider: provider || '',
-				units: units || '',
-				icon_collections: ( collections ?? [] ).map( ( c ) => c.slug ),
-			} ),
-		} );
+		const requestedAt = Date.now();
+		let weatherForecast = null;
 
-		dispatch.receiveWeatherForecast(
-			getWeatherForecastKey( latitude, longitude, provider, units ),
-			weatherForecast
-		);
+		try {
+			weatherForecast = await apiFetch( {
+				path: addQueryArgs( '/elio/v1/weather-forecast', {
+					latitude,
+					longitude,
+					provider: provider || '',
+					units: units || '',
+					icon_collections: ( collections ?? [] ).map(
+						( c ) => c.slug
+					),
+				} ),
+				// Given up after a while: a resolution that never settles is
+				// never started again, and nothing would refresh it.
+				signal: getRequestTimeoutSignal(),
+			} );
+
+			dispatch.receiveWeatherForecast(
+				getWeatherForecastKey( latitude, longitude, provider, units ),
+				weatherForecast
+			);
+		} finally {
+			// Asked again when the front asks again (getRefreshSettings(), the
+			// settings the front gets), once the editor is shown: the blocks
+			// still showing it resolve it again, keeping the one they have
+			// meanwhile.
+			const refreshAt = getRefreshTime(
+				weatherForecast,
+				requestedAt,
+				getRefreshSettings()
+			);
+
+			if ( refreshAt !== null ) {
+				setTimeoutAt(
+					() =>
+						whenVisible( () =>
+							dispatch.invalidateResolution(
+								'getWeatherForecast',
+								[ latitude, longitude, provider, units ]
+							)
+						),
+					refreshAt
+				);
+			}
+		}
 	};
 
 /**
@@ -81,4 +120,16 @@ export const getWeatherForecastProviders =
 		} );
 
 		dispatch.receiveWeatherForecastProviders( providers );
+	};
+
+/**
+ * Fetches every registered provider, whatever it serves, with the credentials
+ * it declares.
+ */
+export const getProviders =
+	() =>
+	async ( { dispatch } ) => {
+		const providers = await apiFetch( { path: '/elio/v1/providers' } );
+
+		dispatch.receiveProviders( providers );
 	};

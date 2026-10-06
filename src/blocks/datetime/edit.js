@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { WeatherValueEdit } from '../../block-editor/components';
+import { useNow } from '../../block-editor/hooks';
 import { getEditorDateSettings } from '../../block-editor/utils';
 import { createDateApi } from '../../shared/date-format';
 import {
@@ -17,6 +18,9 @@ import {
 import Inspector from './inspector';
 
 export default function DatetimeEdit( props ) {
+	// The time the forecast list of the row counts its rows from.
+	const now = useNow();
+
 	return (
 		<WeatherValueEdit
 			{ ...props }
@@ -42,6 +46,7 @@ export default function DatetimeEdit( props ) {
 						nowLabel:
 							attributes.nowLabel || __( 'Now', 'elio-blocks' ),
 						timezone: getWeatherForecastTimezone( weatherForecast ),
+						now,
 					}
 				)
 			}

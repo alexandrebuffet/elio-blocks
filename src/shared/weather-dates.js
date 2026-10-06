@@ -65,17 +65,44 @@ export function withWeatherForecastTimezone( settings, weatherForecast ) {
 }
 
 /**
+ * Every hour and every day starts at a quarter hour in every timezone: UTC
+ * offsets are multiples of 15 minutes (+05:30 in India, +05:45 in Nepal).
+ */
+const QUARTER_HOUR_IN_MS = 900000;
+
+/**
+ * Returns when the next quarter hour starts: bringing "now" up to date then
+ * moves the forecast lists and the "Now"/"Today" labels as soon as the hour or
+ * the day in progress changes, wherever the location is.
+ *
+ * @param {number} now Milliseconds since the epoch.
+ * @return {number} Milliseconds since the epoch.
+ */
+export function getNextQuarterHour( now ) {
+	return ( Math.floor( now / QUARTER_HOUR_IN_MS ) + 1 ) * QUARTER_HOUR_IN_MS;
+}
+
+/**
+ * Format of the date format picker for a relative date ("5 minutes ago"), as
+ * the Date block of WordPress reads it. PHP date() has no such format: the
+ * server prints the date in the site format, the browser words it relative
+ * to now and keeps it current (callbacks.startRelativeDateClock).
+ */
+export const RELATIVE_DATE_FORMAT = 'human-diff';
+
+/**
  * Returns the date or time of a weather item, or a label for the current day / hour.
  *
  * @param {DateApi}               dateApi                  Date functions.
  * @param {string|null|undefined} raw                      Timestamp of the item.
  * @param {Object}                options                  Options.
  * @param {string}                [options.displayType]    'time' or 'date'.
- * @param {string}                [options.format]         PHP date format. Defaults to the site format.
+ * @param {string}                [options.format]         PHP date format, or RELATIVE_DATE_FORMAT. Defaults to the site format.
  * @param {string}                [options.timezone]       Timezone of the location.
  * @param {boolean}               [options.currentAsLabel] Label the current day (date) or hour (time).
  * @param {string}                [options.todayLabel]     Label of the current day.
  * @param {string}                [options.nowLabel]       Label of the current hour.
+ * @param {number}                [options.now]            Milliseconds since the epoch: now, which relative dates and labels are counted from.
  * @return {string} Formatted date, empty without a valid timestamp.
  */
 export function formatItemDate(
@@ -88,6 +115,7 @@ export function formatItemDate(
 		currentAsLabel = false,
 		todayLabel = '',
 		nowLabel = '',
+		now = Date.now(),
 	} = {}
 ) {
 	const date = toDate( raw );
@@ -104,11 +132,15 @@ export function formatItemDate(
 		const sameAs = isTime ? 'Y-m-d H' : 'Y-m-d';
 		const isCurrent =
 			dateApi.date( sameAs, date, timezone ) ===
-			dateApi.date( sameAs, new Date(), timezone );
+			dateApi.date( sameAs, now, timezone );
 
 		if ( isCurrent ) {
 			return isTime ? nowLabel : todayLabel;
 		}
+	}
+
+	if ( format === RELATIVE_DATE_FORMAT ) {
+		return dateApi.relative( date, now );
 	}
 
 	const { formats } = dateApi.getSettings();

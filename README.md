@@ -18,6 +18,7 @@ No coding required. No widgets, no shortcodes, no iframe either.
 ### Feels native, because it is
 
 - **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
+- **Icons for the rest of your page.** The icons of Elio, weather conditions included, are an icon collection of WordPress 7.1: pick one in the Icon block, anywhere on your site.
 - **Forecasts that work like the Query Loop.** The hourly and daily forecast lists repeat a template you design once, just like the Post Template of the Query Loop block.
 - **Start from a layout.** Pick one of the ready-made variations (Default, Minimal, Hourly Forecast, Daily Forecast), or start blank and build your own.
 - **Every design tool you expect.** Colors, typography, spacing, borders and layout come from the standard block supports, so they appear in the same panels as those of core blocks, follow your theme's presets, and can be set for the whole site in `theme.json` or the Styles of the Site Editor.
@@ -134,11 +135,13 @@ npm run build
 
 The WordPress.org package is built by the `build-plugin.yml` GitHub Actions workflow: run it by hand to get a ZIP to test.
 
+The presentation site, [alexandrebuffet.github.io/elio-blocks](https://alexandrebuffet.github.io/elio-blocks/), lives in `docs/site/`: `npm run build:site` assembles it into `_site/`, which any static server can show (the Playground demo needs `elio-blocks.zip` next to it, added by the `deploy-site.yml` workflow).
+
 Bug reports and pull requests are welcome on [GitHub](https://github.com/alexandrebuffet/elio-blocks/issues).
 
 ## Credits
 
-The icons of the plugin come from [Tabler Icons](https://tabler.io/icons), Copyright (c) 2020-2026 Paweł Kuna, released under the [MIT License](https://github.com/tabler/tabler-icons/blob/main/LICENSE), which is compatible with the GPL. Some icons were made for this plugin in the same style.
+The icons of the plugin were drawn for it. The layout illustrations of the Weather block variations include a sun from [Tabler Icons](https://tabler.io/icons), Copyright (c) 2020-2026 Paweł Kuna, released under the [MIT License](https://github.com/tabler/tabler-icons/blob/main/LICENSE), which is compatible with the GPL.
 
 ## Changelog
 

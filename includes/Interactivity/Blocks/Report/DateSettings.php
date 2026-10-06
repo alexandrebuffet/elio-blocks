@@ -41,8 +41,9 @@ final class DateSettings
                 'locale'         => get_locale(),
                 'months'         => array_values((array) $wp_locale->month),
                 'monthsGenitive' => array_values((array) $wp_locale->month_genitive),
-                // The setting wp_maybe_decline_date() reads: a core string, translated per language.
-                'declineMonths'  => 'on' === _x('off', 'decline months names: on or off'), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- The core string.
+                // The setting wp_maybe_decline_date() reads: the translation of 'off' in the core
+                // translations, read as a value, not a text of the plugin to translate.
+                'declineMonths'  => 'on' === get_translations_for_domain('default')->translate('off', 'decline months names: on or off'),
                 'monthsShort'    => array_values((array) $wp_locale->month_abbrev),
                 'weekdays'       => array_values((array) $wp_locale->weekday),
                 'weekdaysShort'  => array_values((array) $wp_locale->weekday_abbrev),

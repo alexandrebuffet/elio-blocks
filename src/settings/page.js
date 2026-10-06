@@ -43,6 +43,7 @@ import {
 	getCredentialsToSave,
 	splitCredentialEdits,
 } from './providers-section';
+import { store as elioDataStore } from '../stores/elio-data';
 import elioLogo from '../icons/brand/components/elio-logo';
 
 /**
@@ -102,7 +103,7 @@ const advancedFields = [
 				help={ sprintf(
 					/* translators: %s: Short duration label (e.g. "30m"). */
 					__(
-						'Length of time weather API responses are kept in the server cache before refetching. Fewer requests improve performance. Auto-refresh updates the blocks in the visitor’s browser at the same pace. Default: %s.',
+						'Length of time weather API responses are kept in the server cache before refetching. Fewer requests improve performance. Auto-refresh updates the blocks on the site and in the editor at the same pace. Default: %s.',
 						'elio-blocks'
 					),
 					CACHE_DURATION_PRESETS.find(
@@ -429,7 +430,7 @@ const generalFields = [
 				help={ sprintf(
 					/* translators: %s: Short duration label (e.g. "15m"). */
 					__(
-						'Time between two updates of the data in the visitor’s browser. With the cache off, each update asks the data provider. Default: %s.',
+						'Time between two updates of the data shown on the site and in the editor. With the cache off, each update asks the data provider. Default: %s.',
 						'elio-blocks'
 					),
 					DEFAULT_INTERVAL_PRESETS.find(
@@ -504,9 +505,7 @@ export default function SettingsPage() {
 		[]
 	);
 
-	// Bumped once credentials are saved: the providers say again which are set.
-	const [ providersVersion, setProvidersVersion ] = useState( 0 );
-	const providers = useProviders( addNotice, providersVersion );
+	const providers = useProviders( addNotice );
 	const weatherForecastProviders = useWeatherForecastProviders( addNotice );
 
 	const data = useSelect(
@@ -558,6 +557,7 @@ export default function SettingsPage() {
 	);
 
 	const { editEntityRecord } = useDispatch( coreStore );
+	const { invalidateResolution } = useDispatch( elioDataStore );
 	const { save, isSaving } = useSaveSettings( addNotice );
 
 	const onSave = async () => {
@@ -565,8 +565,9 @@ export default function SettingsPage() {
 			Object.keys( credentialsToSave ).length > 0;
 		if ( await save( credentialsToSave ) ) {
 			setCredentials( {} );
+			// The providers say again which credentials are set.
 			if ( hasCredentialsToSave ) {
-				setProvidersVersion( ( version ) => version + 1 );
+				invalidateResolution( 'getProviders' );
 			}
 		}
 	};

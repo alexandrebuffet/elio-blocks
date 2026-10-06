@@ -95,6 +95,48 @@ describe( 'weather-report view: fetch', () => {
 		setElement( { ref: document.createElement( 'section' ) } );
 	} );
 
+	it( 'gives up a request that never settles, so the next ones of the block are not held up', async () => {
+		// A request sent as the computer went to sleep may never settle.
+		const timeout = new AbortController();
+		const timeoutSpy = vi
+			.spyOn( AbortSignal, 'timeout' )
+			.mockReturnValue( timeout.signal );
+		global.fetch = vi.fn(
+			( url, { signal } ) =>
+				new Promise( ( resolve, reject ) =>
+					signal.addEventListener( 'abort', () =>
+						reject( signal.reason )
+					)
+				)
+		);
+		const context = makeContext();
+		setContext( context );
+
+		const request = runAction( store().actions.fetch() );
+		expect( context.query.isLoading ).toBe( true );
+
+		timeout.abort( new Error( 'The operation timed out.' ) );
+		await request;
+
+		expect( timeoutSpy ).toHaveBeenCalledWith( 30000 );
+		expect( context.query.isLoading ).toBe( false );
+		timeoutSpy.mockRestore();
+	} );
+
+	it( 'asks nothing for a hidden page, which catches up when it is shown again', async () => {
+		const hidden = vi.spyOn( document, 'hidden', 'get' );
+		hidden.mockReturnValue( true );
+		respondWith( { current: { temperature: 21 } } );
+		setContext( contextWith( { age: 40 * MINUTE } ) );
+
+		await runAction( store().actions.fetch() );
+		expect( global.fetch ).not.toHaveBeenCalled();
+
+		hidden.mockReturnValue( false );
+		await runAction( store().actions.catchUp() );
+		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'refreshes the current item that leaf blocks read, not only query.data', async () => {
 		const context = makeContext();
 		setContext( context );
@@ -276,7 +318,7 @@ describe( 'weather-report view: refresh policy', () => {
 		visibility.mockReturnValue( false );
 		setContext( contextWith( { age: MINUTE, requestedAgo: MINUTE } ) );
 
-		await runAction( store().actions.handleVisibilityChange() );
+		await runAction( store().actions.catchUp() );
 
 		expect( global.fetch ).not.toHaveBeenCalled();
 	} );
@@ -285,7 +327,7 @@ describe( 'weather-report view: refresh policy', () => {
 		visibility.mockReturnValue( false );
 		setContext( contextWith( { age: 31 * MINUTE, requestedAgo: MINUTE } ) );
 
-		await runAction( store().actions.handleVisibilityChange() );
+		await runAction( store().actions.catchUp() );
 
 		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -319,12 +361,129 @@ describe( 'weather-report view: refresh policy', () => {
 	} );
 } );
 
-describe( 'weather-report view: forecast rows', () => {
-	const sync = () => store().callbacks.syncForecastItems();
-	const day = ( n ) => ( { timestamp: `2026-07-0${ n }T00:00:00+02:00` } );
+describe( 'weather-report view: relative date clock', () => {
+	const visibility = vi.spyOn( document, 'hidden', 'get' );
+	const start = () => store().callbacks.startRelativeDateClock();
+
+	beforeEach( () => {
+		vi.useFakeTimers().setSystemTime( new Date( '2026-09-21T14:00:00Z' ) );
+	} );
 
 	afterEach( () => {
 		vi.useRealTimers();
+	} );
+
+	it( 'keeps now current with one timer, however many blocks show a relative date', () => {
+		const stops = [ start(), start() ];
+
+		expect( vi.getTimerCount() ).toBe( 1 );
+
+		vi.advanceTimersByTime( 30000 );
+
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-09-21T14:00:30Z' )
+		);
+
+		stops[ 0 ]();
+		expect( vi.getTimerCount() ).toBe( 1 );
+
+		stops[ 1 ]();
+		expect( vi.getTimerCount() ).toBe( 0 );
+	} );
+
+	it( 'catches up at once when the visitor comes back to the page', async () => {
+		visibility.mockReturnValue( false );
+		setContext( { query: {} } );
+		vi.setSystemTime( new Date( '2026-09-21T15:00:00Z' ) );
+
+		await runAction( store().actions.catchUp() );
+
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-09-21T15:00:00Z' )
+		);
+	} );
+} );
+
+describe( 'weather-report view: quarter-hour clock', () => {
+	const start = () => store().callbacks.startQuarterHourClock();
+
+	beforeEach( () => {
+		vi.useFakeTimers().setSystemTime( new Date( '2026-09-21T14:50:00Z' ) );
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	it( 'brings now up to date at once, then at each quarter hour, with one timer however many blocks', () => {
+		const stops = [ start(), start() ];
+
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-09-21T14:50:00Z' )
+		);
+		expect( vi.getTimerCount() ).toBe( 1 );
+
+		vi.advanceTimersByTime( 10 * MINUTE - 1 );
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-09-21T14:50:00Z' )
+		);
+
+		vi.advanceTimersByTime( 1 );
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-09-21T15:00:00Z' )
+		);
+
+		vi.advanceTimersByTime( 15 * MINUTE );
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-09-21T15:15:00Z' )
+		);
+
+		stops[ 0 ]();
+		expect( vi.getTimerCount() ).toBe( 1 );
+
+		stops[ 1 ]();
+		expect( vi.getTimerCount() ).toBe( 0 );
+	} );
+
+	it( 'catches up within a minute of the computer waking up, however long it slept', () => {
+		const stop = start();
+
+		// Asleep all night: the clock moves on, the timers do not.
+		vi.setSystemTime( new Date( '2026-09-22T08:30:00Z' ) );
+		vi.advanceTimersByTime( MINUTE );
+
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-09-22T08:31:00Z' )
+		);
+		stop();
+	} );
+
+	it( 'reaches the start of an hour at a half-hour offset too (Kolkata, UTC+05:30)', () => {
+		vi.setSystemTime( new Date( '2026-07-01T13:50:00+05:30' ) );
+		const stop = start();
+
+		vi.advanceTimersByTime( 10 * MINUTE );
+
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-07-01T14:00:00+05:30' )
+		);
+		stop();
+	} );
+} );
+
+describe( 'weather-report view: forecast rows', () => {
+	const sync = () => store().callbacks.syncForecastItems();
+	const day = ( n ) => ( { timestamp: `2026-07-0${ n }T00:00:00+02:00` } );
+	const hour = ( h ) => ( { timestamp: `2026-07-01T${ h }:00:00+02:00` } );
+
+	beforeEach( () => {
+		// The morning of 1 July in Paris, the clock the rows count from.
+		store().state.now = Date.parse( '2026-07-01T10:00:00+02:00' );
+	} );
+
+	afterEach( () => {
+		store().state.now = Date.now();
+		setElement( { ref: null } );
 	} );
 
 	it( 'keeps the server-rendered rows while the page only holds the trimmed weather forecast', () => {
@@ -373,10 +532,8 @@ describe( 'weather-report view: forecast rows', () => {
 
 	it( 'starts hourly rows at the hour in progress at the location, whatever the timezone of the visitor', () => {
 		// 13:45 in Kolkata (UTC+05:30): the 13:00 row is the hour in progress.
-		vi.useFakeTimers().setSystemTime(
-			new Date( '2026-07-01T13:45:00+05:30' )
-		);
-		const hour = ( h ) => ( {
+		store().state.now = Date.parse( '2026-07-01T13:45:00+05:30' );
+		const kolkata = ( h ) => ( {
 			timestamp: `2026-07-01T${ h }:00:00+05:30`,
 		} );
 		const context = {
@@ -385,7 +542,12 @@ describe( 'weather-report view: forecast rows', () => {
 			forecastItems: [],
 			query: {
 				data: {
-					hourly: [ hour( 12 ), hour( 13 ), hour( 14 ), hour( 15 ) ],
+					hourly: [
+						kolkata( 12 ),
+						kolkata( 13 ),
+						kolkata( 14 ),
+						kolkata( 15 ),
+					],
 				},
 			},
 		};
@@ -393,7 +555,106 @@ describe( 'weather-report view: forecast rows', () => {
 
 		sync();
 
-		expect( context.forecastItems ).toEqual( [ hour( 13 ), hour( 14 ) ] );
+		expect( context.forecastItems ).toEqual( [
+			kolkata( 13 ),
+			kolkata( 14 ),
+		] );
+	} );
+
+	it( 'counts the rows from the clock the "Now" labels count from, not from the time of the last fetch', () => {
+		const context = {
+			forecastType: 'hourly',
+			forecastCount: 2,
+			forecastItems: [],
+			query: { data: { hourly: [ hour( 14 ), hour( 15 ), hour( 16 ) ] } },
+		};
+		setContext( context );
+
+		store().state.now = Date.parse( '2026-07-01T14:50:00+02:00' );
+		sync();
+		expect( context.forecastItems ).toEqual( [ hour( 14 ), hour( 15 ) ] );
+
+		// Back on the page at 15:05: no fetch, the rows move with the labels.
+		store().state.now = Date.parse( '2026-07-01T15:05:00+02:00' );
+		sync();
+		expect( context.forecastItems ).toEqual( [ hour( 15 ), hour( 16 ) ] );
+	} );
+
+	describe( 'until the first fetch', () => {
+		let report;
+		let refreshes;
+
+		beforeEach( () => {
+			refreshes = 0;
+			report = document.createElement( 'div' );
+			report.className = 'wp-block-elio-weather-report';
+			report.addEventListener( 'weather-refresh', () => refreshes++ );
+			const list = document.createElement( 'ol' );
+			report.append( list );
+			setElement( { ref: list } );
+		} );
+
+		const serverRows = () => ( {
+			forecastType: 'hourly',
+			forecastCount: 2,
+			forecastItems: [ hour( 14 ), hour( 15 ) ],
+			// What the server puts in the page: no hourly/daily sections.
+			query: { data: { current: { temperature: 12 } } },
+		} );
+
+		it( 'keeps the rows the server rendered while the first one is in progress', () => {
+			const context = serverRows();
+			setContext( context );
+			store().state.now = Date.parse( '2026-07-01T14:59:00+02:00' );
+
+			sync();
+
+			expect( context.forecastItems ).toEqual( [
+				hour( 14 ),
+				hour( 15 ),
+			] );
+			expect( refreshes ).toBe( 0 );
+		} );
+
+		it( 'has the report fetch the weather forecast to rebuild them from once the first one has ended', () => {
+			setContext( serverRows() );
+			store().state.now = Date.parse( '2026-07-01T15:00:00+02:00' );
+
+			sync();
+
+			expect( refreshes ).toBe( 1 );
+		} );
+
+		it( 'asks once per ended row: a failed request is retried at the pace of the auto-refresh, not at each tick of the clock', () => {
+			const context = serverRows();
+			setContext( context );
+			store().state.now = Date.parse( '2026-07-01T15:00:00+02:00' );
+			sync();
+
+			// The request failed: still no sections, and the clock ticks on.
+			context.query.requestedAt = Date.parse(
+				'2026-07-01T15:00:01+02:00'
+			);
+			store().state.now = Date.parse( '2026-07-01T15:00:30+02:00' );
+			sync();
+			store().state.now = Date.parse( '2026-07-01T15:01:00+02:00' );
+			sync();
+
+			expect( refreshes ).toBe( 1 );
+		} );
+
+		it( 'does the same for a day that has ended (daily rows rendered before midnight)', () => {
+			setContext( {
+				...serverRows(),
+				forecastType: 'daily',
+				forecastItems: [ day( 1 ), day( 2 ) ],
+			} );
+			store().state.now = Date.parse( '2026-07-02T00:05:00+02:00' );
+
+			sync();
+
+			expect( refreshes ).toBe( 1 );
+		} );
 	} );
 } );
 
@@ -433,6 +694,21 @@ describe( 'weather-report view: auto-refresh', () => {
 		expect( refreshes ).toBe( 0 );
 
 		vi.advanceTimersByTime( 1 );
+		expect( refreshes ).toBe( 1 );
+	} );
+
+	it( 'refreshes within a minute of the computer waking up, however long it slept', () => {
+		setServerState( {
+			refreshInterval: 15 * MINUTE,
+			dataTtl: 30 * MINUTE,
+		} );
+		setContext( contextWith( { age: 10 * MINUTE } ) );
+
+		start();
+		// Asleep all night: the clock moves on, the timers do not.
+		vi.setSystemTime( new Date( '2026-09-22T08:30:00Z' ) );
+		vi.advanceTimersByTime( MINUTE );
+
 		expect( refreshes ).toBe( 1 );
 	} );
 

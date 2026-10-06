@@ -7,6 +7,8 @@
  * @var WP_Block $block      Block instance.
  */
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- render.php runs inside a function (register_block_type_from_metadata): its variables are local.
+
 // Exit if called directly.
 if (! defined('ABSPATH')) {
     die;
@@ -36,6 +38,14 @@ $extra_wrapper_attributes = array(
     'class'           => 'elio-tabular-nums',
     'data-wp-context' => wp_json_encode($context),
 );
+
+// A relative date ("5 minutes ago") is worded in the browser, kept current by the clock of the report.
+// The "Now" and "Today" labels move to the next row as the hour or the day in progress ends.
+if ('human-diff' === $format) {
+    $extra_wrapper_attributes['data-wp-watch'] = 'callbacks.startRelativeDateClock';
+} elseif ($current_as_label) {
+    $extra_wrapper_attributes['data-wp-watch'] = 'callbacks.startQuarterHourClock';
+}
 ?>
 <p <?php echo wp_kses_data(get_block_wrapper_attributes($extra_wrapper_attributes)); ?>>
     <?php if ($show_prefix && $prefix !== '') : ?>

@@ -1,3 +1,0 @@
-import { SVG, Path, Rect, Circle, G } from "@wordpress/primitives";
-const mist = <SVG width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><Path d="M12.75 19.25V20.75H2.25V19.25H12.75ZM19.75 19.25V20.75H15.25V19.25H19.75ZM10.75 14.25V15.75H4.25V14.25H10.75ZM21.75 14.25V15.75H13.25V14.25H21.75ZM14.75 9.25V10.75H2.25V9.25H14.75ZM19.75 9.25V10.75H17.25V9.25H19.75ZM8.75 4.25V5.75H4.25V4.25H8.75ZM21.75 4.25V5.75H11.25V4.25H21.75Z" fill="currentColor" /></SVG>;
-export default mist;

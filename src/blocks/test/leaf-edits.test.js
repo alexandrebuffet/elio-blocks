@@ -29,6 +29,7 @@ import DailyTemperatureEdit from '../daily-temperature/edit';
 import HourlyTemperatureEdit from '../hourly-temperature/edit';
 import DatetimeEdit from '../datetime/edit';
 import SunEventEdit from '../sun-event/edit';
+import LastUpdatedEdit from '../last-updated/edit';
 
 vi.mock( '@wordpress/block-editor', () => ( {
 	useBlockProps: ( props ) => props ?? {},
@@ -43,6 +44,7 @@ vi.mock( '@wordpress/components', () => ( {
 	ToggleControl: () => null,
 } ) );
 vi.mock( '../../block-editor/hooks', () => ( {
+	useNow: () => Date.now(),
 	useWeatherReport: vi.fn(),
 } ) );
 vi.mock( '../temperature/inspector', () => ( { default: () => null } ) );
@@ -51,6 +53,7 @@ vi.mock( '../hourly-temperature/inspector', () => ( { default: () => null } ) );
 vi.mock( '../wind-direction/inspector', () => ( { default: () => null } ) );
 vi.mock( '../datetime/inspector', () => ( { default: () => null } ) );
 vi.mock( '../sun-event/inspector', () => ( { default: () => null } ) );
+vi.mock( '../last-updated/inspector', () => ( { default: () => null } ) );
 
 const NBSP = ' ';
 
@@ -108,6 +111,7 @@ const EDITS = {
 	'hourly-temperature': HourlyTemperatureEdit,
 	datetime: DatetimeEdit,
 	'sun-event': SunEventEdit,
+	'last-updated': LastUpdatedEdit,
 };
 
 /**
@@ -230,6 +234,20 @@ describe( 'leaf blocks in the editor', () => {
 		}
 	);
 
+	it( 'gives the daily temperatures of today out of a row, as in their preview', () => {
+		useWeatherReport.mockReturnValue( {
+			data: { ...WEATHER_FORECAST, daily: [ DAY ] },
+			item: CURRENT,
+		} );
+
+		expect( shown( DailyTemperatureEdit ) ).toBe( '11°C' );
+		expect(
+			shown( DailyTemperatureEdit, {
+				attributes: { displayType: 'max' },
+			} )
+		).toBe( '24.5°C' );
+	} );
+
 	it( 'follows the unit system of the site when nothing overrides it', () => {
 		useWeatherReport.mockReturnValue( {
 			data: { meta: { units: 'imperial' }, current: CURRENT },
@@ -316,7 +334,10 @@ describe( 'leaf blocks in the editor', () => {
 
 	describe( 'dates', () => {
 		const TOKYO = {
-			meta: { timezone: 'Asia/Tokyo' },
+			meta: {
+				timezone: 'Asia/Tokyo',
+				fetched_at: '2026-07-01T05:32:10+00:00',
+			},
 			current: {
 				timestamp: '2026-07-01T14:15:00+09:00',
 				sunrise: '2026-07-01T04:29:00+09:00',
@@ -346,6 +367,26 @@ describe( 'leaf blocks in the editor', () => {
 					attributes: { displayType: 'sunset', format: 'H:i' },
 				} )
 			).toBe( '19:01' );
+			expect(
+				shown( LastUpdatedEdit, { attributes: { format: 'H:i' } } )
+			).toBe( '14:32' );
+		} );
+
+		it( 'say when the weather data was last updated, unless told otherwise', () => {
+			const lastUpdated = ( attributes ) =>
+				shown( LastUpdatedEdit, {
+					attributes: {
+						showPrefix: true,
+						format: 'H:i',
+						...attributes,
+					},
+				} );
+
+			expect( lastUpdated() ).toBe( 'Updated 14:32' );
+			expect( lastUpdated( { prefix: 'Refreshed at' } ) ).toBe(
+				'Refreshed at 14:32'
+			);
+			expect( lastUpdated( { showPrefix: false } ) ).toBe( '14:32' );
 		} );
 
 		it( 'label the current day and hour where the weather forecast is', () => {
@@ -379,6 +420,27 @@ describe( 'leaf blocks in the editor', () => {
 					context: row( '2026-07-02T00:00:00+09:00' ),
 				} )
 			).toBe( 'Maintenant' );
+		} );
+
+		it( 'word a relative date like the front, the "human-diff" format of the picker', () => {
+			vi.useFakeTimers().setSystemTime(
+				new Date( '2026-07-01T05:37:10Z' )
+			);
+			const relative = { format: 'human-diff' };
+
+			expect( shown( LastUpdatedEdit, { attributes: relative } ) ).toBe(
+				'5 minutes ago'
+			);
+			expect(
+				shown( DatetimeEdit, {
+					attributes: { ...relative, displayType: 'time' },
+				} )
+			).toBe( '22 minutes ago' );
+			expect(
+				shown( SunEventEdit, {
+					attributes: { ...relative, displayType: 'sunset' },
+				} )
+			).toBe( 'in 4 hours' );
 		} );
 
 		it( 'give an hourly row the sun event of the day', () => {

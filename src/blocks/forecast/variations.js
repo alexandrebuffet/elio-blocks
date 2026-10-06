@@ -6,8 +6,9 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import weatherCalendar from '../../icons/components/weather-calendar';
-import weatherTime from '../../icons/components/weather-time';
+import cloudSunCalendar from '../../icons/components/cloud-sun-calendar';
+import cloudSunClock from '../../icons/components/cloud-sun-clock';
+import { getBlockExampleFromTemplate } from '../../block-editor/utils';
 
 /**
  * Inner blocks of the forecast template in the weather forecast variations
@@ -80,35 +81,45 @@ export const HOURLY_WEATHER_FORECAST_INNER_BLOCKS = [
 
 const variations = [
 	{
-		name: 'elio/weather-forecast-daily',
-		title: __( 'Daily Weather Forecast', 'elio-blocks' ),
-		description: __(
-			'Display the weather forecast for each day.',
-			'elio-blocks'
-		),
-		icon: weatherCalendar,
+		name: 'elio/forecast-daily',
+		title: __( 'Daily Forecast', 'elio-blocks' ),
+		description: __( 'Display the forecast for each day.', 'elio-blocks' ),
+		icon: cloudSunCalendar,
 		attributes: {
 			type: 'daily',
 			count: 7,
 		},
-		innerBlocks: DAILY_WEATHER_FORECAST_INNER_BLOCKS,
+		innerBlocks: [ DAILY_WEATHER_FORECAST_INNER_BLOCKS ],
+		example: {
+			innerBlocks: [
+				getBlockExampleFromTemplate(
+					DAILY_WEATHER_FORECAST_INNER_BLOCKS
+				),
+			],
+		},
 		isActive: [ 'type' ],
 		scope: [ 'transform', 'inserter' ],
 		isDefault: true,
 	},
 	{
-		name: 'elio/weather-forecast-hourly',
-		title: __( 'Hourly Weather Forecast', 'elio-blocks' ),
-		description: __(
-			'Display the weather forecast for each hour.',
-			'elio-blocks'
-		),
-		icon: weatherTime,
+		name: 'elio/forecast-hourly',
+		title: __( 'Hourly Forecast', 'elio-blocks' ),
+		description: __( 'Display the forecast for each hour.', 'elio-blocks' ),
+		icon: cloudSunClock,
 		attributes: {
 			type: 'hourly',
 			count: 7,
 		},
-		innerBlocks: HOURLY_WEATHER_FORECAST_INNER_BLOCKS,
+		innerBlocks: [ HOURLY_WEATHER_FORECAST_INNER_BLOCKS ],
+		example: {
+			innerBlocks: [
+				getBlockExampleFromTemplate(
+					HOURLY_WEATHER_FORECAST_INNER_BLOCKS
+				),
+			],
+			// Wide enough for the seven hours side by side.
+			viewportWidth: 700,
+		},
 		isActive: [ 'type' ],
 		scope: [ 'transform', 'inserter' ],
 	},

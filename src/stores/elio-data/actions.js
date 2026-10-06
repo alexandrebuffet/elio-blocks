@@ -24,6 +24,16 @@ export function receiveWeatherForecastProviders( providers ) {
 }
 
 /**
+ * Stores every registered provider, with the credentials it declares.
+ *
+ * @param {Object[]} providers Providers returned by the REST API.
+ * @return {Object} Action.
+ */
+export function receiveProviders( providers ) {
+	return { type: 'RECEIVE_PROVIDERS', providers };
+}
+
+/**
  * Stores the registered condition icon collections.
  *
  * @param {Array} collections Collections returned by the REST API.

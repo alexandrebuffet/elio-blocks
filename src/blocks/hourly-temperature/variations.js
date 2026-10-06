@@ -17,7 +17,7 @@ const variations = [
 		name: 'elio/hourly-temperature-feels-like',
 		title: __( 'Feels Like', 'elio-blocks' ),
 		description: __(
-			'Display the hourly feels like (apparent) temperature.',
+			'Display the hourly feels like temperature.',
 			'elio-blocks'
 		),
 		icon: temperatureFeelsLike,

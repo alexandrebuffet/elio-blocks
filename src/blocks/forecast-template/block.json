@@ -6,7 +6,7 @@
 	"title": "Forecast Template",
 	"category": "elio-weather",
 	"icon": "layout",
-	"description": "Contains the blocks used to render each forecast item like the date, condition icon, temperature and more.",
+	"description": "Contains the blocks used to render each forecast item, like the date, condition icon, temperature, and more.",
 	"ancestor": ["elio/forecast"],
 	"usesContext": [
 		"elio/reportLocation",

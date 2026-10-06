@@ -6,7 +6,10 @@
 	"title": "Condition Description",
 	"category": "elio-weather",
 	"icon": "star-fill",
-	"description": "Displays the weather condition description.",
+	"description": "Display the weather condition description.",
+	"example": {
+		"viewportWidth": 350
+	},
 	"ancestor": ["elio/weather-report"],
 	"attributes": {
 		"showPrefix": {

@@ -50,3 +50,6 @@ docs/superpowers/
 
 # git worktrees
 .worktrees/
+
+# Presentation site (npm run build:site)
+/_site

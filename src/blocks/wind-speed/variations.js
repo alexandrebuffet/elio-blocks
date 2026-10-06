@@ -25,7 +25,7 @@ const variations = [
 	{
 		name: 'elio/wind-gusts',
 		title: __( 'Wind Gusts', 'elio-blocks' ),
-		description: __( 'Display the wind gusts speed.', 'elio-blocks' ),
+		description: __( 'Display the speed of wind gusts.', 'elio-blocks' ),
 		icon: wind,
 		attributes: { displayType: 'gusts' },
 		isActive: [ 'displayType' ],

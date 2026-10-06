@@ -8,19 +8,26 @@ if (! defined('ABSPATH')) {
 }
 
 /**
- * Picks the rows a forecast list shows: the next N days, or the next N hours
- * starting at the hour in progress.
+ * Picks the rows a forecast list shows: the next N days or hours, starting at
+ * the day or the hour in progress.
  *
- * Same rules as `state.forecastItems` in src/blocks/weather-report/view.js:
- * the browser rebuilds the list after each fetch and must land on the rows the
+ * Same rules as `selectForecastItems()` in src/shared/forecast-window.js: the
+ * browser rebuilds the list after each fetch and must land on the rows the
  * server rendered.
  */
 final class ForecastWindow
 {
-    private const HOUR_IN_SECONDS = 3600;
+    /**
+     * How long an item lasts when no item follows it.
+     */
+    private const PERIOD_IN_SECONDS = array(
+        'hourly' => 3600,
+        'daily'  => 86400,
+    );
 
     /**
-     * Returns the rows a forecast list shows.
+     * Returns the rows a forecast list shows: from the first item that has not
+     * ended yet, none when every item has.
      *
      * @param array<string, mixed>|null $forecast Normalized forecast.
      * @param string                    $type     'daily' or 'hourly'.
@@ -30,34 +37,54 @@ final class ForecastWindow
      */
     public static function select(?array $forecast, string $type, int $count, int $now): array
     {
-        if (! in_array($type, array( 'daily', 'hourly' ), true) || ! is_array($forecast[ $type ] ?? null)) {
+        if (! isset(self::PERIOD_IN_SECONDS[ $type ]) || ! is_array($forecast[ $type ] ?? null)) {
             return array();
         }
 
         $items = array_values($forecast[ $type ]);
-        $from  = 'hourly' === $type ? self::indexOfHourInProgress($items, $now) : 0;
 
-        return array_slice($items, $from, max(0, $count));
+        foreach (array_keys($items) as $index) {
+            $end = self::endOf($items, $index, self::PERIOD_IN_SECONDS[ $type ]);
+
+            if (null !== $end && $end > $now) {
+                return array_slice($items, $index, max(0, $count));
+            }
+        }
+
+        return array();
     }
 
     /**
-     * Returns the index of the first hourly item that has not ended yet, 0 when they all have.
+     * Returns when the hour or the day of an item ends: when the next item
+     * starts (a day of a change of daylight saving time lasts 23 or 25 hours),
+     * else one period after its own start. Null without a valid timestamp.
      *
      * Timestamps carry their UTC offset, so instants are compared: no timezone
      * of the server or the visitor gets in the way, half-hour offsets included.
      *
-     * @param list<mixed> $items Hourly items.
+     * @param list<mixed> $items  Items of the section.
+     * @param int         $index  Index of the item.
+     * @param int         $period Length of an hour or a day, in seconds.
      */
-    private static function indexOfHourInProgress(array $items, int $now): int
+    private static function endOf(array $items, int $index, int $period): ?int
     {
-        foreach ($items as $index => $item) {
-            $start = is_array($item) ? strtotime((string) ( $item['timestamp'] ?? '' )) : false;
+        $start = self::startOf($items[ $index ] ?? null);
+        $next  = self::startOf($items[ $index + 1 ] ?? null);
 
-            if (false !== $start && $start + self::HOUR_IN_SECONDS > $now) {
-                return $index;
-            }
+        if (null === $start) {
+            return null;
         }
 
-        return 0;
+        return null !== $next && $next > $start ? $next : $start + $period;
+    }
+
+    /**
+     * Returns when an item starts, null without a valid timestamp.
+     */
+    private static function startOf(mixed $item): ?int
+    {
+        $start = is_array($item) ? strtotime((string) ( $item['timestamp'] ?? '' )) : false;
+
+        return false === $start ? null : $start;
     }
 }

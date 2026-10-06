@@ -6,6 +6,7 @@ use Brain\Monkey;
 use Brain\Monkey\Functions;
 use ElioBlocks\BlockEditor\Hooks\EnqueueBlockEditorAssets;
 use ElioBlocks\Interactivity\Blocks\Report\DateSettings;
+use ElioBlocks\Settings\PluginSettings;
 use PHPUnit\Framework\TestCase;
 
 class EnqueueBlockEditorAssetsTest extends TestCase
@@ -18,6 +19,12 @@ class EnqueueBlockEditorAssetsTest extends TestCase
     /** @var array<int, array<int, mixed>> Arguments of each wp_enqueue_script() call. */
     private array $scripts = [];
 
+    /** @var array<int, array<int, mixed>> Arguments of each wp_enqueue_style() call. */
+    private array $styles = [];
+
+    /** @var array<int, array<int, mixed>> Arguments of each wp_style_add_data() call. */
+    private array $styleData = [];
+
     /** @var array<int, array<int, mixed>> Arguments of each wp_set_script_translations() call. */
     private array $translations = [];
 
@@ -28,11 +35,24 @@ class EnqueueBlockEditorAssetsTest extends TestCase
 
         Functions\when('get_option')->returnArg(2);
         Functions\when('get_locale')->justReturn('ru_RU');
-        Functions\when('_x')->alias(fn(string $text, string $context): string => 'decline months names: on or off' === $context ? 'on' : $text);
+        Functions\when('get_translations_for_domain')->justReturn(new class {
+            public function translate(string $text, ?string $context = null): string
+            {
+                return 'decline months names: on or off' === $context ? 'on' : $text;
+            }
+        });
         Functions\when('wp_json_encode')->alias('json_encode');
         Functions\when('untrailingslashit')->alias(fn(string $value): string => rtrim($value, '/\\'));
         Functions\when('wp_enqueue_script')->alias(function (...$args): void {
             $this->scripts[] = $args;
+        });
+        Functions\when('wp_enqueue_style')->alias(function (...$args): void {
+            $this->styles[] = $args;
+        });
+        Functions\when('wp_style_add_data')->alias(function (...$args): bool {
+            $this->styleData[] = $args;
+
+            return true;
         });
         Functions\when('wp_set_script_translations')->alias(function (...$args): bool {
             $this->translations[] = $args;
@@ -57,10 +77,13 @@ class EnqueueBlockEditorAssetsTest extends TestCase
     {
         unset($GLOBALS['wp_locale']);
         @unlink($this->pluginPath . 'build/block-editor/index.asset.php');
+        @unlink($this->pluginPath . 'build/block-editor/style-index.css');
         rmdir($this->pluginPath . 'build/block-editor');
         rmdir($this->pluginPath . 'build');
         rmdir($this->pluginPath);
         $this->scripts      = [];
+        $this->styles       = [];
+        $this->styleData    = [];
         $this->translations = [];
         Monkey\tearDown();
         parent::tearDown();
@@ -91,12 +114,29 @@ class EnqueueBlockEditorAssetsTest extends TestCase
         );
     }
 
+    public function test_gives_the_editor_the_refresh_settings_of_the_front(): void
+    {
+        $inline = [];
+        Functions\when('wp_add_inline_script')->alias(
+            function (string $handle, string $script, string $position) use (&$inline): bool {
+                $inline[] = [$handle, $script, $position];
+
+                return true;
+            }
+        );
+
+        $this->hook()->addRefreshSettings();
+
+        // The defaults: a 30 minutes cache, auto-refresh every 15 minutes.
+        $this->assertSame(
+            [['elio-blocks-block-editor', 'window.elioBlocksRefreshSettings = {"dataTtl":1800000,"refreshInterval":900000};', 'before']],
+            $inline
+        );
+    }
+
     public function test_loads_the_script_translations_from_the_language_packs(): void
     {
-        file_put_contents(
-            $this->pluginPath . 'build/block-editor/index.asset.php',
-            '<?php return array("dependencies" => array("wp-blocks", "wp-i18n"), "version" => ' . var_export(self::BUILD_VERSION, true) . ');'
-        );
+        $this->writeAssetFile();
 
         $this->hook()->enqueueBlockEditorScript();
 
@@ -118,13 +158,44 @@ class EnqueueBlockEditorAssetsTest extends TestCase
     public function test_enqueues_nothing_when_the_build_is_missing(): void
     {
         $this->hook()->enqueueBlockEditorScript();
+        $this->hook()->enqueueBlockEditorStyle();
 
         $this->assertSame([], $this->scripts);
         $this->assertSame([], $this->translations);
+        $this->assertSame([], $this->styles);
+        $this->assertSame([], $this->styleData);
+    }
+
+    public function test_enqueues_the_stylesheet_with_its_right_to_left_copy(): void
+    {
+        $this->writeAssetFile();
+        file_put_contents($this->pluginPath . 'build/block-editor/style-index.css', '.weather-location-control{}');
+
+        $this->hook()->enqueueBlockEditorStyle();
+
+        $this->assertSame(
+            [[
+                'elio-blocks-block-editor',
+                self::PLUGIN_URL . 'build/block-editor/style-index.css',
+                [],
+                self::BUILD_VERSION,
+            ]],
+            $this->styles
+        );
+        // style-index-rtl.css, built next to it, in place of it on a right-to-left admin.
+        $this->assertSame([['elio-blocks-block-editor', 'rtl', 'replace']], $this->styleData);
     }
 
     private function hook(): EnqueueBlockEditorAssets
     {
-        return new EnqueueBlockEditorAssets($this->pluginPath, self::PLUGIN_URL);
+        return new EnqueueBlockEditorAssets($this->pluginPath, self::PLUGIN_URL, new PluginSettings());
+    }
+
+    private function writeAssetFile(): void
+    {
+        file_put_contents(
+            $this->pluginPath . 'build/block-editor/index.asset.php',
+            '<?php return array("dependencies" => array("wp-blocks", "wp-i18n"), "version" => ' . var_export(self::BUILD_VERSION, true) . ');'
+        );
     }
 }

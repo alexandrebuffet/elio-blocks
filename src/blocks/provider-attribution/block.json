@@ -1,0 +1,73 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "elio/provider-attribution",
+	"version": "1.0.0",
+	"title": "Provider Attribution",
+	"category": "elio-weather",
+	"description": "Credit the provider of the weather data, as its license requires.",
+	"example": {
+		"viewportWidth": 350
+	},
+	"keywords": ["credit", "license", "copyright"],
+	"ancestor": ["elio/weather-report"],
+	"usesContext": ["elio/reportProvider"],
+	"blockHooks": {
+		"elio/weather-report": "lastChild"
+	},
+	"attributes": {
+		"linkTarget": {
+			"type": "string",
+			"default": "_self",
+			"enum": ["_self", "_blank"]
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"typography": {
+					"fontSize": "0.75em",
+					"textAlign": "center"
+				}
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"align": ["wide", "full"],
+		"anchor": true,
+		"color": {
+			"background": true,
+			"text": true,
+			"link": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"link": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"textAlign": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
+	},
+	"textdomain": "elio-blocks",
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php"
+}

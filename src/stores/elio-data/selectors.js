@@ -51,11 +51,27 @@ export function getWeatherForecastProviders( state ) {
 }
 
 /**
+ * Returns every registered provider, whatever it serves, with the credentials
+ * it declares, or null while they are not there: the settings page draws one
+ * card per provider (`manage_options`).
+ *
+ * Has a resolver: selecting it fetches them once. A secret is never sent, only
+ * whether it is set: invalidateResolution( 'getProviders' ) fetches them
+ * again once credentials are saved.
+ *
+ * @param {Object} state Store state.
+ * @return {Object[]|null} Providers: slug, label, credentials.
+ */
+export function getProviders( state ) {
+	return state.providers;
+}
+
+/**
  * Returns the registered condition icon collections, or null while they are
  * not there. Has a resolver: selecting it fetches them once.
  *
  * @param {Object} state Store state.
- * @return {Array|null} Collections: slug, label, description, is_default, coverage, preview.
+ * @return {Array|null} Collections: slug, label, description, stroke_width, is_default, coverage, preview.
  */
 export function getConditionIconCollections( state ) {
 	return state.conditionIconCollections;

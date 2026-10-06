@@ -6,7 +6,10 @@
 	"title": "Cloud Cover",
 	"category": "elio-weather",
 	"icon": "cloud",
-	"description": "Displays the cloud cover percentage.",
+	"description": "Display the cloud cover percentage.",
+	"example": {
+		"viewportWidth": 350
+	},
 	"ancestor": ["elio/weather-report"],
 	"attributes": {
 		"showPrefix": {

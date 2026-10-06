@@ -16,6 +16,8 @@
  * @var WP_Block $block      Block instance.
  */
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- render.php runs inside a function (register_block_type_from_metadata): its variables are local.
+
 // Exit if called directly.
 if (! defined('ABSPATH')) {
     die;
@@ -26,14 +28,18 @@ $forecast_count = isset($block->context['elio/forecastCount']) ? absint($block->
 
 $wrapper_attributes = get_block_wrapper_attributes(
     array(
-        'data-wp-context' => wp_json_encode(
+        'data-wp-context'       => wp_json_encode(
             array(
                 'forecastType'  => $forecast_type,
                 'forecastCount' => $forecast_count,
                 'forecastItems' => elio_blocks_get_forecast_items($forecast_type, $forecast_count),
             )
         ),
-        'data-wp-watch'   => 'callbacks.syncForecastItems',
+        'data-wp-watch'         => 'callbacks.syncForecastItems',
+        // The rows move as the hour or the day in progress ends. A second watch
+        // takes a unique ID, after three hyphens since WordPress 7.0 (an older
+        // one reads "-clock" as a suffix, which a watch ignores).
+        'data-wp-watch---clock' => 'callbacks.startQuarterHourClock',
     )
 );
 ?>

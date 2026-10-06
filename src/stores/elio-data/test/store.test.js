@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -205,6 +205,142 @@ describe( 'elio/data store: weather forecasts', () => {
 	} );
 } );
 
+describe( 'elio/data store: weather forecast refresh', () => {
+	const MINUTE = 60000;
+
+	beforeEach( () => {
+		apiFetch.mockReset();
+		vi.useFakeTimers().setSystemTime( new Date( '2026-10-05T21:10:00Z' ) );
+		vi.spyOn( Math, 'random' ).mockReturnValue( 0 );
+		// What the server prints for the editor: the settings of the front.
+		window.elioBlocksRefreshSettings = {
+			dataTtl: 30 * MINUTE,
+			refreshInterval: 15 * MINUTE,
+		};
+	} );
+
+	afterEach( () => {
+		delete window.elioBlocksRefreshSettings;
+		vi.restoreAllMocks();
+		vi.useRealTimers();
+	} );
+
+	const resolve = async ( registry ) => {
+		const resolved = registry
+			.resolveSelect( store )
+			.getWeatherForecast( ...PARIS );
+		// `@wordpress/data` starts each resolver on a timer of its own.
+		await vi.advanceTimersByTimeAsync( 10 );
+		return resolved;
+	};
+
+	it( 'asks again when the front does, once the server copy expires, even after the computer slept', async () => {
+		respondWith( {
+			meta: { fetched_at: '2026-10-05T21:00:00+00:00' },
+			current: { temperature: 12 },
+		} );
+		const registry = makeRegistry();
+		await resolve( registry );
+
+		respondWith( {
+			meta: { fetched_at: '2026-10-06T08:30:00+00:00' },
+			current: { temperature: 21 },
+		} );
+		// Asleep all night: the clock moves on, the timers do not.
+		vi.setSystemTime( new Date( '2026-10-06T08:30:00Z' ) );
+		await vi.advanceTimersByTimeAsync( MINUTE );
+		await resolve( registry );
+
+		expect( forecastCalls() ).toHaveLength( 2 );
+		expect(
+			registry.select( store ).getWeatherForecast( ...PARIS ).current
+				.temperature
+		).toBe( 21 );
+	} );
+
+	it( 'gives up a request that never settles, and asks again at the interval of the site', async () => {
+		const timeout = new AbortController();
+		vi.spyOn( AbortSignal, 'timeout' ).mockReturnValueOnce(
+			timeout.signal
+		);
+		let hangs = true;
+		apiFetch.mockImplementation( ( { path, signal } ) => {
+			if ( path.startsWith( '/elio/v1/condition-icon-collections' ) ) {
+				return Promise.resolve( COLLECTIONS );
+			}
+			if ( hangs ) {
+				// Sent as the computer went to sleep: no answer, ever.
+				hangs = false;
+				return new Promise( ( settle, reject ) =>
+					signal?.addEventListener( 'abort', () =>
+						reject( { code: 'fetch_error', message: 'Timed out.' } )
+					)
+				);
+			}
+			return Promise.resolve( { current: { temperature: 21 } } );
+		} );
+		const registry = makeRegistry();
+
+		const resolved = registry
+			.resolveSelect( store )
+			.getWeatherForecast( ...PARIS );
+		await vi.advanceTimersByTimeAsync( 10 );
+		timeout.abort();
+		await resolved.catch( () => {} );
+
+		await vi.advanceTimersByTimeAsync( 15 * MINUTE );
+		await resolve( registry );
+
+		expect( forecastCalls() ).toHaveLength( 2 );
+		expect(
+			registry.select( store ).getWeatherForecast( ...PARIS ).current
+				.temperature
+		).toBe( 21 );
+	} );
+
+	it( 'asks nothing while the editor is hidden, and catches up once it is shown', async () => {
+		respondWith( {
+			meta: { fetched_at: '2026-10-05T21:00:00+00:00' },
+			current: { temperature: 12 },
+		} );
+		const registry = makeRegistry();
+		await resolve( registry );
+
+		const hidden = vi
+			.spyOn( document, 'hidden', 'get' )
+			.mockReturnValue( true );
+		respondWith( {
+			meta: { fetched_at: '2026-10-05T21:40:00+00:00' },
+			current: { temperature: 21 },
+		} );
+		await vi.advanceTimersByTimeAsync( 30 * MINUTE );
+		await resolve( registry );
+		expect( forecastCalls() ).toHaveLength( 1 );
+
+		hidden.mockReturnValue( false );
+		document.dispatchEvent( new Event( 'visibilitychange' ) );
+		await resolve( registry );
+
+		expect( forecastCalls() ).toHaveLength( 2 );
+		expect(
+			registry.select( store ).getWeatherForecast( ...PARIS ).current
+				.temperature
+		).toBe( 21 );
+	} );
+
+	it( 'keeps the weather forecast while auto-refresh is off', async () => {
+		window.elioBlocksRefreshSettings.refreshInterval = 0;
+		respondWith( { current: { temperature: 12 } } );
+		const registry = makeRegistry();
+		await resolve( registry );
+
+		await vi.advanceTimersByTimeAsync( 24 * 60 * MINUTE );
+		await resolve( registry );
+
+		expect( forecastCalls() ).toHaveLength( 1 );
+	} );
+} );
+
 describe( 'elio/data store: weather forecast providers', () => {
 	const PROVIDERS = [
 		{ slug: 'open-meteo', label: 'Open-Meteo', isDefault: true },
@@ -266,6 +402,77 @@ describe( 'elio/data store: weather forecast providers', () => {
 		expect(
 			registry.select( store ).getWeatherForecastProviders()
 		).toBeNull();
+	} );
+} );
+
+describe( 'elio/data store: providers', () => {
+	const PROVIDERS = [
+		{ slug: 'open-meteo', label: 'Open-Meteo', credentials: [] },
+		{
+			slug: 'acme-weather',
+			label: 'Acme Weather',
+			credentials: [ { name: 'api_key', secret: true, isSet: false } ],
+		},
+	];
+
+	beforeEach( () => {
+		apiFetch.mockReset();
+	} );
+
+	it( 'lists every provider with its credentials, fetched once', async () => {
+		apiFetch.mockResolvedValue( PROVIDERS );
+		const registry = makeRegistry();
+
+		expect( registry.select( store ).getProviders() ).toBeNull();
+		await Promise.all( [
+			registry.resolveSelect( store ).getProviders(),
+			registry.resolveSelect( store ).getProviders(),
+		] );
+
+		expect( registry.select( store ).getProviders() ).toEqual( PROVIDERS );
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/elio/v1/providers',
+		} );
+	} );
+
+	it( 'keeps the providers while they are fetched again once the resolution is invalidated', async () => {
+		apiFetch.mockResolvedValue( PROVIDERS );
+		const registry = makeRegistry();
+		await registry.resolveSelect( store ).getProviders();
+
+		let answer;
+		apiFetch.mockReturnValue(
+			new Promise( ( resolve ) => ( answer = resolve ) )
+		);
+		registry.dispatch( store ).invalidateResolution( 'getProviders' );
+		const refetch = registry.resolveSelect( store ).getProviders();
+		await vi.waitFor( () => expect( apiFetch ).toHaveBeenCalledTimes( 2 ) );
+
+		expect( registry.select( store ).getProviders() ).toEqual( PROVIDERS );
+
+		const saved = structuredClone( PROVIDERS );
+		saved[ 1 ].credentials[ 0 ].isSet = true;
+		answer( saved );
+		await refetch;
+
+		expect( registry.select( store ).getProviders() ).toEqual( saved );
+	} );
+
+	it( 'reports a failed request', async () => {
+		apiFetch.mockRejectedValue(
+			new Error( 'Sorry, you are not allowed.' )
+		);
+		const registry = makeRegistry();
+
+		await expect(
+			registry.resolveSelect( store ).getProviders()
+		).rejects.toThrow( 'Sorry, you are not allowed.' );
+		expect(
+			registry.select( store ).getResolutionError( 'getProviders' )
+				.message
+		).toBe( 'Sorry, you are not allowed.' );
+		expect( registry.select( store ).getProviders() ).toBeNull();
 	} );
 } );
 

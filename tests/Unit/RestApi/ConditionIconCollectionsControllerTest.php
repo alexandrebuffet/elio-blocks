@@ -35,7 +35,7 @@ class ConditionIconCollectionsControllerTest extends TestCase
         WordPressCore::stubKses();
 
         $this->registry = new ConditionIconsRegistry();
-        $this->registry->registerCollection('elio', ['label' => 'Elio', 'description' => 'Shipped.']);
+        $this->registry->registerCollection('elio', ['label' => 'Elio', 'description' => 'Shipped.', 'stroke_width' => 1.5]);
         foreach (WmoConditionCodes::getSlugs() as $condition) {
             $this->registry->registerIcon('elio/' . $condition, ['content' => self::SUN, 'style' => 'stroke', 'conditions' => [[$condition, 'all']]]);
         }
@@ -76,6 +76,7 @@ class ConditionIconCollectionsControllerTest extends TestCase
         $this->assertSame(['elio', 'sparse'], array_column($data, 'slug'));
         $this->assertSame(['Elio', 'Sparse'], array_column($data, 'label'));
         $this->assertSame(['Shipped.', ''], array_column($data, 'description'));
+        $this->assertSame([1.5, 2.0], array_column($data, 'stroke_width'), 'The stroke width the icons are drawn with, two when the collection says nothing.');
     }
 
     public function test_flags_the_collection_of_the_site(): void
@@ -99,18 +100,18 @@ class ConditionIconCollectionsControllerTest extends TestCase
         $this->assertSame(['covered' => 2, 'total' => $total], $sparse['coverage']);
     }
 
-    public function test_previews_four_conditions_with_a_hole_where_the_collection_has_no_icon(): void
+    public function test_previews_six_conditions_with_a_hole_where_the_collection_has_no_icon(): void
     {
         $this->registry->build();
 
         [$elio, $sparse] = $this->get()->get_data();
 
         $this->assertSame(
-            ['elio/clear-sky', 'elio/partly-cloudy', 'elio/moderate-rain', 'elio/moderate-snowfall'],
+            ['elio/clear-sky', 'elio/partly-cloudy', 'elio/clear-sky', 'elio/moderate-rain', 'elio/moderate-snowfall', 'elio/thunderstorm'],
             array_column($elio['preview'], 'name')
         );
         $this->assertSame(['content' => self::SUN, 'style' => 'stroke'], array_intersect_key($elio['preview'][0], ['content' => 1, 'style' => 1]));
-        $this->assertSame(['sparse/sun', 'sparse/sun', null, null], array_map(static fn(?array $icon): ?string => $icon['name'] ?? null, $sparse['preview']));
+        $this->assertSame(['sparse/sun', 'sparse/sun', 'sparse/moon', null, null, null], array_map(static fn(?array $icon): ?string => $icon['name'] ?? null, $sparse['preview']));
     }
 
     public function test_describes_its_items(): void
@@ -118,6 +119,6 @@ class ConditionIconCollectionsControllerTest extends TestCase
         $schema = (new ConditionIconCollectionsController($this->registry, $this->createMock(PluginSettings::class)))->get_item_schema();
 
         $this->assertSame('condition-icon-collection', $schema['title']);
-        $this->assertSame(['slug', 'label', 'description', 'is_default', 'coverage', 'preview'], array_keys($schema['properties']));
+        $this->assertSame(['slug', 'label', 'description', 'is_default', 'stroke_width', 'coverage', 'preview'], array_keys($schema['properties']));
     }
 }

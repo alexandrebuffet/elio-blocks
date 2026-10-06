@@ -57,7 +57,8 @@ function useSettledValue( value, delay ) {
  * The store fetches a weather forecast once per location, provider and units:
  * every block asking for it shares the request and its result. Nothing is
  * fetched here, so there is no response to lose track of when the location
- * changes.
+ * changes. While the location, provider or units change, the weather forecast
+ * received before is returned with `isLoading`, until the new one is there.
  *
  * @param {Object}        options           Query.
  * @param {number|string} options.latitude  Latitude coordinate.
@@ -91,25 +92,39 @@ export function useWeatherForecastQuery( {
 				getResolutionError,
 			} = select( elioDataStore );
 
+			const data = getWeatherForecast( ...args );
+
 			return {
-				data: getWeatherForecast( ...args ),
+				data,
 				isLoading: ! hasFinishedResolution(
 					'getWeatherForecast',
 					args
 				),
-				error:
-					getResolutionError( 'getWeatherForecast', args )?.message ??
-					null,
+				// A refresh that failed leaves the weather forecast shown, as
+				// on the front: no error over blocks still showing one, the
+				// next refresh tries again. An error says there is none.
+				error: data
+					? null
+					: ( getResolutionError( 'getWeatherForecast', args )
+							?.message ?? null ),
 			};
 		},
 		[ settledQuery ]
 	);
 
+	// The answer shown stays until the next one is there, while new coordinates
+	// settle and while their request is on its way, as ServerSideRender keeps
+	// its last render: the blocks are filled in place, never emptied between
+	// two weather forecasts.
+	const isLoading = query !== settledQuery || result.isLoading;
+	const [ shown, setShown ] = useState( NO_QUERY );
+	if ( ! isLoading && result !== shown ) {
+		setShown( result );
+	}
+
 	if ( ! hasLocation ) {
 		return NO_QUERY;
 	}
 
-	// New coordinates are settling: the previous weather forecast stays, marked
-	// as loading.
-	return query === settledQuery ? result : { ...result, isLoading: true };
+	return isLoading ? { ...shown, isLoading: true } : result;
 }

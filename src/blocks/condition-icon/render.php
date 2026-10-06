@@ -24,19 +24,23 @@
  * @var WP_Block $block      Block instance.
  */
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- render.php runs inside a function (register_block_type_from_metadata): its variables are local.
+
 // Exit if called directly.
 if (! defined('ABSPATH')) {
     die;
 }
 
 $is_decorative = (bool) ( $attributes['isDecorative'] ?? false );
-$stroke_width  = $attributes['strokeWidth'] ?? 1.5;
 
 // Collection of the icons of this block: its own, else the one of its report, else the one of the site.
 $icon_collection = elio_blocks_get_condition_icon_collection(
     isset($attributes['iconCollection']) ? (string) $attributes['iconCollection'] : null,
     isset($block->context['elio/reportIconCollection']) ? (string) $block->context['elio/reportIconCollection'] : null
 );
+
+// Stroke width of the symbol: the one of the block, else the one the icons of the collection are drawn with.
+$stroke_width = isset($attributes['strokeWidth']) ? (float) $attributes['strokeWidth'] : elio_blocks_get_condition_icon_stroke_width($icon_collection);
 
 // Icons this block shows: the one of the current conditions, or the ones of the rows of its list.
 $items = isset($block->context['elio/forecastType'])

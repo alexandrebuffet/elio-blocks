@@ -6,7 +6,10 @@
 	"title": "Precipitation Probability",
 	"category": "elio-weather",
 	"icon": "cloud",
-	"description": "Displays the probability of precipitation.",
+	"description": "Display the probability of precipitation.",
+	"example": {
+		"viewportWidth": 350
+	},
 	"ancestor": ["elio/weather-report"],
 	"usesContext": [
 		"elio/reportLocation",

@@ -1,8 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import temperatureMinus from '../../icons/components/temperature-minus';
 import temperaturePlus from '../../icons/components/temperature-plus';
-import temperatureFeelsLikeMin from '../../icons/components/temperature-feels-like-min';
-import temperatureFeelsLikeMax from '../../icons/components/temperature-feels-like-max';
+import temperatureFeelsLikeMin from '../../icons/components/temperature-feels-like-minus';
+import temperatureFeelsLikeMax from '../../icons/components/temperature-feels-like-plus';
 
 const variations = [
 	{
@@ -31,7 +31,7 @@ const variations = [
 		scope: [ 'inserter', 'transform' ],
 	},
 	{
-		name: 'elio/daily-temperature-feels-like-min',
+		name: 'elio/daily-temperature-feels-like-minus',
 		title: __( 'Feels Like Min.', 'elio-blocks' ),
 		description: __(
 			'Display the daily minimum feels like temperature.',
@@ -43,7 +43,7 @@ const variations = [
 		scope: [ 'inserter', 'transform' ],
 	},
 	{
-		name: 'elio/daily-temperature-feels-like-max',
+		name: 'elio/daily-temperature-feels-like-plus',
 		title: __( 'Feels Like Max.', 'elio-blocks' ),
 		description: __(
 			'Display the daily maximum feels like temperature.',

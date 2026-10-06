@@ -10,7 +10,7 @@ import edit from './edit';
 import save from './save';
 import variations from './variations';
 import metadata from './block.json';
-import weatherForecast from '../../icons/components/weather-forecast';
+import cloudSunItemRow from '../../icons/components/cloud-sun-item-row';
 
 /**
  * Registers the block type.
@@ -18,7 +18,7 @@ import weatherForecast from '../../icons/components/weather-forecast';
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
 registerBlockType( metadata.name, {
-	icon: weatherForecast,
+	icon: cloudSunItemRow,
 	/**
 	 * @see ./edit.js
 	 */

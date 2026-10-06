@@ -96,9 +96,24 @@ if (! class_exists('WP_Block_Type')) {
 		/**
 		 * Constructor.
 		 *
-		 * @param array<string, mixed> $supports
+		 * @param array<string, mixed>       $supports
+		 * @param list<array<string, mixed>> $variations
+		 * @param array<string, mixed>       $attributes
 		 */
-		public function __construct(public string $name = '', public array $supports = []) {}
+		public function __construct(
+			public string $name = '',
+			public array $supports = [],
+			public array $variations = [],
+			public ?array $attributes = null,
+		) {}
+
+		/**
+		 * @return list<array<string, mixed>>
+		 */
+		public function get_variations(): array
+		{
+			return $this->variations;
+		}
 	}
 }
 

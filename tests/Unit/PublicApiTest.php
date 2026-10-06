@@ -30,7 +30,8 @@ class PublicApiTest extends TestCase
 {
     private const WEATHER_FORECAST = [
         'current' => ['temperature' => 20.0, 'condition_icons' => ['elio' => 'elio/sun']],
-        'daily'   => [['timestamp' => '2026-07-01T00:00:00+02:00'], ['timestamp' => '2026-07-02T00:00:00+02:00']],
+        // Days ahead whenever the test runs: a list skips the days that have ended.
+        'daily'   => [['timestamp' => '2099-07-01T00:00:00+02:00'], ['timestamp' => '2099-07-02T00:00:00+02:00']],
         'icons'   => ['elio/sun' => ['content' => '<svg></svg>', 'style' => 'fill']],
     ];
 
@@ -75,8 +76,10 @@ class PublicApiTest extends TestCase
                 'elio_blocks_add_icon_to_sprite',
                 'elio_blocks_get_condition_icon',
                 'elio_blocks_get_condition_icon_collection',
+                'elio_blocks_get_condition_icon_stroke_width',
                 'elio_blocks_get_current_conditions',
                 'elio_blocks_get_forecast_items',
+                'elio_blocks_get_weather_forecast_attribution',
                 'elio_blocks_get_weather_report_interactivity_context',
                 'elio_blocks_get_weather_report_interactivity_state',
                 'elio_blocks_register_condition_icon',
@@ -248,6 +251,33 @@ class PublicApiTest extends TestCase
 
         $this->assertSame('theme', elio_blocks_get_condition_icon_collection(null, 'theme'));
         $this->assertSame('elio', elio_blocks_get_condition_icon_collection('uninstalled', null));
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function test_a_report_credits_its_provider_else_the_site_default_one_as_its_license_asks(): void
+    {
+        require_once dirname(__DIR__, 2) . '/functions.php';
+        Functions\stubTranslationFunctions();
+        Functions\when('get_option')->alias(static fn(string $name, mixed $default = false): mixed => $default);
+
+        $container = Plugin::instance()->container();
+        // What the plugin does on 'init', priorities 15 and 20.
+        $container->get(RegisterProviders::class)->registerBuiltInProviders();
+        $container->get(RegisterWeatherForecastProviders::class)->registerBuiltInProviders();
+        $container->get(ProviderRegistry::class)->register('silent', ['label' => 'Silent']);
+        $container->get(WeatherForecastProviderRegistry::class)->register('silent', new StubWeatherForecastProvider());
+
+        $openMeteo = [
+            'name'        => 'Open-Meteo',
+            'url'         => 'https://open-meteo.com/',
+            'license'     => 'CC BY 4.0',
+            'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
+        ];
+        $this->assertSame($openMeteo, elio_blocks_get_weather_forecast_attribution('open-meteo'));
+        $this->assertSame($openMeteo, elio_blocks_get_weather_forecast_attribution(''), 'Open-Meteo is the default provider.');
+        $this->assertNull(elio_blocks_get_weather_forecast_attribution('silent'), 'It asks for no credit.');
+        $this->assertNull(elio_blocks_get_weather_forecast_attribution('uninstalled'));
     }
 
     /** Leaves the settings at their defaults. */

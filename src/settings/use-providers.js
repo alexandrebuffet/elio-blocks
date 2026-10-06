@@ -2,65 +2,73 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import { useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 
 /**
- * Loads a list of providers, and says so when it could not.
+ * Internal dependencies
+ */
+import { store as elioDataStore } from '../stores/elio-data';
+
+const NO_PROVIDERS = [];
+
+/**
+ * Returns a list of providers from the elio/data store, which fetches it once,
+ * and says so when it could not be loaded.
  *
- * @param {string}                                    path           REST path of the list.
+ * @param {string}                                    selectorName   Selector of the list, which has a resolver.
  * @param {(status: string, message: string) => void} addNotice      Shows a notice.
  * @param {string}                                    failureMessage Notice when the request fails without a message.
- * @param {number}                                    version        Loads the list again when it changes.
  * @return {Object[]} The providers, empty until they are loaded.
  */
-function useProviderList( path, addNotice, failureMessage, version = 0 ) {
-	const [ providers, setProviders ] = useState( [] );
+function useProviderList( selectorName, addNotice, failureMessage ) {
+	const { providers, error } = useSelect(
+		( select ) => {
+			const store = select( elioDataStore );
+
+			return {
+				providers: store[ selectorName ]() ?? NO_PROVIDERS,
+				error: store.getResolutionError( selectorName ),
+			};
+		},
+		[ selectorName ]
+	);
 
 	useEffect( () => {
-		const controller = new AbortController();
-
-		apiFetch( { path, signal: controller.signal } )
-			.then( setProviders )
-			.catch( ( error ) => {
-				if ( ! controller.signal.aborted ) {
-					addNotice( 'error', error?.message || failureMessage );
-				}
-			} );
-
-		return () => controller.abort();
-	}, [ path, addNotice, failureMessage, version ] );
+		if ( error ) {
+			addNotice( 'error', error.message || failureMessage );
+		}
+	}, [ error, addNotice, failureMessage ] );
 
 	return providers;
 }
 
 /**
- * Loads every provider, whatever it serves, with the credentials it declares:
- * the settings page draws their fields.
+ * Returns every provider, whatever it serves, with the credentials it
+ * declares: the settings page draws their fields. Once credentials are saved,
+ * invalidateResolution( 'getProviders' ) loads them again.
  *
  * @param {(status: string, message: string) => void} addNotice Shows a notice.
- * @param {number}                                    version   Loads them again when it changes (once credentials are saved).
  * @return {Object[]} Providers: slug, label, credentials.
  */
-export function useProviders( addNotice, version = 0 ) {
+export function useProviders( addNotice ) {
 	return useProviderList(
-		'/elio/v1/providers',
+		'getProviders',
 		addNotice,
-		__( 'Failed to load providers.', 'elio-blocks' ),
-		version
+		__( 'Failed to load providers.', 'elio-blocks' )
 	);
 }
 
 /**
- * Loads the providers that serve the weather forecast, for the select of the
- * default one.
+ * Returns the providers that serve the weather forecast, for the select of the
+ * default one: the same list as the Provider select of the report block.
  *
  * @param {(status: string, message: string) => void} addNotice Shows a notice.
  * @return {Object[]} Providers: slug, label, isDefault.
  */
 export function useWeatherForecastProviders( addNotice ) {
 	return useProviderList(
-		'/elio/v1/weather-forecast/providers',
+		'getWeatherForecastProviders',
 		addNotice,
 		__( 'Failed to load weather forecast providers.', 'elio-blocks' )
 	);

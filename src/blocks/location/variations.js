@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import mapPin from '../../icons/components/map-pin';
-import geolocate from '../../icons/components/geolocate';
+import geolocation from '../../icons/components/geolocation';
 
 const variations = [
 	{
@@ -20,7 +20,7 @@ const variations = [
 		name: 'elio/location-coordinates',
 		title: __( 'Location Coordinates', 'elio-blocks' ),
 		description: __( 'Display the location coordinates.', 'elio-blocks' ),
-		icon: geolocate,
+		icon: geolocation,
 		attributes: { displayType: 'coordinates' },
 		isActive: [ 'displayType' ],
 		scope: [ 'inserter', 'transform' ],

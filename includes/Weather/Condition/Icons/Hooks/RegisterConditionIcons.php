@@ -11,14 +11,15 @@ if (! defined('ABSPATH')) {
 }
 
 /**
- * Registers the plugin's own icon collection on init (priority 20) and locks
+ * Registers the plugin's own icon collections on init (priority 20) and locks
  * the registry (priority 26), once elio_blocks_init (priority 25) has let
  * third parties register theirs with elio_blocks_register_condition_icon_collection()
  * and elio_blocks_register_condition_icon() (see functions.php).
  *
- * The "elio" collection comes from the manifest the build writes next to the
- * icons (scripts/build-weather-condition-icons.mjs): each icon is registered
- * by file path and read the first time it is served.
+ * The collection comes from the manifest the build writes next to the icons
+ * (scripts/build-icons.mjs): "elio", the icons drawn for the plugin, those its
+ * condition mappings name. Each icon is registered by file path and read the
+ * first time it is served.
  */
 class RegisterConditionIcons implements HookInterface
 {
@@ -26,7 +27,7 @@ class RegisterConditionIcons implements HookInterface
      * Constructor.
      *
      * @param ConditionIconsRegistry $registry  The icon registry.
-     * @param string                 $iconsPath Absolute path of the built icons directory.
+     * @param string                 $iconsPath Absolute path of the built icons directory, one folder per collection.
      */
     public function __construct(
         private ConditionIconsRegistry $registry,
@@ -44,49 +45,59 @@ class RegisterConditionIcons implements HookInterface
     }
 
     /**
-     * Registers the "elio" collection and its icons from the manifest.
+     * Registers the plugin's collections and their icons from the manifest.
      */
     public function registerDefaultCollection(): void
     {
         $manifest = $this->manifest();
 
-        if (empty($manifest['icons']) || ! is_array($manifest['icons'])) {
+        if (empty($manifest['collections']) || ! is_array($manifest['collections'])) {
             return;
-        }
-
-        $this->registry->registerCollection(
-            ConditionIconsRegistry::DEFAULT_COLLECTION,
-            array(
-                'label'       => __('Elio', 'elio-blocks'),
-                'description' => __('The icons of the Elio Blocks plugin.', 'elio-blocks'),
-            )
-        );
-
-        // The manifest maps conditions to icons; an icon is registered with the conditions it represents.
-        $conditions = array();
-
-        foreach ($manifest['conditionMappings'] ?? array() as $mapping) {
-            if (isset($mapping['condition'], $mapping['dayOrNight'], $mapping['iconSlug'])) {
-                $conditions[ $mapping['iconSlug'] ][] = array( $mapping['condition'], $mapping['dayOrNight'] );
-            }
         }
 
         $directory = rtrim($this->iconsPath, '/\\');
 
-        foreach ($manifest['icons'] as $slug => $entry) {
-            if (! is_array($entry) || ! isset($entry['filePath'])) {
+        foreach ($manifest['collections'] as $slug => $collection) {
+            if (! is_string($slug) || ! is_array($collection) || empty($collection['icons']) || ! is_array($collection['icons'])) {
                 continue;
             }
 
-            $this->registry->registerIcon(
-                ConditionIconsRegistry::DEFAULT_COLLECTION . '/' . $slug,
-                array(
-                    'label'      => (string) ( $entry['label'] ?? '' ),
-                    'file_path'  => $directory . '/' . $entry['filePath'],
-                    'style'      => $entry['style'] ?? 'fill',
-                    'conditions' => $conditions[ $slug ] ?? array(),
-                )
+            $args = array(
+                'label'       => (string) ( $collection['label'] ?? $slug ),
+                'description' => (string) ( $collection['description'] ?? '' ),
             );
+
+            // The stroke width the icons are drawn with, what the condition icon block applies by default.
+            if (isset($collection['strokeWidth']) && is_numeric($collection['strokeWidth'])) {
+                $args['stroke_width'] = (float) $collection['strokeWidth'];
+            }
+
+            $this->registry->registerCollection($slug, $args);
+
+            // The manifest maps conditions to icons; an icon is registered with the conditions it represents.
+            $conditions = array();
+
+            foreach ($collection['conditionMappings'] ?? array() as $mapping) {
+                if (isset($mapping['condition'], $mapping['dayOrNight'], $mapping['iconSlug'])) {
+                    $conditions[ $mapping['iconSlug'] ][] = array( $mapping['condition'], $mapping['dayOrNight'] );
+                }
+            }
+
+            foreach ($collection['icons'] as $iconSlug => $entry) {
+                if (! is_array($entry) || ! isset($entry['filePath'])) {
+                    continue;
+                }
+
+                $this->registry->registerIcon(
+                    $slug . '/' . $iconSlug,
+                    array(
+                        'label'      => (string) ( $entry['label'] ?? '' ),
+                        'file_path'  => $directory . '/' . $slug . '/' . $entry['filePath'],
+                        'style'      => $entry['style'] ?? 'fill',
+                        'conditions' => $conditions[ $iconSlug ] ?? array(),
+                    )
+                );
+            }
         }
     }
 

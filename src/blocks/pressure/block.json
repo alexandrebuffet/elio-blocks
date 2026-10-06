@@ -6,7 +6,10 @@
 	"title": "Pressure",
 	"category": "elio-weather",
 	"icon": "chart-bar",
-	"description": "Displays the atmospheric pressure.",
+	"description": "Display the atmospheric pressure.",
+	"example": {
+		"viewportWidth": 350
+	},
 	"ancestor": [ "elio/weather-report" ],
 	"attributes": {
 		"showPrefix": {
