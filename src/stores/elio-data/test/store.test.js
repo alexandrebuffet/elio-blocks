@@ -258,6 +258,46 @@ describe( 'elio/data store: weather forecast refresh', () => {
 		).toBe( 21 );
 	} );
 
+	it( 'gives up a request that never settles, and asks again at the interval of the site', async () => {
+		const timeout = new AbortController();
+		vi.spyOn( AbortSignal, 'timeout' ).mockReturnValueOnce(
+			timeout.signal
+		);
+		let hangs = true;
+		apiFetch.mockImplementation( ( { path, signal } ) => {
+			if ( path.startsWith( '/elio/v1/condition-icon-collections' ) ) {
+				return Promise.resolve( COLLECTIONS );
+			}
+			if ( hangs ) {
+				// Sent as the computer went to sleep: no answer, ever.
+				hangs = false;
+				return new Promise( ( settle, reject ) =>
+					signal?.addEventListener( 'abort', () =>
+						reject( { code: 'fetch_error', message: 'Timed out.' } )
+					)
+				);
+			}
+			return Promise.resolve( { current: { temperature: 21 } } );
+		} );
+		const registry = makeRegistry();
+
+		const resolved = registry
+			.resolveSelect( store )
+			.getWeatherForecast( ...PARIS );
+		await vi.advanceTimersByTimeAsync( 10 );
+		timeout.abort();
+		await resolved.catch( () => {} );
+
+		await vi.advanceTimersByTimeAsync( 15 * MINUTE );
+		await resolve( registry );
+
+		expect( forecastCalls() ).toHaveLength( 2 );
+		expect(
+			registry.select( store ).getWeatherForecast( ...PARIS ).current
+				.temperature
+		).toBe( 21 );
+	} );
+
 	it( 'keeps the weather forecast while auto-refresh is off', async () => {
 		window.elioBlocksRefreshSettings.refreshInterval = 0;
 		respondWith( { current: { temperature: 12 } } );

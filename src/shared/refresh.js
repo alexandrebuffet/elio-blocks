@@ -27,6 +27,13 @@ const REFRESH_SPREAD = 30000;
 const LONGEST_WAIT = 60000;
 
 /**
+ * Time after which a request is given up: one that never settles (sent as the
+ * computer went to sleep) would keep its block waiting, query.isLoading on the
+ * front, the resolution in the editor, and no refresh would follow.
+ */
+const REQUEST_TIMEOUT = 30000;
+
+/**
  * Returns when the server will have newer data than the weather forecast held:
  * it keeps a weather forecast for the cache duration (dataTtl) after asking
  * the provider (meta.fetched_at). Until then, a request returns the same one.
@@ -73,6 +80,20 @@ export function getRefreshTime(
 	return dataTtl > 0 && expiresAt > Date.now()
 		? expiresAt + Math.random() * REFRESH_SPREAD
 		: requestedAt + refreshInterval;
+}
+
+/**
+ * Returns the signal that gives up a request after REQUEST_TIMEOUT, for
+ * fetch() on the front and apiFetch() in the editor.
+ *
+ * None where the browser has no AbortSignal.timeout(): Chrome 89 to 102 run
+ * the script modules without it. The request then has no time limit, rather
+ * than failing.
+ *
+ * @return {AbortSignal|undefined} Signal of the request.
+ */
+export function getRequestTimeoutSignal() {
+	return AbortSignal.timeout?.( REQUEST_TIMEOUT );
 }
 
 /**

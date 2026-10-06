@@ -6,7 +6,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 /**
  * Internal dependencies
  */
-import { getRefreshTime, setTimeoutAt } from '../refresh';
+import {
+	getRefreshTime,
+	getRequestTimeoutSignal,
+	setTimeoutAt,
+} from '../refresh';
 
 const MINUTE = 60000;
 const at = ( iso ) => Date.parse( iso );
@@ -58,6 +62,30 @@ describe( 'setTimeoutAt', () => {
 
 		expect( callback ).not.toHaveBeenCalled();
 		expect( vi.getTimerCount() ).toBe( 0 );
+	} );
+} );
+
+describe( 'getRequestTimeoutSignal', () => {
+	afterEach( () => {
+		vi.restoreAllMocks();
+	} );
+
+	it( 'gives up a request after 30 seconds', () => {
+		const timeout = vi.spyOn( AbortSignal, 'timeout' );
+
+		expect( getRequestTimeoutSignal() ).toBeInstanceOf( AbortSignal );
+		expect( timeout ).toHaveBeenCalledWith( 30000 );
+	} );
+
+	it( 'gives no signal where the browser has no AbortSignal.timeout(), rather than failing', () => {
+		const { timeout } = AbortSignal;
+		AbortSignal.timeout = undefined;
+
+		try {
+			expect( getRequestTimeoutSignal() ).toBeUndefined();
+		} finally {
+			AbortSignal.timeout = timeout;
+		}
 	} );
 } );
 

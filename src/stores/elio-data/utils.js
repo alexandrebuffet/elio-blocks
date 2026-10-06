@@ -11,3 +11,14 @@
 export function getWeatherForecastKey( latitude, longitude, provider, units ) {
 	return [ latitude, longitude, provider || '', units || '' ].join( '|' );
 }
+
+/**
+ * Returns the refresh settings of the front, which the server prints for the
+ * editor (EnqueueBlockEditorAssets): none outside the editor, where nothing is
+ * asked again.
+ *
+ * @return {{ dataTtl?: number, refreshInterval?: number }} Settings, in ms.
+ */
+export function getRefreshSettings() {
+	return window.elioBlocksRefreshSettings ?? {};
+}

@@ -7,8 +7,12 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { getWeatherForecastKey } from './utils';
-import { getRefreshTime, setTimeoutAt } from '../../shared/refresh';
+import { getRefreshSettings, getWeatherForecastKey } from './utils';
+import {
+	getRefreshTime,
+	getRequestTimeoutSignal,
+	setTimeoutAt,
+} from '../../shared/refresh';
 
 /**
  * Fetches the registered condition icon collections, for the pickers and for
@@ -68,6 +72,9 @@ export const getWeatherForecast =
 						( c ) => c.slug
 					),
 				} ),
+				// Given up after a while: a resolution that never settles is
+				// never started again, and nothing would refresh it.
+				signal: getRequestTimeoutSignal(),
 			} );
 
 			dispatch.receiveWeatherForecast(
@@ -75,13 +82,13 @@ export const getWeatherForecast =
 				weatherForecast
 			);
 		} finally {
-			// Asked again when the front asks again (window.elioBlocksRefreshSettings,
-			// the settings the front gets): the blocks still showing it resolve
-			// it again, keeping the one they have meanwhile.
+			// Asked again when the front asks again (getRefreshSettings(), the
+			// settings the front gets): the blocks still showing it resolve it
+			// again, keeping the one they have meanwhile.
 			const refreshAt = getRefreshTime(
 				weatherForecast,
 				requestedAt,
-				window.elioBlocksRefreshSettings
+				getRefreshSettings()
 			);
 
 			if ( refreshAt !== null ) {
