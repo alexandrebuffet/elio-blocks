@@ -16,26 +16,21 @@ import {
 	selectForecastItems,
 } from '../../shared/forecast-window';
 import { defineIcons } from '../../shared/icon-sprite';
+import {
+	getExpiresAt,
+	getRefreshTime,
+	setTimeoutAt,
+} from '../../shared/refresh';
 import { getNextQuarterHour } from '../../shared/weather-dates';
 
 const FALLBACK_ERROR = 'Failed to fetch weather data.';
 
 /**
- * Time past the expiry of the server copy before it counts as expired: the
- * server stamps meta.fetched_at to the second and WordPress keeps a transient
- * through the second it expires; the clocks of the browser and the server may
- * differ a little too.
+ * Time after which a request is given up: one that never settles (sent as the
+ * computer went to sleep) would keep query.isLoading, and every next request
+ * of the block would wait for it.
  */
-const EXPIRY_MARGIN = 5000;
-
-/**
- * Time over which the pages open on a location spread their refreshes past the
- * expiry of the server copy: the first request asks the provider and refills
- * the cache, the next ones read it. Without it, every page would ask at once,
- * before the cache holds the new weather forecast, and each request would reach
- * the provider.
- */
-const REFRESH_SPREAD = 30000;
+const REQUEST_TIMEOUT = 30000;
 
 /**
  * How often relative dates ("5 minutes ago") are brought up to date.
@@ -52,7 +47,7 @@ const relativeDateClock = { blocks: 0, timer: 0 };
  * The one timer of the page that brings state.now up to date at each quarter
  * hour, and the number of blocks that keep it running.
  */
-const quarterHourClock = { blocks: 0, timer: 0 };
+const quarterHourClock = { blocks: 0, cancel: () => {} };
 
 /**
  * Checks whether a coordinate is usable. 0 is valid (equator, prime meridian).
@@ -70,28 +65,13 @@ function isCoordinate( value ) {
 }
 
 /**
- * Returns when the server will have newer data than the block holds: it keeps
- * a weather forecast for the cache duration (dataTtl) after asking the
- * provider (meta.fetched_at). Until then, a request returns the same weather forecast.
- *
- * @param {Object} query Query state from context.
- * @return {number} Milliseconds since the epoch, 0 when unknown.
- */
-function getExpiresAt( query ) {
-	const { dataTtl = 0 } = getServerState();
-	const fetchedAt = Date.parse( query?.data?.meta?.fetched_at ?? '' );
-
-	return Number.isNaN( fetchedAt ) ? 0 : fetchedAt + dataTtl + EXPIRY_MARGIN;
-}
-
-/**
  * Checks whether a request would return the weather forecast the block already holds.
  *
  * @param {Object} query Query state from context.
  * @return {boolean} True until the copy kept by the server expires.
  */
 function isFresh( query ) {
-	return Date.now() < getExpiresAt( query );
+	return Date.now() < getExpiresAt( query?.data, getServerState().dataTtl );
 }
 
 const { state, actions } = store( 'elio/weather-report', {
@@ -173,17 +153,9 @@ const { state, actions } = store( 'elio/weather-report', {
 	callbacks: {
 		/**
 		 * Schedules the next refresh of the block (data-wp-watch on the
-		 * block wrapper).
-		 *
-		 * While the server keeps a copy of the weather forecast, the block
-		 * refreshes when that copy expires: before, the server would send the
-		 * same weather forecast again; after, the block would show old data for
-		 * nothing. The pages open on a location spread their requests over the
-		 * next seconds (REFRESH_SPREAD).
-		 *
-		 * Without a copy ahead (cache off, or a refresh that brought no newer
-		 * data, e.g. a failed request), the block waits for the interval set
-		 * by the site, counted from its last request.
+		 * block wrapper), at the time getRefreshTime() gives: when the server
+		 * copy expires, else the interval set by the site after the last
+		 * request.
 		 *
 		 * One timer per run: the callback reads query.requestedAt and the
 		 * weather forecast, which every request changes, so the runtime cleans
@@ -200,30 +172,23 @@ const { state, actions } = store( 'elio/weather-report', {
 		 * @return {(() => void)|undefined} Cleanup, when a timer was started.
 		 */
 		startAutoRefresh() {
-			const { dataTtl = 0, refreshInterval = 0 } = getServerState();
 			const { ref } = getElement();
+			const { query } = getContext();
+			const refreshAt = getRefreshTime(
+				query?.data,
+				query?.requestedAt ?? 0,
+				getServerState()
+			);
 
-			if ( ! ( refreshInterval > 0 ) || ! ref ) {
+			if ( refreshAt === null || ! ref ) {
 				return undefined;
 			}
 
-			const { query } = getContext();
-			const expiresAt = getExpiresAt( query );
-			const refreshAt =
-				dataTtl > 0 && expiresAt > Date.now()
-					? expiresAt + Math.random() * REFRESH_SPREAD
-					: ( query?.requestedAt ?? 0 ) + refreshInterval;
-
-			const timeoutId = setTimeout(
-				() => {
-					ref.dispatchEvent(
-						new CustomEvent( 'weather-refresh', { bubbles: false } )
-					);
-				},
-				Math.max( 0, refreshAt - Date.now() )
-			);
-
-			return () => clearTimeout( timeoutId );
+			return setTimeoutAt( () => {
+				ref.dispatchEvent(
+					new CustomEvent( 'weather-refresh', { bubbles: false } )
+				);
+			}, refreshAt );
 		},
 		/**
 		 * Keeps state.now current while a date block shows a relative date
@@ -266,9 +231,9 @@ const { state, actions } = store( 'elio/weather-report', {
 					const now = Date.now();
 
 					state.now = now;
-					quarterHourClock.timer = setTimeout(
+					quarterHourClock.cancel = setTimeoutAt(
 						tick,
-						getNextQuarterHour( now ) - now
+						getNextQuarterHour( now )
 					);
 				};
 
@@ -279,7 +244,7 @@ const { state, actions } = store( 'elio/weather-report', {
 
 			return () => {
 				if ( --quarterHourClock.blocks === 0 ) {
-					clearTimeout( quarterHourClock.timer );
+					quarterHourClock.cancel();
 				}
 			};
 		},
@@ -368,7 +333,9 @@ const { state, actions } = store( 'elio/weather-report', {
 			context.query.error = '';
 
 			try {
-				const response = yield fetch( url );
+				const response = yield fetch( url, {
+					signal: AbortSignal.timeout( REQUEST_TIMEOUT ),
+				} );
 
 				if ( ! response.ok ) {
 					let message = '';

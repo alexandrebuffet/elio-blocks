@@ -42,6 +42,17 @@ describe( 'useNow', () => {
 		expect( vi.getTimerCount() ).toBe( 0 );
 	} );
 
+	it( 'catches up within a minute of the computer waking up, however long it slept', () => {
+		const { result, unmount } = renderHook( createRegistry(), useNow );
+
+		// Asleep all night: the clock moves on, the timers do not.
+		act( () => vi.setSystemTime( new Date( '2026-09-22T08:30:00Z' ) ) );
+		act( () => vi.advanceTimersByTime( MINUTE ) );
+
+		expect( result.current ).toBe( Date.parse( '2026-09-22T08:31:00Z' ) );
+		unmount();
+	} );
+
 	it( 'moves a block rendered later in the same quarter hour at the same time', () => {
 		const first = renderHook( createRegistry(), useNow );
 		act( () => vi.advanceTimersByTime( 4 * MINUTE ) );

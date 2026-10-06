@@ -95,6 +95,34 @@ describe( 'weather-report view: fetch', () => {
 		setElement( { ref: document.createElement( 'section' ) } );
 	} );
 
+	it( 'gives up a request that never settles, so the next ones of the block are not held up', async () => {
+		// A request sent as the computer went to sleep may never settle.
+		const timeout = new AbortController();
+		const timeoutSpy = vi
+			.spyOn( AbortSignal, 'timeout' )
+			.mockReturnValue( timeout.signal );
+		global.fetch = vi.fn(
+			( url, { signal } ) =>
+				new Promise( ( resolve, reject ) =>
+					signal.addEventListener( 'abort', () =>
+						reject( signal.reason )
+					)
+				)
+		);
+		const context = makeContext();
+		setContext( context );
+
+		const request = runAction( store().actions.fetch() );
+		expect( context.query.isLoading ).toBe( true );
+
+		timeout.abort( new Error( 'The operation timed out.' ) );
+		await request;
+
+		expect( timeoutSpy ).toHaveBeenCalledWith( 30000 );
+		expect( context.query.isLoading ).toBe( false );
+		timeoutSpy.mockRestore();
+	} );
+
 	it( 'refreshes the current item that leaf blocks read, not only query.data', async () => {
 		const context = makeContext();
 		setContext( context );
@@ -403,6 +431,19 @@ describe( 'weather-report view: quarter-hour clock', () => {
 		expect( vi.getTimerCount() ).toBe( 0 );
 	} );
 
+	it( 'catches up within a minute of the computer waking up, however long it slept', () => {
+		const stop = start();
+
+		// Asleep all night: the clock moves on, the timers do not.
+		vi.setSystemTime( new Date( '2026-09-22T08:30:00Z' ) );
+		vi.advanceTimersByTime( MINUTE );
+
+		expect( store().state.now ).toBe(
+			Date.parse( '2026-09-22T08:31:00Z' )
+		);
+		stop();
+	} );
+
 	it( 'reaches the start of an hour at a half-hour offset too (Kolkata, UTC+05:30)', () => {
 		vi.setSystemTime( new Date( '2026-07-01T13:50:00+05:30' ) );
 		const stop = start();
@@ -621,6 +662,21 @@ describe( 'weather-report view: auto-refresh', () => {
 		expect( refreshes ).toBe( 0 );
 
 		vi.advanceTimersByTime( 1 );
+		expect( refreshes ).toBe( 1 );
+	} );
+
+	it( 'refreshes within a minute of the computer waking up, however long it slept', () => {
+		setServerState( {
+			refreshInterval: 15 * MINUTE,
+			dataTtl: 30 * MINUTE,
+		} );
+		setContext( contextWith( { age: 10 * MINUTE } ) );
+
+		start();
+		// Asleep all night: the clock moves on, the timers do not.
+		vi.setSystemTime( new Date( '2026-09-22T08:30:00Z' ) );
+		vi.advanceTimersByTime( MINUTE );
+
 		expect( refreshes ).toBe( 1 );
 	} );
 
