@@ -6,6 +6,7 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { setTimeoutAt } from '../../shared/refresh';
 import { getNextQuarterHour } from '../../shared/weather-dates';
 
 /**
@@ -22,14 +23,14 @@ import { getNextQuarterHour } from '../../shared/weather-dates';
 export function useNow() {
 	const [ now, setNow ] = useState( Date.now );
 
-	useEffect( () => {
-		const timeoutId = setTimeout(
-			() => setNow( Date.now() ),
-			getNextQuarterHour( now ) - Date.now()
-		);
-
-		return () => clearTimeout( timeoutId );
-	}, [ now ] );
+	useEffect(
+		() =>
+			setTimeoutAt(
+				() => setNow( Date.now() ),
+				getNextQuarterHour( now )
+			),
+		[ now ]
+	);
 
 	return now;
 }
