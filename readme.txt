@@ -4,7 +4,7 @@ Tags: weather, forecast, block-editor, blocks, location
 Requires at least: 6.7
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -131,6 +131,13 @@ The icons of the plugin were drawn for it. The layout illustrations of the Weath
 5. The General section of the settings page: units and data refresh.
 
 == Changelog ==
+
+= 0.3.0 =
+
+-   The weather of an open page stays current after the computer sleeps, and a hidden page asks for nothing until it is shown again.
+-   The Block Editor refreshes the weather forecast when the front end does, and keeps it shown when a refresh fails.
+-   A new logo for Elio: a sun of twelve rays.
+-   The description links the source code of the plugin and explains how to build it.
 
 = 0.2.0 =
 
