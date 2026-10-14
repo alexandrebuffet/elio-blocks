@@ -118,6 +118,41 @@ describe( 'datetime view', () => {
 		expect( state().formattedDateTime ).toBe( 'Today' );
 	} );
 
+	it( 'reads the days of the location on the clock of the server, whatever the timezone database of the browser says', () => {
+		// Marrakech, Wednesday 7 October 2026 at 22:30: the server (PHP,
+		// tzdata 2025b) and Open-Meteo put Africa/Casablanca at +01:00, the
+		// browser (ICU, tzdata 2026c) at +00:00, where each of these days
+		// starts at 23:00 the day before: "mardi, Today, jeudi".
+		vi.useFakeTimers().setSystemTime( new Date( '2026-10-07T21:30:00Z' ) );
+		const meta = {
+			timezone: 'Africa/Casablanca',
+			timezone_transitions: [
+				{ from: 1791327600, offset: 3600, abbr: '+01' },
+			],
+		};
+		const day = ( timestamp ) => {
+			setContext(
+				makeContext( {
+					displayType: 'date',
+					format: 'l',
+					currentAsLabel: true,
+					item: { timestamp },
+					query: { data: { meta } },
+				} )
+			);
+
+			return state().formattedDateTime;
+		};
+
+		expect(
+			[
+				'2026-10-07T00:00:00+01:00',
+				'2026-10-08T00:00:00+01:00',
+				'2026-10-09T00:00:00+01:00',
+			].map( day )
+		).toEqual( [ 'Today', 'jeudi', 'vendredi' ] );
+	} );
+
 	it( 'labels the row of the current hour "Now"', () => {
 		vi.useFakeTimers().setSystemTime(
 			new Date( '2026-07-02T00:30:00+09:00' )
@@ -149,8 +184,12 @@ describe( 'datetime view', () => {
 						meta: {
 							timezone: 'Asia/Tokyo',
 							// Intl knows "GMT+9" only.
-							timezone_abbreviations: [
-								{ from: 1782831600, abbr: 'JST' },
+							timezone_transitions: [
+								{
+									from: 1782831600,
+									offset: 32400,
+									abbr: 'JST',
+								},
 							],
 						},
 					},

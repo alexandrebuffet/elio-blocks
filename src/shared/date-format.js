@@ -7,15 +7,19 @@
  * of WP_Locale, passed by the server, so the page does not change once scripts
  * run. Month names are declined like wp_maybe_decline_date() does.
  *
- * What the browser cannot know comes from the server too: the names PHP gives
- * a timezone (`T`: "CEST" where Intl says "GMT+2"), read in its timezone
- * database for the period of a weather forecast.
+ * What the browser cannot know comes from the server too: the UTC offsets and
+ * the names PHP gives a timezone (`T`: "CEST" where Intl says "GMT+2"), read in
+ * its timezone database for the period of a weather forecast. The offsets of
+ * the timestamps come from that database, and the one of the browser may be
+ * older or newer: tzdata 2026c moves Africa/Casablanca from +01:00 to +00:00
+ * in October 2026, PHP 8.4 still has it at +01:00, and every day of a weather
+ * forecast would start at 23:00 the day before.
  *
  * @typedef {Object} DateSettings
- * @property {Object} [l10n]          Names: months, monthsShort, weekdays, weekdaysShort, meridiem {am, pm, AM, PM}; declension: locale, declineMonths, monthsGenitive.
- * @property {Object} [formats]       Site formats: date, time.
- * @property {Object} [timezone]      Site timezone: string (IANA name, may be empty), offset (hours).
- * @property {Object} [abbreviations] Names of timezones (`T`), by IANA name: [{from, abbr}], each in force from a Unix time on.
+ * @property {Object} [l10n]        Names: months, monthsShort, weekdays, weekdaysShort, meridiem {am, pm, AM, PM}; declension: locale, declineMonths, monthsGenitive.
+ * @property {Object} [formats]     Site formats: date, time.
+ * @property {Object} [timezone]    Site timezone: string (IANA name, may be empty), offset (hours).
+ * @property {Object} [transitions] UTC offsets (seconds) and names (`T`) of timezones, by IANA name: [{from, offset, abbr}], each in force from a Unix time on.
  */
 
 const ENGLISH = {
@@ -216,12 +220,12 @@ function offsetAt( ms, formatter ) {
 /**
  * Resolves where to read the wall clock: a named timezone, or a fixed UTC offset.
  *
- * @param {string|undefined} timezone      Timezone asked for.
- * @param {Object}           site          Site timezone settings.
- * @param {Object}           abbreviations Names PHP gives timezones, by IANA name.
- * @return {{name: string, formatter: Intl.DateTimeFormat|null, offset: number, abbreviations: Array}} Zone.
+ * @param {string|undefined} timezone    Timezone asked for.
+ * @param {Object}           site        Site timezone settings.
+ * @param {Object}           transitions UTC offsets and names PHP gives timezones, by IANA name.
+ * @return {{name: string, formatter: Intl.DateTimeFormat|null, offset: number, transitions: Array}} Zone.
  */
-function resolveZone( timezone, site = {}, abbreviations = {} ) {
+function resolveZone( timezone, site = {}, transitions = {} ) {
 	for ( const name of [ timezone, site.string ] ) {
 		const formatter = name ? getFormatter( name ) : null;
 		if ( formatter ) {
@@ -229,7 +233,7 @@ function resolveZone( timezone, site = {}, abbreviations = {} ) {
 				name,
 				formatter,
 				offset: 0,
-				abbreviations: abbreviations[ name ] ?? [],
+				transitions: transitions[ name ] ?? [],
 			};
 		}
 	}
@@ -240,7 +244,7 @@ function resolveZone( timezone, site = {}, abbreviations = {} ) {
 		name: offset ? formatOffset( offset, ':' ) : 'UTC',
 		formatter: null,
 		offset,
-		abbreviations: [],
+		transitions: [],
 	};
 }
 
@@ -277,6 +281,35 @@ function toMilliseconds( value ) {
 }
 
 /**
+ * Returns the transition of a zone in force at a given time, as the server
+ * read it: undefined outside the weather forecast period.
+ *
+ * @param {number} ms   Milliseconds since the epoch.
+ * @param {Object} zone Zone from resolveZone().
+ * @return {{from: number, offset: number, abbr: string}|undefined} Transition.
+ */
+function serverTransition( ms, zone ) {
+	return zone.transitions.findLast( ( { from } ) => from * 1000 <= ms );
+}
+
+/**
+ * Returns the UTC offset of a zone at a given time: the one the server gave
+ * the timestamps, the one Intl knows outside the weather forecast period.
+ *
+ * @param {number} ms   Milliseconds since the epoch.
+ * @param {Object} zone Zone from resolveZone().
+ * @return {number} Offset in minutes.
+ */
+function zoneOffset( ms, zone ) {
+	if ( ! zone.formatter ) {
+		return zone.offset;
+	}
+	const known = serverTransition( ms, zone );
+
+	return known ? known.offset / 60 : offsetAt( ms, zone.formatter );
+}
+
+/**
  * Returns the date as read on the wall clock of a zone.
  *
  * @param {number} ms   Milliseconds since the epoch.
@@ -285,9 +318,7 @@ function toMilliseconds( value ) {
  */
 function wallClock( ms, zone ) {
 	const seconds = Math.floor( ms / 1000 ) * 1000;
-	const offset = zone.formatter
-		? offsetAt( seconds, zone.formatter )
-		: zone.offset;
+	const offset = zoneOffset( seconds, zone );
 	const wall = new Date( seconds + offset * 60000 );
 
 	return {
@@ -361,9 +392,7 @@ function zoneAbbreviation( ms, zone ) {
 	if ( ! zone.formatter ) {
 		return zone.name;
 	}
-	const known = zone.abbreviations.findLast(
-		( { from } ) => from * 1000 <= ms
-	);
+	const known = serverTransition( ms, zone );
 	if ( known ) {
 		return known.abbr;
 	}
@@ -552,7 +581,7 @@ export function createDateApi( settings = {} ) {
 				resolveZone(
 					timezone,
 					settings.timezone,
-					settings.abbreviations
+					settings.transitions
 				),
 				names
 			),
