@@ -11,12 +11,12 @@ use ElioBlocks\Provider\Hooks\RegisterProviders;
 use ElioBlocks\Provider\Provider;
 use ElioBlocks\Provider\ProviderCredential;
 use ElioBlocks\Provider\ProviderRegistry;
-use ElioBlocks\Tests\Stub\StubWeatherForecastProvider;
+use ElioBlocks\Tests\Stub\StubWeatherForecastAdapter;
 use ElioBlocks\Tests\Support\WordPressCore;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 use ElioBlocks\Weather\Condition\Icons\Hooks\RegisterConditionIcons;
-use ElioBlocks\WeatherForecast\Hooks\RegisterWeatherForecastProviders;
-use ElioBlocks\WeatherForecast\WeatherForecastProviderRegistry;
+use ElioBlocks\WeatherForecast\Hooks\RegisterWeatherForecastAdapters;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -104,14 +104,14 @@ class PublicApiTest extends TestCase
 
         $container               = Plugin::instance()->container();
         $providersHook           = $container->get(RegisterProviders::class);
-        $weatherForecastHook     = $container->get(RegisterWeatherForecastProviders::class);
-        $weatherForecastProvider = new StubWeatherForecastProvider();
+        $weatherForecastHook     = $container->get(RegisterWeatherForecastAdapters::class);
+        $weatherForecastAdapter = new StubWeatherForecastAdapter();
 
         // What a third party does.
         Actions\expectDone('elio_blocks_init')->once()->whenHappen(
-            static function () use ($weatherForecastProvider): void {
+            static function () use ($weatherForecastAdapter): void {
                 elio_blocks_register_provider('third-party', ['label' => 'Third Party', 'credentials' => ['api_key' => ['label' => 'API Key', 'required' => true, 'secret' => true]]]);
-                elio_blocks_register_weather_forecast_provider('third-party', $weatherForecastProvider);
+                elio_blocks_register_weather_forecast_provider('third-party', $weatherForecastAdapter);
             }
         );
 
@@ -125,13 +125,13 @@ class PublicApiTest extends TestCase
             $container->get(ProviderRegistry::class)->getBySlug('third-party')
         );
         $this->assertSame(
-            $weatherForecastProvider,
-            $container->get(WeatherForecastProviderRegistry::class)->getBySlug('third-party')
+            $weatherForecastAdapter,
+            $container->get(WeatherForecastAdapterRegistry::class)->getBySlug('third-party')
         );
 
         Functions\expect('_doing_it_wrong')->twice();
         $this->assertFalse(elio_blocks_register_provider('too-late', ['label' => 'Too Late']));
-        $this->assertFalse(elio_blocks_register_weather_forecast_provider('third-party', new StubWeatherForecastProvider()));
+        $this->assertFalse(elio_blocks_register_weather_forecast_provider('third-party', new StubWeatherForecastAdapter()));
     }
 
     #[RunInSeparateProcess]
@@ -151,7 +151,7 @@ class PublicApiTest extends TestCase
             }
         );
 
-        $container->get(RegisterWeatherForecastProviders::class)->firePublicAction();
+        $container->get(RegisterWeatherForecastAdapters::class)->firePublicAction();
         $container->get(RegisterConditionIcons::class)->lockRegistry();
 
         $registry = $container->get(ConditionIconsRegistry::class);
@@ -264,9 +264,9 @@ class PublicApiTest extends TestCase
         $container = Plugin::instance()->container();
         // What the plugin does on 'init', priorities 15 and 20.
         $container->get(RegisterProviders::class)->registerBuiltInProviders();
-        $container->get(RegisterWeatherForecastProviders::class)->registerBuiltInProviders();
+        $container->get(RegisterWeatherForecastAdapters::class)->registerBuiltInAdapters();
         $container->get(ProviderRegistry::class)->register('silent', ['label' => 'Silent']);
-        $container->get(WeatherForecastProviderRegistry::class)->register('silent', new StubWeatherForecastProvider());
+        $container->get(WeatherForecastAdapterRegistry::class)->register('silent', new StubWeatherForecastAdapter());
 
         $openMeteo = [
             'name'        => 'Open-Meteo',

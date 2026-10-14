@@ -31,7 +31,7 @@ class RegisterProviders implements HookInterface
      */
     public function initHooks(): void
     {
-        // Priority 15: before the built-in weather forecast provider (20) names its provider.
+        // Priority 15: before the built-in weather forecast adapter (20) names its provider.
         add_action('init', array( $this, 'registerBuiltInProviders' ), 15);
 
         // Priority 26: lock the registry, after elio_blocks_init (25).

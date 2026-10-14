@@ -10,20 +10,20 @@ if (! defined('ABSPATH')) {
 }
 
 /**
- * Registry of the weather forecast providers: how the registered providers
+ * Registry of the weather forecast adapters: how the registered providers
  * serve the weather forecast, one each at most, indexed by provider slug.
  *
  * The registry is locked after build() is called — no further registrations
  * are accepted, as for the ConditionIconsRegistry.
  */
-final class WeatherForecastProviderRegistry
+final class WeatherForecastAdapterRegistry
 {
     /**
-     * Weather forecast providers, indexed by provider slug.
+     * Weather forecast adapters, indexed by provider slug.
      *
-     * @var array<string, WeatherForecastProviderInterface>
+     * @var array<string, WeatherForecastAdapterInterface>
      */
-    private array $weatherForecastProviders = array();
+    private array $adapters = array();
 
     /**
      * Whether the registry has been locked.
@@ -35,7 +35,7 @@ final class WeatherForecastProviderRegistry
     /**
      * Constructor.
      *
-     * @param ProviderRegistry $providers The providers a weather forecast provider belongs to.
+     * @param ProviderRegistry $providers The providers a weather forecast adapter belongs to.
      */
     public function __construct(
         private ProviderRegistry $providers,
@@ -50,18 +50,18 @@ final class WeatherForecastProviderRegistry
      * exception: a third-party plugin getting it wrong must not take the
      * site down during init.
      *
-     * @param string                           $provider                Slug of a registered provider.
-     * @param WeatherForecastProviderInterface $weatherForecastProvider Fetches its weather forecast.
-     * @return bool True if the weather forecast provider was registered, false otherwise.
+     * @param string                          $provider Slug of a registered provider.
+     * @param WeatherForecastAdapterInterface $adapter  Fetches its weather forecast.
+     * @return bool True if the weather forecast adapter was registered, false otherwise.
      */
-    public function register(string $provider, WeatherForecastProviderInterface $weatherForecastProvider): bool
+    public function register(string $provider, WeatherForecastAdapterInterface $adapter): bool
     {
         if ($this->built) {
             _doing_it_wrong(
                 __METHOD__,
                 esc_html(
                     sprintf(
-                        'Cannot register the weather forecast provider of "%s": the registry is already built.',
+                        'Cannot register the weather forecast adapter of "%s": the registry is already built.',
                         $provider
                     )
                 ),
@@ -86,17 +86,17 @@ final class WeatherForecastProviderRegistry
             return false;
         }
 
-        if (isset($this->weatherForecastProviders[ $provider ])) {
+        if (isset($this->adapters[ $provider ])) {
             _doing_it_wrong(
                 __METHOD__,
-                esc_html(sprintf('Provider "%s" already has a weather forecast provider.', $provider)),
+                esc_html(sprintf('Provider "%s" already has a weather forecast adapter.', $provider)),
                 '0.1.0'
             );
 
             return false;
         }
 
-        $this->weatherForecastProviders[ $provider ] = $weatherForecastProvider;
+        $this->adapters[ $provider ] = $adapter;
 
         return true;
     }
@@ -129,7 +129,7 @@ final class WeatherForecastProviderRegistry
         return array_values(
             array_filter(
                 $this->providers->getAll(),
-                fn(Provider $provider): bool => isset($this->weatherForecastProviders[ $provider->slug ])
+                fn(Provider $provider): bool => isset($this->adapters[ $provider->slug ])
             )
         );
     }
@@ -143,17 +143,17 @@ final class WeatherForecastProviderRegistry
      */
     public function getProvider(string $slug): ?Provider
     {
-        return isset($this->weatherForecastProviders[ $slug ]) ? $this->providers->getBySlug($slug) : null;
+        return isset($this->adapters[ $slug ]) ? $this->providers->getBySlug($slug) : null;
     }
 
     /**
-     * Returns the weather forecast provider of the given provider, or null if it has none.
+     * Returns the weather forecast adapter of the given provider, or null if it has none.
      *
      * @param string $slug Provider slug.
-     * @return WeatherForecastProviderInterface|null
+     * @return WeatherForecastAdapterInterface|null
      */
-    public function getBySlug(string $slug): ?WeatherForecastProviderInterface
+    public function getBySlug(string $slug): ?WeatherForecastAdapterInterface
     {
-        return $this->weatherForecastProviders[ $slug ] ?? null;
+        return $this->adapters[ $slug ] ?? null;
     }
 }
