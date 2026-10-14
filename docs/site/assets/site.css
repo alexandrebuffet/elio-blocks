@@ -529,9 +529,13 @@ a.brand:hover .brand__sun {
 	transform: rotate(90deg);
 }
 
+/* The name as the logo writes it, its capitals 56% of the tile. */
 .brand__name {
-	font-weight: 600;
-	letter-spacing: -0.01em;
+	flex: none;
+	width: auto;
+	height: 17.5px;
+	aspect-ratio: 706.57 / 111.86;
+	fill: currentcolor;
 }
 
 .site-nav {
