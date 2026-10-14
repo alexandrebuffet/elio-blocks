@@ -8,6 +8,9 @@
  * - assets/wporg/: the screenshots and icons of the WordPress.org page
  *   (.wordpress-org/).
  * - favicon.svg: the plugin logo (src/icons/brand/).
+ * - the logo of the header and the footer: its tile and its sun
+ *   (src/icons/brand/) and its name (docs/brand/elio-blocks-wordmark.svg), as
+ *   symbols of the sprite of the page.
  * - blueprint.json: the Playground blueprint of the WordPress.org Live
  *   Preview, which the "Try it live" links load with the plugin zip of the
  *   site in place of the WordPress.org slug.
@@ -123,6 +126,17 @@ const logoSymbols =
 		) }</symbol>` +
 	`<symbol id="elio-logo-sun" viewBox="0 0 128 128" fill="none">${ logoSun[ 0 ] }</symbol>`;
 
+// The name of the plugin as the logo writes it (docs/brand/), outlined from
+// Geologica, in currentColor.
+const wordmark = readFileSync(
+	join( root, 'docs/brand/elio-blocks-wordmark.svg' ),
+	'utf8'
+).match( /viewBox="([^"]+)"[^>]*>([\s\S]*)<\/svg>/ );
+if ( ! wordmark ) {
+	throw new Error( 'The wordmark has no viewBox' );
+}
+const wordmarkSymbol = `<symbol id="elio-wordmark" viewBox="${ wordmark[ 1 ] }">${ wordmark[ 2 ].trim() }</symbol>`;
+
 // The FAQ as structured data (schema.org FAQPage), read from the page itself
 // so the questions and answers are written once: each <details> of the FAQ,
 // its <summary> the question, its text the answer.
@@ -132,7 +146,7 @@ const page = readFileSync( indexPath, 'utf8' );
 if ( ! page.includes( sprite ) ) {
 	throw new Error( 'No sprite in index.html' );
 }
-const index = page.replace( sprite, sprite + logoSymbols );
+const index = page.replace( sprite, sprite + logoSymbols + wordmarkSymbol );
 const text = ( html ) =>
 	html
 		.replace( /<span class="screen-reader-text">[\s\S]*?<\/span>/g, '' )
