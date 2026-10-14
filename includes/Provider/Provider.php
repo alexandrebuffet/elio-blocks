@@ -15,7 +15,7 @@ if (! defined('ABSPATH')) {
  * with and the credit its data is shown with.
  *
  * Registered with elio_blocks_register_provider(); what it serves is registered
- * apart, per domain (elio_blocks_register_weather_forecast_provider()).
+ * apart, per domain (elio_blocks_register_weather_forecast_adapter()).
  */
 final class Provider
 {
