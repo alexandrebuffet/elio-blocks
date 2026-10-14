@@ -40,7 +40,7 @@ use ElioBlocks\WeatherForecast\OpenMeteoWeatherForecastAdapter;
 use ElioBlocks\WeatherForecast\OpenMeteoWeatherForecastResponseNormalizer;
 use ElioBlocks\Weather\Units\UnitsConversionService;
 use ElioBlocks\Weather\Geocoding\GeocodingService;
-use ElioBlocks\Weather\Geocoding\OpenMeteoGeocodingProvider;
+use ElioBlocks\Weather\Geocoding\OpenMeteoGeocodingAdapter;
 use ElioBlocks\RestApi\Hooks\RegisterCacheApi;
 use ElioBlocks\WordPress\Cache\TransientCache;
 use ElioBlocks\WordPress\Http\WpHttpClient;
@@ -179,12 +179,12 @@ return static function ( ContainerBuilder $container ): void {
 		->setArguments( array( new Reference( SecretInterface::class ) ) )
 		->setPublic( true );
 
-	$container->register( OpenMeteoGeocodingProvider::class )
+	$container->register( OpenMeteoGeocodingAdapter::class )
 		->setArguments( array( new Reference( HttpClientInterface::class ) ) )
 		->setPublic( true );
 
 	$container->register( GeocodingService::class )
-		->setArguments( array( new Reference( OpenMeteoGeocodingProvider::class ), new Reference( CacheInterface::class ) ) )
+		->setArguments( array( new Reference( OpenMeteoGeocodingAdapter::class ), new Reference( CacheInterface::class ) ) )
 		->setPublic( true );
 
 	// -------------------------------------------------------------------------
