@@ -9,19 +9,19 @@ use ElioBlocks\Interactivity\Blocks\Report\ReportContext;
 use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\Tests\Stub\ArrayCache;
-use ElioBlocks\Tests\Stub\StubWeatherForecastProvider;
+use ElioBlocks\Tests\Stub\StubWeatherForecastAdapter;
 use ElioBlocks\Tests\Support\WordPressCore;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconCollectionResolver;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 use ElioBlocks\WeatherForecast\WeatherForecastPresenter;
-use ElioBlocks\WeatherForecast\WeatherForecastProviderRegistry;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use ElioBlocks\WeatherForecast\WeatherForecastService;
 use ElioBlocks\Weather\Units\UnitsConversionService;
 use PHPUnit\Framework\TestCase;
 
 class PreloadWeatherForecastTest extends TestCase
 {
-    private StubWeatherForecastProvider $provider;
+    private StubWeatherForecastAdapter $adapter;
     private ReportContext $reportContext;
     private ConditionIconsRegistry $icons;
     private array $unitOverrides = array();
@@ -33,7 +33,7 @@ class PreloadWeatherForecastTest extends TestCase
         Functions\when('__')->returnArg();
         Functions\stubEscapeFunctions();
 
-        $this->provider      = new StubWeatherForecastProvider(array( 'current' => array( 'temperature' => 68.0 ) ));
+        $this->adapter      = new StubWeatherForecastAdapter(array( 'current' => array( 'temperature' => 68.0 ) ));
         // The morning of the days of the weather forecasts below: a list skips the days that have ended.
         $this->reportContext = new ReportContext(static fn(): int => (int) strtotime('2026-07-01T10:00:00+02:00'));
         $this->icons         = new ConditionIconsRegistry();
@@ -55,11 +55,11 @@ class PreloadWeatherForecastTest extends TestCase
 
         $providers = new ProviderRegistry();
         $providers->register('stub', array( 'label' => 'Stub' ));
-        $weatherForecastProviders = new WeatherForecastProviderRegistry($providers);
-        $weatherForecastProviders->register('stub', $this->provider);
+        $weatherForecastAdapters = new WeatherForecastAdapterRegistry($providers);
+        $weatherForecastAdapters->register('stub', $this->adapter);
 
         $service = new WeatherForecastService(
-            $weatherForecastProviders,
+            $weatherForecastAdapters,
             new ArrayCache(),
             new WeatherForecastPresenter($this->icons, new UnitsConversionService()),
             $settings,
@@ -79,7 +79,7 @@ class PreloadWeatherForecastTest extends TestCase
 
         $this->makeHook('imperial')->preloadForecast(array(), $block);
 
-        $this->assertSame('imperial', $this->provider->calls[0]['units']);
+        $this->assertSame('imperial', $this->adapter->calls[0]['units']);
     }
 
     public function test_the_block_unit_system_wins_over_the_site_setting(): void
@@ -93,7 +93,7 @@ class PreloadWeatherForecastTest extends TestCase
 
         $this->makeHook('imperial')->preloadForecast(array(), $block);
 
-        $this->assertSame('metric', $this->provider->calls[0]['units']);
+        $this->assertSame('metric', $this->adapter->calls[0]['units']);
     }
 
     public function test_a_location_on_the_equator_and_prime_meridian_is_preloaded(): void
@@ -107,7 +107,7 @@ class PreloadWeatherForecastTest extends TestCase
 
     public function test_weather_forecast_rows_get_the_unit_overrides_of_the_site(): void
     {
-        $this->provider = new StubWeatherForecastProvider(
+        $this->adapter = new StubWeatherForecastAdapter(
             array(
                 'current' => array( 'wind_speed' => 36.0 ),
                 'daily'   => array( array( 'timestamp' => '2026-07-01T00:00:00+02:00', 'wind_speed' => 72.0 ) ),
@@ -137,7 +137,7 @@ class PreloadWeatherForecastTest extends TestCase
         $context = $this->makeHook('metric')->preloadForecast(array( 'a' => 1 ), array( 'blockName' => 'core/paragraph' ));
 
         $this->assertSame(array( 'a' => 1 ), $context);
-        $this->assertCount(0, $this->provider->calls);
+        $this->assertCount(0, $this->adapter->calls);
     }
 
     public function test_preloads_the_icons_of_the_collections_the_report_and_its_blocks_show(): void
@@ -147,7 +147,7 @@ class PreloadWeatherForecastTest extends TestCase
         $this->icons->registerIcon('elio/sun', array( 'content' => '<svg id="sun"></svg>', 'conditions' => array( array( 'clear-sky', 'all' ) ) ));
         $this->icons->registerCollection('theme', array( 'label' => 'Theme' ));
         $this->icons->registerIcon('theme/sunny', array( 'content' => '<svg id="sunny"></svg>', 'conditions' => array( array( 'clear-sky', 'all' ) ) ));
-        $this->provider = new StubWeatherForecastProvider(array( 'current' => array( 'condition_code' => 0, 'is_day' => 1 ) ));
+        $this->adapter = new StubWeatherForecastAdapter(array( 'current' => array( 'condition_code' => 0, 'is_day' => 1 ) ));
         $block          = $this->reportBlock(array( 'location' => array( 'latitude' => 48.85, 'longitude' => 2.35 ) ));
         $block['innerBlocks'] = array(
             array( 'blockName' => 'elio/condition-icon', 'attrs' => array( 'iconCollection' => 'theme' ), 'innerBlocks' => array() ),

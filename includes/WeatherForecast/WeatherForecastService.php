@@ -52,14 +52,14 @@ class WeatherForecastService
     /**
      * Constructor.
      *
-     * @param WeatherForecastProviderRegistry $registry  Weather forecast providers, by provider slug.
-     * @param CacheInterface                  $cache     Cache instance.
-     * @param WeatherForecastPresenter        $presenter Adds what depends on the site and the request.
-     * @param PluginSettings                  $settings  Holds the credentials of the providers.
-     * @param (callable(): int)|null          $clock     Returns the current Unix timestamp. Defaults to time().
+     * @param WeatherForecastAdapterRegistry $registry  Weather forecast adapters, by provider slug.
+     * @param CacheInterface                 $cache     Cache instance.
+     * @param WeatherForecastPresenter       $presenter Adds what depends on the site and the request.
+     * @param PluginSettings                 $settings  Holds the credentials of the providers.
+     * @param (callable(): int)|null         $clock     Returns the current Unix timestamp. Defaults to time().
      */
     public function __construct(
-        private WeatherForecastProviderRegistry $registry,
+        private WeatherForecastAdapterRegistry $registry,
         private CacheInterface $cache,
         private WeatherForecastPresenter $presenter,
         private PluginSettings $settings,
@@ -85,8 +85,8 @@ class WeatherForecastService
      */
     public function getWeatherForecast(Coordinates $coordinates, string $provider, string $units, array $unitSettings = array(), array $iconCollections = array()): array
     {
-        $weatherForecastProvider = $this->registry->getBySlug($provider);
-        if (null === $weatherForecastProvider) {
+        $adapter = $this->registry->getBySlug($provider);
+        if (null === $adapter) {
             throw ProviderNotFound::forSlug(esc_html($provider));
         }
 
@@ -94,7 +94,7 @@ class WeatherForecastService
         $cacheKey = $this->cache->key(self::CACHE_NAMESPACE, $coordinates->latitude, $coordinates->longitude, $provider, $units);
 
         $this->loaded[ $cacheKey ] ??= $this->fromCache($cacheKey)
-            ?? $this->fromProvider($provider, $weatherForecastProvider, $coordinates, $units, $cacheKey);
+            ?? $this->fromProvider($provider, $adapter, $coordinates, $units, $cacheKey);
 
         return $this->presenter->present($this->loaded[ $cacheKey ], $units, $unitSettings, $iconCollections);
     }
@@ -128,14 +128,14 @@ class WeatherForecastService
      */
     private function fromProvider(
         string $provider,
-        WeatherForecastProviderInterface $weatherForecastProvider,
+        WeatherForecastAdapterInterface $adapter,
         Coordinates $coordinates,
         string $units,
         string $cacheKey
     ): WeatherForecast {
         $args = array( 'credentials' => $this->getCredentials($provider) );
 
-        $weatherForecast = WeatherForecast::fromArray($weatherForecastProvider->fetch($coordinates->latitude, $coordinates->longitude, $units, $args))
+        $weatherForecast = WeatherForecast::fromArray($adapter->fetch($coordinates->latitude, $coordinates->longitude, $units, $args))
             ->withFetchedAt(( $this->clock )());
 
         $this->cache->set($cacheKey, $weatherForecast->toArray(), CacheInterface::TTL_FROM_SETTINGS);

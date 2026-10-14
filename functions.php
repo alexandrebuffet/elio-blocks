@@ -13,8 +13,8 @@ use ElioBlocks\Interactivity\Blocks\Report\DirectivesHelper;
 use ElioBlocks\Interactivity\Blocks\Report\IconSprite;
 use ElioBlocks\Interactivity\Blocks\Report\ReportContext;
 use ElioBlocks\Settings\PluginSettings;
-use ElioBlocks\WeatherForecast\WeatherForecastProviderInterface;
-use ElioBlocks\WeatherForecast\WeatherForecastProviderRegistry;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterInterface;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconCollectionResolver;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 
@@ -72,11 +72,11 @@ function elio_blocks_register_provider( string $slug, array $args ): bool {
  * register_block_type() does.
  *
  * @param string                           $provider                  Slug of the provider.
- * @param WeatherForecastProviderInterface $weather_forecast_provider Fetches its weather forecast.
+ * @param WeatherForecastAdapterInterface $weather_forecast_provider Fetches its weather forecast.
  * @return bool True if the weather forecast provider was registered, false otherwise.
  */
-function elio_blocks_register_weather_forecast_provider( string $provider, WeatherForecastProviderInterface $weather_forecast_provider ): bool {
-	return Plugin::instance()->container()->get( WeatherForecastProviderRegistry::class )->register( $provider, $weather_forecast_provider );
+function elio_blocks_register_weather_forecast_provider( string $provider, WeatherForecastAdapterInterface $weather_forecast_provider ): bool {
+	return Plugin::instance()->container()->get( WeatherForecastAdapterRegistry::class )->register( $provider, $weather_forecast_provider );
 }
 
 /**
@@ -279,7 +279,7 @@ function elio_blocks_get_weather_forecast_attribution( string $provider ): ?arra
 		$provider = $container->get( PluginSettings::class )->getDefaultWeatherForecastProvider();
 	}
 
-	$provider    = $container->get( WeatherForecastProviderRegistry::class )->getProvider( $provider );
+	$provider    = $container->get( WeatherForecastAdapterRegistry::class )->getProvider( $provider );
 	$attribution = $provider?->attribution;
 	if ( null === $attribution ) {
 		return null;

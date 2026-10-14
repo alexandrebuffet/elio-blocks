@@ -10,14 +10,14 @@ use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\Tests\Stub\ArrayCache;
 use ElioBlocks\Tests\Stub\FixedSecret;
-use ElioBlocks\Tests\Stub\StubWeatherForecastProvider;
+use ElioBlocks\Tests\Stub\StubWeatherForecastAdapter;
 use ElioBlocks\Tests\Support\WordPressCore;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconCollectionResolver;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 use ElioBlocks\Weather\Coordinates;
-use ElioBlocks\WeatherForecast\WeatherForecastProviderInterface;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterInterface;
 use ElioBlocks\WeatherForecast\WeatherForecastPresenter;
-use ElioBlocks\WeatherForecast\WeatherForecastProviderRegistry;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use ElioBlocks\WeatherForecast\WeatherForecastRequestSigner;
 use ElioBlocks\WeatherForecast\WeatherForecastService;
 use ElioBlocks\Weather\Units\UnitsConversionService;
@@ -27,7 +27,7 @@ use WP_REST_Request;
 
 class WeatherForecastControllerTest extends TestCase
 {
-    private WeatherForecastProviderRegistry $providers;
+    private WeatherForecastAdapterRegistry $adapters;
     private WeatherForecastRequestSigner $signer;
     private ConditionIconsRegistry $icons;
 
@@ -45,7 +45,7 @@ class WeatherForecastControllerTest extends TestCase
         $providers->register('stub', array( 'label' => 'Stub' ));
         $providers->register('keyed', array( 'label' => 'Keyed', 'credentials' => array( 'api_key' => array( 'label' => 'API Key', 'required' => true ) ) ));
 
-        $this->providers = new WeatherForecastProviderRegistry($providers);
+        $this->adapters = new WeatherForecastAdapterRegistry($providers);
         $this->signer    = new WeatherForecastRequestSigner(new FixedSecret('s3cret'));
         $this->icons     = new ConditionIconsRegistry();
     }
@@ -65,7 +65,7 @@ class WeatherForecastControllerTest extends TestCase
         $settings->method('getConditionIconCollection')->willReturn('elio');
 
         $service = new WeatherForecastService(
-            $this->providers,
+            $this->adapters,
             new ArrayCache(),
             new WeatherForecastPresenter($this->icons, new UnitsConversionService()),
             $settings,
@@ -93,7 +93,7 @@ class WeatherForecastControllerTest extends TestCase
         $this->icons->registerIcon('elio/sun', array( 'content' => '<svg></svg>', 'conditions' => array( array( 'clear-sky', 'all' ) ) ));
         $this->icons->registerCollection('theme', array( 'label' => 'Theme' ));
         $this->icons->registerIcon('theme/sunny', array( 'content' => '<svg></svg>', 'conditions' => array( array( 'clear-sky', 'all' ) ) ));
-        $this->providers->register('stub', new StubWeatherForecastProvider(array( 'current' => array( 'condition_code' => 0 ) )));
+        $this->adapters->register('stub', new StubWeatherForecastAdapter(array( 'current' => array( 'condition_code' => 0 ) )));
     }
 
     public function test_items_name_their_icon_in_the_collections_the_request_asks_for(): void
@@ -170,13 +170,13 @@ class WeatherForecastControllerTest extends TestCase
 
     public function test_returns_the_weather_forecast_of_the_default_provider_for_rounded_coordinates(): void
     {
-        $provider = new StubWeatherForecastProvider(array( 'current' => array( 'temperature' => 20.0 ) ));
-        $this->providers->register('stub', $provider);
+        $adapter = new StubWeatherForecastAdapter(array( 'current' => array( 'temperature' => 20.0 ) ));
+        $this->adapters->register('stub', $adapter);
 
         $response = $this->makeController()->get_items($this->parisRequest());
 
         $this->assertSame(20.0, $response->get_data()['current']['temperature']);
-        $this->assertSame(array( 'latitude' => 48.86, 'longitude' => 2.35, 'units' => 'metric' ), $provider->calls[0]);
+        $this->assertSame(array( 'latitude' => 48.86, 'longitude' => 2.35, 'units' => 'metric' ), $adapter->calls[0]);
     }
 
     public function test_the_route_accepts_empty_units_and_does_not_default_to_metric(): void
@@ -189,12 +189,12 @@ class WeatherForecastControllerTest extends TestCase
 
     public function test_the_editor_leaves_units_empty_to_get_the_unit_system_of_the_site(): void
     {
-        $provider = new StubWeatherForecastProvider(array( 'current' => array( 'temperature' => 68.0 ) ));
-        $this->providers->register('stub', $provider);
+        $adapter = new StubWeatherForecastAdapter(array( 'current' => array( 'temperature' => 68.0 ) ));
+        $this->adapters->register('stub', $adapter);
 
         $response = $this->makeController('imperial')->get_items($this->parisRequest(array( 'units' => '' )));
 
-        $this->assertSame('imperial', $provider->calls[0]['units']);
+        $this->assertSame('imperial', $adapter->calls[0]['units']);
         $this->assertSame('imperial', $response->get_data()['meta']['units']);
     }
 
@@ -209,9 +209,9 @@ class WeatherForecastControllerTest extends TestCase
 
     public function test_a_third_party_provider_that_crashes_is_a_502_not_a_fatal_error(): void
     {
-        $crashing = $this->createMock(WeatherForecastProviderInterface::class);
+        $crashing = $this->createMock(WeatherForecastAdapterInterface::class);
         $crashing->method('fetch')->willThrowException(new \TypeError('Unsupported operand types: string * float'));
-        $this->providers->register('stub', $crashing);
+        $this->adapters->register('stub', $crashing);
 
         $error = $this->makeController()->get_items($this->parisRequest());
 
@@ -222,9 +222,9 @@ class WeatherForecastControllerTest extends TestCase
 
     public function test_upstream_failure_is_a_502_that_does_not_leak_the_upstream_message(): void
     {
-        $failing = $this->createMock(WeatherForecastProviderInterface::class);
+        $failing = $this->createMock(WeatherForecastAdapterInterface::class);
         $failing->method('fetch')->willThrowException(new \RuntimeException('cURL error 28: resolving api.internal timed out'));
-        $this->providers->register('stub', $failing);
+        $this->adapters->register('stub', $failing);
 
         $error = $this->makeController()->get_items($this->parisRequest());
 
@@ -235,9 +235,9 @@ class WeatherForecastControllerTest extends TestCase
 
     public function test_a_provider_missing_a_required_credential_is_a_503_that_says_so(): void
     {
-        $keyed = $this->createMock(WeatherForecastProviderInterface::class);
+        $keyed = $this->createMock(WeatherForecastAdapterInterface::class);
         $keyed->expects($this->never())->method('fetch');
-        $this->providers->register('keyed', $keyed);
+        $this->adapters->register('keyed', $keyed);
 
         $error = $this->makeController()->get_items($this->parisRequest(array( 'provider' => 'keyed' )));
 

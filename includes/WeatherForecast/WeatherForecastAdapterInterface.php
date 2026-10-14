@@ -13,7 +13,7 @@ if (! defined('ABSPATH')) {
  * elio_blocks_register_weather_forecast_provider(): the provider holds the
  * name and the credentials, this fetches its weather forecast.
  */
-interface WeatherForecastProviderInterface
+interface WeatherForecastAdapterInterface
 {
     /**
      * Fetches weather forecast data for the given coordinates.
