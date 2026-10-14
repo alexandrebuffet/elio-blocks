@@ -1,6 +1,6 @@
 # Naming the two levels of a provider
 
-Status: analysis, nothing renamed. Written 2026-10-10 for the open question of the tides plan (`docs/plans/tides.md` on branch `feat/tides`).
+Status: decided on 2026-10-14, the recommendation below (adapter), renamed on branch fix/provider-naming. Written 2026-10-10 for the open question of the tides plan (`docs/plans/tides.md` on branch `feat/tides`).
 
 ## The problem
 
