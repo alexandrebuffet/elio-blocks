@@ -85,7 +85,7 @@ class PublicApiTest extends TestCase
                 'elio_blocks_register_condition_icon',
                 'elio_blocks_register_condition_icon_collection',
                 'elio_blocks_register_provider',
-                'elio_blocks_register_weather_forecast_provider',
+                'elio_blocks_register_weather_forecast_adapter',
                 'elio_blocks_render_icon_sprite',
                 'elio_blocks_unregister_condition_icon',
                 'elio_blocks_unregister_condition_icon_collection',
@@ -96,7 +96,7 @@ class PublicApiTest extends TestCase
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_a_provider_and_its_weather_forecast_provider_registered_on_elio_blocks_init_go_to_the_registries_the_plugin_reads_and_locks(): void
+    public function test_a_provider_and_its_weather_forecast_adapter_registered_on_elio_blocks_init_go_to_the_registries_the_plugin_reads_and_locks(): void
     {
         require_once dirname(__DIR__, 2) . '/functions.php';
         // The slug in the error message is escaped.
@@ -111,7 +111,7 @@ class PublicApiTest extends TestCase
         Actions\expectDone('elio_blocks_init')->once()->whenHappen(
             static function () use ($weatherForecastAdapter): void {
                 elio_blocks_register_provider('third-party', ['label' => 'Third Party', 'credentials' => ['api_key' => ['label' => 'API Key', 'required' => true, 'secret' => true]]]);
-                elio_blocks_register_weather_forecast_provider('third-party', $weatherForecastAdapter);
+                elio_blocks_register_weather_forecast_adapter('third-party', $weatherForecastAdapter);
             }
         );
 
@@ -131,7 +131,7 @@ class PublicApiTest extends TestCase
 
         Functions\expect('_doing_it_wrong')->twice();
         $this->assertFalse(elio_blocks_register_provider('too-late', ['label' => 'Too Late']));
-        $this->assertFalse(elio_blocks_register_weather_forecast_provider('third-party', new StubWeatherForecastAdapter()));
+        $this->assertFalse(elio_blocks_register_weather_forecast_adapter('third-party', new StubWeatherForecastAdapter()));
     }
 
     #[RunInSeparateProcess]

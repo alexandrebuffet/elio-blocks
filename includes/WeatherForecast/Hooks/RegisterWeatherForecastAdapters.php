@@ -72,7 +72,7 @@ class RegisterWeatherForecastAdapters implements HookInterface
          *               'api_key' => array( 'label' => __( 'API Key', 'my-plugin' ), 'required' => true, 'secret' => true ),
          *           ),
          *       ) );
-         *       elio_blocks_register_weather_forecast_provider( 'my-provider', new MyWeatherForecastProvider() );
+         *       elio_blocks_register_weather_forecast_adapter( 'my-provider', new MyWeatherForecastAdapter() );
          *
          *       elio_blocks_register_condition_icon_collection( 'my-theme', array(
          *           'label'       => __( 'My Theme', 'my-theme' ),

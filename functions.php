@@ -26,14 +26,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Registers a provider: an organization the data comes from.
  *
  * Must be called on the 'elio_blocks_init' action, before what it serves is
- * registered (elio_blocks_register_weather_forecast_provider()). A provider
+ * registered (elio_blocks_register_weather_forecast_adapter()). A provider
  * the registry refuses (malformed slug or arguments, duplicate slug, registry
  * already locked) gets a _doing_it_wrong() notice, as register_block_type()
  * does.
  *
  * A provider that needs to identify the site (an API key, an account, a
  * contact address) declares its credentials: the settings page gives it a card
- * with their fields, and its providers get their values in fetch(). One whose
+ * with their fields, and its adapters get their values in fetch(). One whose
  * license asks for a credit wherever its data is shown declares its
  * attribution: the provider-attribution block prints it in the reports.
  *
@@ -71,12 +71,12 @@ function elio_blocks_register_provider( string $slug, array $args ): bool {
  * registry already locked) gets a _doing_it_wrong() notice, as
  * register_block_type() does.
  *
- * @param string                           $provider                  Slug of the provider.
- * @param WeatherForecastAdapterInterface $weather_forecast_provider Fetches its weather forecast.
- * @return bool True if the weather forecast provider was registered, false otherwise.
+ * @param string                          $provider                 Slug of the provider.
+ * @param WeatherForecastAdapterInterface $weather_forecast_adapter Fetches its weather forecast.
+ * @return bool True if the weather forecast adapter was registered, false otherwise.
  */
-function elio_blocks_register_weather_forecast_provider( string $provider, WeatherForecastAdapterInterface $weather_forecast_provider ): bool {
-	return Plugin::instance()->container()->get( WeatherForecastAdapterRegistry::class )->register( $provider, $weather_forecast_provider );
+function elio_blocks_register_weather_forecast_adapter( string $provider, WeatherForecastAdapterInterface $weather_forecast_adapter ): bool {
+	return Plugin::instance()->container()->get( WeatherForecastAdapterRegistry::class )->register( $provider, $weather_forecast_adapter );
 }
 
 /**
