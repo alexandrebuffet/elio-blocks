@@ -8,9 +8,9 @@ if (! defined('ABSPATH')) {
 }
 
 /**
- * Interface for geocoding API providers.
+ * How a provider serves geocoding.
  */
-interface GeocodingProviderInterface
+interface GeocodingAdapterInterface
 {
     /**
      * Geocodes a location query.

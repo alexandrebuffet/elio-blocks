@@ -10,18 +10,18 @@ if (! defined('ABSPATH')) {
 }
 
 /**
- * Delegates geocoding queries to the configured provider.
+ * Delegates geocoding queries to the adapter of the configured provider.
  */
 class GeocodingService
 {
     /**
      * Constructor.
      *
-     * @param GeocodingProviderInterface $provider Geocoding provider.
-     * @param CacheInterface             $cache    Cache instance.
+     * @param GeocodingAdapterInterface $adapter Geocoding adapter.
+     * @param CacheInterface            $cache   Cache instance.
      */
     public function __construct(
-        private GeocodingProviderInterface $provider,
+        private GeocodingAdapterInterface $adapter,
         private CacheInterface $cache,
     ) {
     }
@@ -45,7 +45,7 @@ class GeocodingService
             return array_values($cached);
         }
 
-        $result = $this->provider->geocode($query, $limit);
+        $result = $this->adapter->geocode($query, $limit);
 
         // No results is a valid outcome; return empty list.
         if (null === $result) {
