@@ -176,7 +176,7 @@ class WeatherForecastPresenterTest extends TestCase
         $this->assertSame('Sandstorm', $result['current']['condition_description']);
     }
 
-    public function test_names_the_timezone_of_the_location_as_php_does_over_the_weather_forecast_period(): void
+    public function test_gives_the_offsets_and_names_of_the_timezone_of_the_location_as_php_does_over_the_weather_forecast_period(): void
     {
         // Paris leaves summer time on 25 October 2026 at 01:00 UTC, inside the
         // weather forecast.
@@ -191,13 +191,13 @@ class WeatherForecastPresenterTest extends TestCase
             )
         );
 
-        // The browser has no timezone database: it would print "GMT+2" for "CEST".
+        // Intl would print "GMT+2" for "CEST".
         $this->assertSame(
             [
-                ['from' => strtotime('2026-10-24T06:26:00Z'), 'abbr' => 'CEST'],
-                ['from' => strtotime('2026-10-25T01:00:00Z'), 'abbr' => 'CET'],
+                ['from' => strtotime('2026-10-24T06:26:00Z'), 'offset' => 7200, 'abbr' => 'CEST'],
+                ['from' => strtotime('2026-10-25T01:00:00Z'), 'offset' => 3600, 'abbr' => 'CET'],
             ],
-            $result['meta']['timezone_abbreviations']
+            $result['meta']['timezone_transitions']
         );
     }
 
@@ -208,7 +208,7 @@ class WeatherForecastPresenterTest extends TestCase
                 WeatherForecast::fromArray(['meta' => ['timezone' => $timezone], 'current' => ['timestamp' => '2026-10-24T12:00:00+02:00']])
             );
 
-            $this->assertSame([], $result['meta']['timezone_abbreviations'], $timezone);
+            $this->assertSame([], $result['meta']['timezone_transitions'], $timezone);
         }
     }
 }

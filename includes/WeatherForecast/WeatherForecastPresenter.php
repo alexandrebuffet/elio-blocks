@@ -104,22 +104,25 @@ class WeatherForecastPresenter
         $presented['meta']['units']         = $units;
         $presented['meta']['unit_settings'] = $unitSettings;
 
-        $presented['meta']['timezone_abbreviations'] = $this->timezoneAbbreviations($presented['meta']['timezone'] ?? '', $times);
+        $presented['meta']['timezone_transitions'] = $this->timezoneTransitions($presented['meta']['timezone'] ?? '', $times);
 
         return $presented;
     }
 
     /**
-     * Returns the names PHP gives the timezone of the location (`T` in a date
-     * format) over the weather forecast period, each from the Unix time it comes
-     * into force: "CEST", then "CET". Browsers have no timezone database to name it: Intl
-     * says "GMT+2".
+     * Returns the UTC offsets (seconds) and the names (`T` in a date format) PHP
+     * gives the timezone of the location over the weather forecast period, each
+     * from the Unix time it comes into force: +02:00 "CEST", then +01:00 "CET".
+     * The browser reads the wall clock of the location in them: the offsets of
+     * the timestamps come from this timezone database, which the one of the
+     * browser may contradict (tzdata 2026c moves Africa/Casablanca to +00:00 in
+     * October 2026), and Intl names no timezone: it says "GMT+2".
      *
      * @param mixed     $timezone IANA name of the timezone of the location.
      * @param list<int> $times    Unix times of the dates of the weather forecast.
-     * @return list<array{from: int, abbr: string}>
+     * @return list<array{from: int, offset: int, abbr: string}>
      */
-    private function timezoneAbbreviations(mixed $timezone, array $times): array
+    private function timezoneTransitions(mixed $timezone, array $times): array
     {
         if (! is_string($timezone) || '' === $timezone || empty($times)) {
             return array();
@@ -134,8 +137,9 @@ class WeatherForecastPresenter
 
         return false === $transitions ? array() : array_map(
             fn(array $transition): array => array(
-                'from' => (int) $transition['ts'],
-                'abbr' => (string) $transition['abbr'],
+                'from'   => (int) $transition['ts'],
+                'offset' => (int) $transition['offset'],
+                'abbr'   => (string) $transition['abbr'],
             ),
             array_values($transitions)
         );
