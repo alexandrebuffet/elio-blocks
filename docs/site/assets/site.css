@@ -59,11 +59,8 @@
 	--sky: #b7cdd6;
 	--sky-2: #93a8c6;
 	--night: #14110d;
-	--night-2: #1d1914;
 	--on-night: #eee7db;
 	--on-night-2: rgb(238 231 219 / 70%);
-	--tool: #fff;
-	--tool-line: rgb(0 0 0 / 22%);
 	--browser-tabs: #eee6d9;
 	--browser-bar: #f6efe3;
 	--browser-field: #fff;
@@ -117,8 +114,6 @@
 		--line-strong: rgb(238 231 219 / 40%);
 		--accent: var(--amber);
 		--accent-2: var(--ember);
-		--tool: #1e1e1e;
-		--tool-line: rgb(255 255 255 / 24%);
 		--browser-tabs: #0d0b08;
 		--browser-bar: #221d17;
 		--browser-field: #14110d;
@@ -514,8 +509,6 @@ pre code {
 	flex: none;
 	width: 28px;
 	height: 28px;
-	overflow: hidden;
-	border-radius: 7px;
 }
 
 /* On hover, the sun turns in its tile. */
@@ -1176,14 +1169,14 @@ a.brand:hover .brand__sun {
 
 .section--inverse::before {
 	background:
-		radial-gradient(24% 30% at 33% 43%, rgb(183 205 214 / 95%), rgb(183 205 214 / 0%)),
+		radial-gradient(24% 30% at 33% 43%, color-mix(in srgb, var(--sky) 95%, transparent), rgb(183 205 214 / 0%)),
 		radial-gradient(closest-side at 30% 40%, var(--gold), rgb(247 212 154 / 0%)),
 		radial-gradient(closest-side at 72% 62%, var(--amber), rgb(240 160 68 / 0%));
 }
 
 .section--inverse::after {
 	background:
-		radial-gradient(17% 22% at 40% 70%, rgb(147 168 198 / 80%), rgb(147 168 198 / 0%)),
+		radial-gradient(17% 22% at 40% 70%, color-mix(in srgb, var(--sky-2) 80%, transparent), rgb(147 168 198 / 0%)),
 		radial-gradient(closest-side at 62% 34%, #e8703a, rgb(232 112 58 / 0%)),
 		radial-gradient(closest-side at 38% 72%, rgb(247 212 154 / 70%), rgb(247 212 154 / 0%));
 	animation-duration: 34s;
