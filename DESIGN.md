@@ -170,7 +170,7 @@ components:
     textColor: "{colors.primary-dark}"
     typography: "{typography.display-md}"
   lead:
-    textColor: "{colors.ink-2}"
+    textColor: "{colors.ink}"
     typography: "{typography.body-lg}"
   eyebrow:
     textColor: "{colors.ink-2}"
