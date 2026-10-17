@@ -3,7 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { Button, __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	Button,
+	ColorIndicator,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { Icon, mapMarker } from '@wordpress/icons';
 
 /**
@@ -67,10 +71,9 @@ export default function SearchLocationControl( { location = {}, onChange } ) {
 					describedBy={ __( 'Edit location', 'elio-blocks' ) }
 					onClick={ handleOpenModal }
 				>
-					<Icon
-						className="weather-search-location-control__preview-icon"
-						icon={ mapMarker }
-					/>
+					<ColorIndicator className="weather-search-location-control__preview-indicator">
+						<Icon icon={ mapMarker } size={ 16 } />
+					</ColorIndicator>
 					<VStack
 						as="span"
 						className="weather-search-location-control__preview-content"
