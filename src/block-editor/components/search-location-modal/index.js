@@ -129,7 +129,7 @@ export default function SearchLocationModal( {
 							}
 						/>
 					</Autocomplete.InputGroup>
-					<Autocomplete.Popup>
+					<Autocomplete.Popup className="weather-location-search-modal__suggestions">
 						<Autocomplete.Status>
 							{ isSearching && (
 								<HStack justify="flex-start" spacing={ 2 }>
