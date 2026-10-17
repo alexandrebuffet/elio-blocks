@@ -7,8 +7,8 @@ use Brain\Monkey\Functions;
 use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\RestApi\Endpoints\WeatherForecastProvidersController;
 use ElioBlocks\Settings\PluginSettings;
-use ElioBlocks\Tests\Stub\StubWeatherForecastProvider;
-use ElioBlocks\WeatherForecast\WeatherForecastProviderRegistry;
+use ElioBlocks\Tests\Stub\StubWeatherForecastAdapter;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +23,7 @@ class WeatherForecastProvidersControllerTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    private WeatherForecastProviderRegistry $weatherForecastProviders;
+    private WeatherForecastAdapterRegistry $weatherForecastAdapters;
 
     protected function setUp(): void
     {
@@ -39,9 +39,9 @@ class WeatherForecastProvidersControllerTest extends TestCase
         $providers->register('air-only', ['label' => 'Air Only']);
         $providers->register('third-party', ['label' => 'Third Party', 'credentials' => ['api_key' => ['label' => 'API Key', 'required' => true]]]);
 
-        $this->weatherForecastProviders = new WeatherForecastProviderRegistry($providers);
-        $this->weatherForecastProviders->register('open-meteo', new StubWeatherForecastProvider());
-        $this->weatherForecastProviders->register('third-party', new StubWeatherForecastProvider());
+        $this->weatherForecastAdapters = new WeatherForecastAdapterRegistry($providers);
+        $this->weatherForecastAdapters->register('open-meteo', new StubWeatherForecastAdapter());
+        $this->weatherForecastAdapters->register('third-party', new StubWeatherForecastAdapter());
     }
 
     protected function tearDown(): void
@@ -55,7 +55,7 @@ class WeatherForecastProvidersControllerTest extends TestCase
         $settings = $this->createMock(PluginSettings::class);
         $settings->method('getDefaultWeatherForecastProvider')->willReturn($defaultProvider);
 
-        return new WeatherForecastProvidersController($this->weatherForecastProviders, $settings);
+        return new WeatherForecastProvidersController($this->weatherForecastAdapters, $settings);
     }
 
     public function test_is_the_providers_route_of_the_weather_forecast(): void

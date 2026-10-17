@@ -2,9 +2,9 @@
 
 namespace ElioBlocks\Tests\Stub;
 
-use ElioBlocks\WeatherForecast\WeatherForecastProviderInterface;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterInterface;
 
-final class StubWeatherForecastProvider implements WeatherForecastProviderInterface
+final class StubWeatherForecastAdapter implements WeatherForecastAdapterInterface
 {
 	/** @var list<array{latitude: float, longitude: float, units: string}> Every fetch() call received. */
 	public array $calls = [];

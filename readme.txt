@@ -4,7 +4,7 @@ Tags: weather, forecast, block-editor, blocks, location
 Requires at least: 6.7
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,6 +34,20 @@ Blocks are rendered on the server, so the weather is in the page from the first 
 
 Weather data and location search are provided by the Open-Meteo API. See the External services section below for what is sent to it and when.
 
+= Source code =
+
+The scripts and styles in the `build` folder of the plugin are compiled. Their human-readable sources (the `src` folder) and the configuration of the build tools are public on GitHub, where the plugin is developed: [https://github.com/alexandrebuffet/elio-blocks](https://github.com/alexandrebuffet/elio-blocks)
+
+To build the plugin from its sources, with Node.js 22 and Composer:
+
+1. `git clone https://github.com/alexandrebuffet/elio-blocks.git`
+2. `cd elio-blocks`
+3. `composer install`
+4. `npm install`
+5. `npm run build`
+
+The build uses `@wordpress/scripts` (webpack), the build tool of WordPress itself. See the README of the repository for every command.
+
 == Installation ==
 
 = Installation from within WordPress =
@@ -60,7 +74,7 @@ No, this plugin uses the Open-Meteo API, an open-source weather API that needs n
 The plugin adds its own REST API endpoints: one serves the weather forecast, another finds locations by name. In the Block Editor, a data store fetches the forecast and passes it to the Weather block and all its inner blocks through block context. On the front end, the blocks are rendered on the server, then the Interactivity API keeps the data up to date in the browser. ⚡️
 
 = Where can I find the source code? =
-The plugin ships compiled scripts and styles. Their sources and the build tools are on [GitHub](https://github.com/alexandrebuffet/elio-blocks), where the plugin is developed.
+On [GitHub](https://github.com/alexandrebuffet/elio-blocks): see the Source code section of the description.
 
 = Can I customize the blocks? =
 Yes. Like core blocks, the Weather blocks come with the standard design tools, such as colors, spacing and typography, straight from the Block Editor. Beyond that, you can style them with `theme.json`, block style variations or plain CSS. Clear skies ahead. 🌤️
@@ -117,6 +131,13 @@ The icons of the plugin were drawn for it. The layout illustrations of the Weath
 5. The General section of the settings page: units and data refresh.
 
 == Changelog ==
+
+= 0.3.0 =
+
+-   The weather of an open page stays current after the computer sleeps, and a hidden page asks for nothing until it is shown again.
+-   The Block Editor refreshes the weather forecast when the front end does, and keeps it shown when a refresh fails.
+-   A new logo for Elio: a sun of twelve rays.
+-   The description links the source code of the plugin and explains how to build it.
 
 = 0.2.0 =
 

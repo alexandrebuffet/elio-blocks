@@ -14,7 +14,7 @@ if (! defined('ABSPATH')) {
 /**
  * Fetches weather forecast data from the Open-Meteo API.
  */
-class OpenMeteoWeatherForecastProvider implements WeatherForecastProviderInterface
+class OpenMeteoWeatherForecastAdapter implements WeatherForecastAdapterInterface
 {
     private const API_URL = 'https://api.open-meteo.com/v1/forecast';
 

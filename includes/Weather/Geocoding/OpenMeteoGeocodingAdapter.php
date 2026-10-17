@@ -13,7 +13,7 @@ if (! defined('ABSPATH')) {
 /**
  * Geocodes location name using the Open-Meteo Geocoding API.
  */
-class OpenMeteoGeocodingProvider implements GeocodingProviderInterface
+class OpenMeteoGeocodingAdapter implements GeocodingAdapterInterface
 {
     private const API_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 

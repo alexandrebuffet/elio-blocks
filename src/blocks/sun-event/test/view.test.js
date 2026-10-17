@@ -80,8 +80,12 @@ describe( 'sun-event view', () => {
 						meta: {
 							timezone: 'Asia/Tokyo',
 							// Intl knows "GMT+9" only.
-							timezone_abbreviations: [
-								{ from: 1782831600, abbr: 'JST' },
+							timezone_transitions: [
+								{
+									from: 1782831600,
+									offset: 32400,
+									abbr: 'JST',
+								},
 							],
 						},
 						current: CURRENT,

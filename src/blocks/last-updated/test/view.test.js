@@ -85,8 +85,8 @@ describe( 'last-updated view', () => {
 			makeContext( {
 				format: 'H:i T',
 				meta: {
-					timezone_abbreviations: [
-						{ from: 1782831600, abbr: 'JST' },
+					timezone_transitions: [
+						{ from: 1782831600, offset: 32400, abbr: 'JST' },
 					],
 				},
 			} )

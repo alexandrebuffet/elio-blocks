@@ -40,26 +40,27 @@ export function getWeatherForecastTimezone( weatherForecast ) {
 
 /**
  * Returns the date settings for the dates of a weather forecast: the ones of the site, plus
- * the names the server gives the timezone of the location over the weather
- * forecast period (`T`), which the browser has no timezone database for.
+ * the UTC offsets and the names (`T`) the server gives the timezone of the
+ * location over the weather forecast period: the offsets of the timestamps
+ * come from its timezone database, which the one of the browser may contradict.
  *
  * @param {Object}      settings        Site date settings.
- * @param {Object|null} weatherForecast Weather forecast (meta.timezone, meta.timezone_abbreviations).
+ * @param {Object|null} weatherForecast Weather forecast (meta.timezone, meta.timezone_transitions).
  * @return {Object} Date settings.
  */
 export function withWeatherForecastTimezone( settings, weatherForecast ) {
 	const timezone = getWeatherForecastTimezone( weatherForecast );
-	const abbreviations = weatherForecast?.meta?.timezone_abbreviations;
+	const transitions = weatherForecast?.meta?.timezone_transitions;
 
-	if ( ! timezone || ! Array.isArray( abbreviations ) ) {
+	if ( ! timezone || ! Array.isArray( transitions ) ) {
 		return settings;
 	}
 
 	return {
 		...settings,
-		abbreviations: {
-			...settings?.abbreviations,
-			[ timezone ]: abbreviations,
+		transitions: {
+			...settings?.transitions,
+			[ timezone ]: transitions,
 		},
 	};
 }

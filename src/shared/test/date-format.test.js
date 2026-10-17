@@ -185,17 +185,25 @@ describe( 'createDateApi', () => {
 	} );
 } );
 
-describe( 'timezone abbreviations (T)', () => {
+describe( 'timezone transitions, as the server read them', () => {
 	const seconds = ( iso ) => Date.parse( iso ) / 1000;
 
 	// What the server read in its timezone database for the weather forecast
-	// period (meta.timezone_abbreviations): Paris leaves summer time on 25
+	// period (meta.timezone_transitions): Paris leaves summer time on 25
 	// October.
 	const api = createDateApi( {
-		abbreviations: {
+		transitions: {
 			'Europe/Paris': [
-				{ from: seconds( '2026-10-24T06:26:00Z' ), abbr: 'CEST' },
-				{ from: seconds( '2026-10-25T01:00:00Z' ), abbr: 'CET' },
+				{
+					from: seconds( '2026-10-24T06:26:00Z' ),
+					offset: 7200,
+					abbr: 'CEST',
+				},
+				{
+					from: seconds( '2026-10-25T01:00:00Z' ),
+					offset: 3600,
+					abbr: 'CET',
+				},
 			],
 		},
 	} );
@@ -216,6 +224,26 @@ describe( 'timezone abbreviations (T)', () => {
 		expect( api.date( 'T', '2026-10-24T12:00:00Z', 'Asia/Tokyo' ) ).toBe(
 			'GMT+9'
 		);
+	} );
+
+	it( 'reads the wall clock in the offsets of the server, not in the timezone database of the browser', () => {
+		// Marrakech: PHP (tzdata 2025b) puts Africa/Casablanca at +01:00 in
+		// October 2026, the ICU of the browser (tzdata 2026c) at +00:00.
+		const marrakech = createDateApi( {
+			transitions: {
+				'Africa/Casablanca': [
+					{ from: 1791327600, offset: 3600, abbr: '+01' },
+				],
+			},
+		} );
+
+		expect(
+			marrakech.date(
+				'D H:i T',
+				'2026-10-08T00:00:00+01:00',
+				'Africa/Casablanca'
+			)
+		).toBe( 'Thu 00:00 +01' );
 	} );
 } );
 

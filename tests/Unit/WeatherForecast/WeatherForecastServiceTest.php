@@ -9,14 +9,14 @@ use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\Tests\Stub\ArrayCache;
 use ElioBlocks\Tests\Stub\NullCache;
-use ElioBlocks\Tests\Stub\StubWeatherForecastProvider;
+use ElioBlocks\Tests\Stub\StubWeatherForecastAdapter;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 use ElioBlocks\Weather\Coordinates;
 use ElioBlocks\WeatherForecast\Exception\ProviderNotConfigured;
 use ElioBlocks\WeatherForecast\Exception\InvalidProviderResponse;
 use ElioBlocks\WeatherForecast\Exception\ProviderNotFound;
 use ElioBlocks\WeatherForecast\WeatherForecastPresenter;
-use ElioBlocks\WeatherForecast\WeatherForecastProviderRegistry;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use ElioBlocks\WeatherForecast\WeatherForecastService;
 use ElioBlocks\Weather\Units\UnitsConversionService;
 use ElioBlocks\Tests\Support\WordPressCore;
@@ -27,7 +27,7 @@ class WeatherForecastServiceTest extends TestCase
     private const SUN  = '<svg id="sun"></svg>';
     private const MOON = '<svg id="moon"></svg>';
 
-    private WeatherForecastProviderRegistry $registry;
+    private WeatherForecastAdapterRegistry $registry;
     private ArrayCache $cache;
     private ConditionIconsRegistry $iconRegistry;
 
@@ -68,7 +68,7 @@ class WeatherForecastServiceTest extends TestCase
             ]
         );
 
-        $this->registry     = new WeatherForecastProviderRegistry($providers);
+        $this->registry     = new WeatherForecastAdapterRegistry($providers);
         $this->cache        = new ArrayCache();
         $this->iconRegistry = new ConditionIconsRegistry();
     }
@@ -107,7 +107,7 @@ class WeatherForecastServiceTest extends TestCase
 
     public function test_caches_the_weather_forecast_of_the_provider_with_the_settings_ttl(): void
     {
-        $this->registry->register('stub', new StubWeatherForecastProvider($this->rawWeatherForecast));
+        $this->registry->register('stub', new StubWeatherForecastAdapter($this->rawWeatherForecast));
 
         $this->makeService()->getWeatherForecast($this->paris(), 'stub', 'metric', ['wind' => 'ms']);
 
@@ -121,7 +121,7 @@ class WeatherForecastServiceTest extends TestCase
 
     public function test_the_weather_forecast_tells_when_the_provider_was_asked(): void
     {
-        $this->registry->register('stub', new StubWeatherForecastProvider($this->rawWeatherForecast));
+        $this->registry->register('stub', new StubWeatherForecastAdapter($this->rawWeatherForecast));
 
         $result = $this->makeService()->getWeatherForecast($this->paris(), 'stub', 'metric');
 
@@ -131,7 +131,7 @@ class WeatherForecastServiceTest extends TestCase
 
     public function test_a_weather_forecast_served_from_the_cache_keeps_the_time_the_provider_was_asked(): void
     {
-        $this->registry->register('stub', new StubWeatherForecastProvider($this->rawWeatherForecast));
+        $this->registry->register('stub', new StubWeatherForecastAdapter($this->rawWeatherForecast));
         $this->makeService()->getWeatherForecast($this->paris(), 'stub', 'metric');
 
         $result = $this->makeService(self::NOW + 600)->getWeatherForecast($this->paris(), 'stub', 'metric');
@@ -143,7 +143,7 @@ class WeatherForecastServiceTest extends TestCase
     {
         $legacyKey                        = $this->cache->key('forecast_v3', 48.86, 2.35, 'stub', 'metric');
         $this->cache->entries[$legacyKey] = ['current' => ['temperature' => -99.0]];
-        $this->registry->register('stub', new StubWeatherForecastProvider($this->rawWeatherForecast));
+        $this->registry->register('stub', new StubWeatherForecastAdapter($this->rawWeatherForecast));
 
         $result = $this->makeService()->getWeatherForecast($this->paris(), 'stub', 'metric');
 
@@ -152,7 +152,7 @@ class WeatherForecastServiceTest extends TestCase
 
     public function test_a_malformed_weather_forecast_is_refused_and_never_cached(): void
     {
-        $this->registry->register('stub', new StubWeatherForecastProvider(['hourly' => 'not a list']));
+        $this->registry->register('stub', new StubWeatherForecastAdapter(['hourly' => 'not a list']));
 
         try {
             $this->makeService()->getWeatherForecast($this->paris(), 'stub', 'metric');
@@ -164,8 +164,8 @@ class WeatherForecastServiceTest extends TestCase
 
     public function test_a_corrupt_cache_entry_is_fetched_again(): void
     {
-        $provider = new StubWeatherForecastProvider($this->rawWeatherForecast);
-        $this->registry->register('stub', $provider);
+        $adapter = new StubWeatherForecastAdapter($this->rawWeatherForecast);
+        $this->registry->register('stub', $adapter);
         $service = $this->makeService();
         $service->getWeatherForecast($this->paris(), 'stub', 'metric');
         $key                        = array_key_first($this->cache->entries);
@@ -175,19 +175,19 @@ class WeatherForecastServiceTest extends TestCase
         $result = $this->makeService()->getWeatherForecast($this->paris(), 'stub', 'metric');
 
         $this->assertSame(20.0, $result['current']['temperature']);
-        $this->assertCount(2, $provider->calls);
+        $this->assertCount(2, $adapter->calls);
     }
 
     public function test_second_request_is_served_from_cache(): void
     {
-        $provider = new StubWeatherForecastProvider($this->rawWeatherForecast);
-        $this->registry->register('stub', $provider);
+        $adapter = new StubWeatherForecastAdapter($this->rawWeatherForecast);
+        $this->registry->register('stub', $adapter);
         $service = $this->makeService();
 
         $service->getWeatherForecast($this->paris(), 'stub', 'metric');
         $service->getWeatherForecast($this->paris(), 'stub', 'metric');
 
-        $this->assertCount(1, $provider->calls);
+        $this->assertCount(1, $adapter->calls);
     }
 
     public function test_ignores_entries_cached_before_timestamps_carried_an_offset(): void
@@ -195,7 +195,7 @@ class WeatherForecastServiceTest extends TestCase
         // Key format used up to 1.x: those entries hold local times without offset.
         $legacyKey                        = $this->cache->key('forecast', 48.86, 2.35, 'stub', 'metric');
         $this->cache->entries[$legacyKey] = ['current' => ['temperature' => -99.0]];
-        $this->registry->register('stub', new StubWeatherForecastProvider($this->rawWeatherForecast));
+        $this->registry->register('stub', new StubWeatherForecastAdapter($this->rawWeatherForecast));
 
         $result = $this->makeService()->getWeatherForecast($this->paris(), 'stub', 'metric');
 
@@ -204,31 +204,31 @@ class WeatherForecastServiceTest extends TestCase
 
     public function test_neighbouring_points_share_one_upstream_call(): void
     {
-        $provider = new StubWeatherForecastProvider($this->rawWeatherForecast);
-        $this->registry->register('stub', $provider);
+        $adapter = new StubWeatherForecastAdapter($this->rawWeatherForecast);
+        $this->registry->register('stub', $adapter);
         $service = $this->makeService();
 
         $service->getWeatherForecast(Coordinates::fromFloats(48.8566141, 2.3522219), 'stub', 'metric');
         $service->getWeatherForecast(Coordinates::fromFloats(48.8566142, 2.3522218), 'stub', 'metric');
 
-        $this->assertCount(1, $provider->calls);
+        $this->assertCount(1, $adapter->calls);
         $this->assertSame(
             ['latitude' => 48.86, 'longitude' => 2.35, 'units' => 'metric'],
-            $provider->calls[0]
+            $adapter->calls[0]
         );
     }
 
     public function test_one_upstream_call_per_request_even_when_the_persistent_cache_is_disabled(): void
     {
-        $provider = new StubWeatherForecastProvider($this->rawWeatherForecast);
-        $this->registry->register('stub', $provider);
+        $adapter = new StubWeatherForecastAdapter($this->rawWeatherForecast);
+        $this->registry->register('stub', $adapter);
         $service = new WeatherForecastService($this->registry, new NullCache(), $this->makePresenter(), new PluginSettings());
 
         // A report block asks twice per render: once to preload the icon, once for its context.
         $service->getWeatherForecast($this->paris(), 'stub', 'metric');
         $service->getWeatherForecast($this->paris(), 'stub', 'metric', ['wind' => 'ms']);
 
-        $this->assertCount(1, $provider->calls);
+        $this->assertCount(1, $adapter->calls);
     }
 
     public function test_a_provider_gets_its_credentials_that_are_set_and_no_other(): void
@@ -237,30 +237,30 @@ class WeatherForecastServiceTest extends TestCase
             'acme-weather' => ['username' => 'me', 'password' => 's3cret'],
             'other'        => ['api_key' => 'n0t-y0urs'],
         ];
-        $provider = new StubWeatherForecastProvider($this->rawWeatherForecast);
-        $this->registry->register('acme-weather', $provider);
+        $adapter = new StubWeatherForecastAdapter($this->rawWeatherForecast);
+        $this->registry->register('acme-weather', $adapter);
 
         $this->makeService()->getWeatherForecast($this->paris(), 'acme-weather', 'metric');
 
-        $this->assertSame([['credentials' => ['username' => 'me', 'password' => 's3cret']]], $provider->receivedArgs);
+        $this->assertSame([['credentials' => ['username' => 'me', 'password' => 's3cret']]], $adapter->receivedArgs);
     }
 
     public function test_a_provider_that_declares_no_credentials_gets_none(): void
     {
         $this->options[PluginSettings::OPTION_PROVIDER_CREDENTIALS] = ['other' => ['api_key' => 'n0t-y0urs']];
-        $provider = new StubWeatherForecastProvider($this->rawWeatherForecast);
-        $this->registry->register('stub', $provider);
+        $adapter = new StubWeatherForecastAdapter($this->rawWeatherForecast);
+        $this->registry->register('stub', $adapter);
 
         $this->makeService()->getWeatherForecast($this->paris(), 'stub', 'metric');
 
-        $this->assertSame([['credentials' => []]], $provider->receivedArgs);
+        $this->assertSame([['credentials' => []]], $adapter->receivedArgs);
     }
 
     public function test_a_provider_missing_a_required_credential_is_not_asked(): void
     {
         $this->options[PluginSettings::OPTION_PROVIDER_CREDENTIALS] = ['acme-weather' => ['username' => 'me']];
-        $provider = new StubWeatherForecastProvider($this->rawWeatherForecast);
-        $this->registry->register('acme-weather', $provider);
+        $adapter = new StubWeatherForecastAdapter($this->rawWeatherForecast);
+        $this->registry->register('acme-weather', $adapter);
 
         try {
             $this->makeService()->getWeatherForecast($this->paris(), 'acme-weather', 'metric');
@@ -269,26 +269,26 @@ class WeatherForecastServiceTest extends TestCase
             $this->assertStringContainsString('password', $e->getMessage());
         }
 
-        $this->assertSame([], $provider->calls);
+        $this->assertSame([], $adapter->calls);
         $this->assertSame([], $this->cache->entries);
     }
 
     public function test_unit_overrides_do_not_fragment_the_cache(): void
     {
-        $provider = new StubWeatherForecastProvider($this->rawWeatherForecast);
-        $this->registry->register('stub', $provider);
+        $adapter = new StubWeatherForecastAdapter($this->rawWeatherForecast);
+        $this->registry->register('stub', $adapter);
         $service = $this->makeService();
 
         $service->getWeatherForecast($this->paris(), 'stub', 'metric', ['wind' => 'ms']);
         $service->getWeatherForecast($this->paris(), 'stub', 'metric');
 
-        $this->assertCount(1, $provider->calls);
+        $this->assertCount(1, $adapter->calls);
         $this->assertCount(1, $this->cache->entries);
     }
 
     public function test_unit_overrides_are_applied_to_current_hourly_and_daily(): void
     {
-        $this->registry->register('stub', new StubWeatherForecastProvider($this->rawWeatherForecast));
+        $this->registry->register('stub', new StubWeatherForecastAdapter($this->rawWeatherForecast));
 
         $result = $this->makeService()->getWeatherForecast($this->paris(), 'stub', 'metric', ['wind' => 'ms']);
 
@@ -300,7 +300,7 @@ class WeatherForecastServiceTest extends TestCase
     public function test_the_weather_forecast_is_presented_with_the_icons_of_the_site(): void
     {
         $this->registerSunAndMoon();
-        $this->registry->register('stub', new StubWeatherForecastProvider($this->rawWeatherForecast));
+        $this->registry->register('stub', new StubWeatherForecastAdapter($this->rawWeatherForecast));
 
         $result = $this->makeService()->getWeatherForecast($this->paris(), 'stub', 'metric', [], ['elio']);
 

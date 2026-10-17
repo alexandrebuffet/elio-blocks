@@ -51,7 +51,7 @@
 	<!--
 		WordPress icons (@wordpress/icons, GPL-2.0-or-later), for the features, the steps and Get started.
 		elio-description-sun: an Elio icon drawn for the site alone (Figma, description-sun), for the server step.
-		build-site.mjs adds the logo of the plugin here, its tile and its sun apart (#elio-logo-tile, #elio-logo-sun).
+		build-site.mjs adds the logo of the plugin here, its tile and its sun apart (#elio-logo-tile, #elio-logo-sun), and its name (#elio-wordmark).
 	-->
 	<svg class="sprite" aria-hidden="true" focusable="false">
 		<symbol id="wp-styles" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 4.75C7.99594 4.75 4.75 7.99593 4.75 12C4.75 16.0041 7.99594 19.25 12 19.25L12 4.75Z" fill="currentColor" stroke="none"/><path d="M12 19.25C16.0041 19.25 19.25 16.0041 19.25 12C19.25 7.99594 16.0041 4.75 12 4.75C7.99594 4.75 4.75 7.99594 4.75 12C4.75 16.0041 7.99594 19.25 12 19.25Z" stroke-linejoin="round"/></symbol>
@@ -69,7 +69,7 @@
 		<div class="container site-header__inner">
 			<a class="brand" href="./">
 				<svg class="brand__logo" viewBox="0 0 128 128" width="28" height="28" aria-hidden="true" focusable="false"><use href="#elio-logo-tile"/><use class="brand__sun" href="#elio-logo-sun"/></svg>
-				<span class="brand__name">Elio Blocks</span>
+				<svg class="brand__name" role="img" aria-label="Elio Blocks"><use href="#elio-wordmark"/></svg>
 			</a>
 			<nav class="site-nav" aria-label="Main">
 				<a href="#live">Demo</a>
@@ -276,7 +276,7 @@
 		<div class="container">
 			<div class="site-footer__top">
 				<div class="site-footer__about">
-					<a class="brand" href="./"><svg class="brand__logo" viewBox="0 0 128 128" width="28" height="28" aria-hidden="true" focusable="false"><use href="#elio-logo-tile"/><use class="brand__sun" href="#elio-logo-sun"/></svg><span class="brand__name">Elio Blocks</span></a>
+					<a class="brand" href="./"><svg class="brand__logo" viewBox="0 0 128 128" width="28" height="28" aria-hidden="true" focusable="false"><use href="#elio-logo-tile"/><use class="brand__sun" href="#elio-logo-sun"/></svg><svg class="brand__name" role="img" aria-label="Elio Blocks"><use href="#elio-wordmark"/></svg></a>
 					<p>Weather forecast blocks for the WordPress Block Editor. Free, no API key by default.</p>
 				</div>
 				<nav class="site-footer__nav" aria-label="Footer">

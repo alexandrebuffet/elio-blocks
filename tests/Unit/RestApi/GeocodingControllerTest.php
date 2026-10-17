@@ -6,7 +6,7 @@ use Brain\Monkey;
 use Brain\Monkey\Functions;
 use ElioBlocks\RestApi\Endpoints\GeocodingController;
 use ElioBlocks\Tests\Stub\ArrayCache;
-use ElioBlocks\Weather\Geocoding\GeocodingProviderInterface;
+use ElioBlocks\Weather\Geocoding\GeocodingAdapterInterface;
 use ElioBlocks\Weather\Geocoding\GeocodingService;
 use PHPUnit\Framework\TestCase;
 use WP_Error;
@@ -29,11 +29,11 @@ class GeocodingControllerTest extends TestCase
         parent::tearDown();
     }
 
-    private function makeController(?GeocodingProviderInterface $provider = null): GeocodingController
+    private function makeController(?GeocodingAdapterInterface $adapter = null): GeocodingController
     {
-        $provider ??= $this->createMock(GeocodingProviderInterface::class);
+        $adapter ??= $this->createMock(GeocodingAdapterInterface::class);
 
-        return new GeocodingController(new GeocodingService($provider, new ArrayCache()));
+        return new GeocodingController(new GeocodingService($adapter, new ArrayCache()));
     }
 
     public function test_location_search_is_reserved_to_people_who_can_edit_content(): void
@@ -60,7 +60,7 @@ class GeocodingControllerTest extends TestCase
 
     public function test_upstream_failure_is_a_502_that_does_not_leak_the_upstream_message(): void
     {
-        $failing = $this->createMock(GeocodingProviderInterface::class);
+        $failing = $this->createMock(GeocodingAdapterInterface::class);
         $failing->method('geocode')->willThrowException(new \RuntimeException('cURL error 6: could not resolve host'));
 
         $error = $this->makeController($failing)->get_items(new WP_REST_Request(array( 'search' => 'Paris', 'limit' => 5 )));

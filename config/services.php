@@ -32,15 +32,15 @@ use ElioBlocks\Settings\Hooks\RegisterGlobalSettings;
 use ElioBlocks\Settings\Hooks\RegisterOptionsPage;
 use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\WeatherForecast\WeatherForecastPresenter;
-use ElioBlocks\WeatherForecast\WeatherForecastProviderRegistry;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use ElioBlocks\WeatherForecast\WeatherForecastRequestSigner;
 use ElioBlocks\WeatherForecast\WeatherForecastService;
-use ElioBlocks\WeatherForecast\Hooks\RegisterWeatherForecastProviders;
-use ElioBlocks\WeatherForecast\OpenMeteoWeatherForecastProvider;
+use ElioBlocks\WeatherForecast\Hooks\RegisterWeatherForecastAdapters;
+use ElioBlocks\WeatherForecast\OpenMeteoWeatherForecastAdapter;
 use ElioBlocks\WeatherForecast\OpenMeteoWeatherForecastResponseNormalizer;
 use ElioBlocks\Weather\Units\UnitsConversionService;
 use ElioBlocks\Weather\Geocoding\GeocodingService;
-use ElioBlocks\Weather\Geocoding\OpenMeteoGeocodingProvider;
+use ElioBlocks\Weather\Geocoding\OpenMeteoGeocodingAdapter;
 use ElioBlocks\RestApi\Hooks\RegisterCacheApi;
 use ElioBlocks\WordPress\Cache\TransientCache;
 use ElioBlocks\WordPress\Http\WpHttpClient;
@@ -138,19 +138,19 @@ return static function ( ContainerBuilder $container ): void {
 
 	$container->register( UnitsConversionService::class )->setPublic( true );
 
-	$container->register( OpenMeteoWeatherForecastProvider::class )
+	$container->register( OpenMeteoWeatherForecastAdapter::class )
 		->setArguments( array( new Reference( HttpClientInterface::class ), new Reference( OpenMeteoWeatherForecastResponseNormalizer::class ) ) )
 		->setPublic( true );
 
-	$container->register( WeatherForecastProviderRegistry::class )
+	$container->register( WeatherForecastAdapterRegistry::class )
 		->setArguments( array( new Reference( ProviderRegistry::class ) ) )
 		->setPublic( true );
 
-	$container->register( RegisterWeatherForecastProviders::class )
+	$container->register( RegisterWeatherForecastAdapters::class )
 		->setArguments(
 			array(
-				new Reference( WeatherForecastProviderRegistry::class ),
-				new Reference( OpenMeteoWeatherForecastProvider::class ),
+				new Reference( WeatherForecastAdapterRegistry::class ),
+				new Reference( OpenMeteoWeatherForecastAdapter::class ),
 			)
 		)
 		->addTag( 'elio_blocks.hookable' )
@@ -167,7 +167,7 @@ return static function ( ContainerBuilder $container ): void {
 	$container->register( WeatherForecastService::class )
 		->setArguments(
 			array(
-				new Reference( WeatherForecastProviderRegistry::class ),
+				new Reference( WeatherForecastAdapterRegistry::class ),
 				new Reference( CacheInterface::class ),
 				new Reference( WeatherForecastPresenter::class ),
 				new Reference( PluginSettings::class ),
@@ -179,12 +179,12 @@ return static function ( ContainerBuilder $container ): void {
 		->setArguments( array( new Reference( SecretInterface::class ) ) )
 		->setPublic( true );
 
-	$container->register( OpenMeteoGeocodingProvider::class )
+	$container->register( OpenMeteoGeocodingAdapter::class )
 		->setArguments( array( new Reference( HttpClientInterface::class ) ) )
 		->setPublic( true );
 
 	$container->register( GeocodingService::class )
-		->setArguments( array( new Reference( OpenMeteoGeocodingProvider::class ), new Reference( CacheInterface::class ) ) )
+		->setArguments( array( new Reference( OpenMeteoGeocodingAdapter::class ), new Reference( CacheInterface::class ) ) )
 		->setPublic( true );
 
 	// -------------------------------------------------------------------------
@@ -215,7 +215,7 @@ return static function ( ContainerBuilder $container ): void {
 		->setPublic( true );
 
 	$container->register( WeatherForecastProvidersController::class )
-		->setArguments( array( new Reference( WeatherForecastProviderRegistry::class ), new Reference( PluginSettings::class ) ) )
+		->setArguments( array( new Reference( WeatherForecastAdapterRegistry::class ), new Reference( PluginSettings::class ) ) )
 		->setPublic( true );
 
 	$container->register( RegisterRestApiRoutes::class )

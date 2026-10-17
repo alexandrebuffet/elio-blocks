@@ -3,28 +3,28 @@
 namespace ElioBlocks\WeatherForecast\Hooks;
 
 use ElioBlocks\Contracts\HookInterface;
-use ElioBlocks\WeatherForecast\WeatherForecastProviderRegistry;
-use ElioBlocks\WeatherForecast\OpenMeteoWeatherForecastProvider;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
+use ElioBlocks\WeatherForecast\OpenMeteoWeatherForecastAdapter;
 
 if (! defined('ABSPATH')) {
     die;
 }
 
 /**
- * Registers the built-in weather forecast provider, fires the elio_blocks_init
+ * Registers the built-in weather forecast adapter, fires the elio_blocks_init
  * action for third-party registrations, then locks the registry.
  */
-class RegisterWeatherForecastProviders implements HookInterface
+class RegisterWeatherForecastAdapters implements HookInterface
 {
     /**
      * Constructor.
      *
-     * @param WeatherForecastProviderRegistry  $registry          Weather forecast provider registry.
-     * @param OpenMeteoWeatherForecastProvider $openMeteoProvider Weather forecast provider of Open-Meteo.
+     * @param WeatherForecastAdapterRegistry  $registry         Weather forecast adapter registry.
+     * @param OpenMeteoWeatherForecastAdapter $openMeteoAdapter Weather forecast adapter of Open-Meteo.
      */
     public function __construct(
-        private WeatherForecastProviderRegistry $registry,
-        private OpenMeteoWeatherForecastProvider $openMeteoProvider,
+        private WeatherForecastAdapterRegistry $registry,
+        private OpenMeteoWeatherForecastAdapter $openMeteoAdapter,
     ) {
     }
 
@@ -33,8 +33,8 @@ class RegisterWeatherForecastProviders implements HookInterface
      */
     public function initHooks(): void
     {
-        // Priority 20: register the built-in weather forecast provider, once its provider is (15).
-        add_action('init', array( $this, 'registerBuiltInProviders' ), 20);
+        // Priority 20: register the built-in weather forecast adapter, once its provider is (15).
+        add_action('init', array( $this, 'registerBuiltInAdapters' ), 20);
 
         // Priority 25: allow third-party code to register via elio_blocks_init.
         add_action('init', array( $this, 'firePublicAction' ), 25);
@@ -44,11 +44,11 @@ class RegisterWeatherForecastProviders implements HookInterface
     }
 
     /**
-     * Registers the built-in weather forecast provider.
+     * Registers the built-in weather forecast adapter.
      */
-    public function registerBuiltInProviders(): void
+    public function registerBuiltInAdapters(): void
     {
-        $this->registry->register('open-meteo', $this->openMeteoProvider);
+        $this->registry->register('open-meteo', $this->openMeteoAdapter);
     }
 
     /**
@@ -57,7 +57,7 @@ class RegisterWeatherForecastProviders implements HookInterface
     public function firePublicAction(): void
     {
         /**
-         * Fires once the built-in provider, its weather forecast provider and the
+         * Fires once the built-in provider, its weather forecast adapter and the
          * "elio" icon collection are registered.
          *
          * Register custom providers, what they serve, and condition icon collections
@@ -72,7 +72,7 @@ class RegisterWeatherForecastProviders implements HookInterface
          *               'api_key' => array( 'label' => __( 'API Key', 'my-plugin' ), 'required' => true, 'secret' => true ),
          *           ),
          *       ) );
-         *       elio_blocks_register_weather_forecast_provider( 'my-provider', new MyWeatherForecastProvider() );
+         *       elio_blocks_register_weather_forecast_adapter( 'my-provider', new MyWeatherForecastAdapter() );
          *
          *       elio_blocks_register_condition_icon_collection( 'my-theme', array(
          *           'label'       => __( 'My Theme', 'my-theme' ),
