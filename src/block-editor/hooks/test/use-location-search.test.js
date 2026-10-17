@@ -69,6 +69,30 @@ describe( 'useLocationSearch', () => {
 		} );
 	} );
 
+	it( 'counts a term waiting for its search as searching', async () => {
+		const { result, rerender } = renderHook( createRegistry(), useHook, {
+			query: 'L',
+		} );
+
+		expect( apiFetch ).not.toHaveBeenCalled();
+		expect( result.current ).toEqual( {
+			results: [],
+			isSearching: true,
+			error: null,
+		} );
+
+		await advance( 400 );
+		pending.L.resolve( { success: true, data: [ PARIS ] } );
+		await advance( 1 );
+		rerender( { query: 'Li' } );
+
+		expect( result.current ).toEqual( {
+			results: [ PARIS ],
+			isSearching: true,
+			error: null,
+		} );
+	} );
+
 	it( 'never shows the results of a previous term, even when they arrive last', async () => {
 		const { result, rerender } = renderHook( createRegistry(), useHook, {
 			query: 'Par',
