@@ -3,13 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import {
-	Button,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalText as Text,
-} from '@wordpress/components';
-import { pencil } from '@wordpress/icons';
+import { Button, __experimentalVStack as VStack } from '@wordpress/components';
+import { Icon, mapMarker } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +15,7 @@ import SearchLocationModal from '../search-location-modal';
 /**
  * Renders a search interface for finding locations via the shared SearchLocationModal.
  *
- * Shows a "Search a location" button when empty, or a preview + edit button when a location is set.
+ * Shows a "Search a location" button when empty, or the location set as a button opening the search.
  * Used in the sidebar (LocationControl); the report placeholder uses SearchLocationModal directly.
  *
  * @param {Object}                     props          Component props.
@@ -66,53 +61,32 @@ export default function SearchLocationControl( { location = {}, onChange } ) {
 			) }
 
 			{ hasLocation && (
-				<HStack
+				<Button
+					__next40pxDefaultSize
 					className="weather-search-location-control__preview-button"
-					spacing={ 2 }
-					alignment="center"
-					justify="space-between"
+					describedBy={ __( 'Edit location', 'elio-blocks' ) }
+					onClick={ handleOpenModal }
 				>
+					<Icon
+						className="weather-search-location-control__preview-icon"
+						icon={ mapMarker }
+					/>
 					<VStack
 						as="span"
 						className="weather-search-location-control__preview-content"
 						spacing={ 0 }
 						alignment="left"
-						expanded={ false }
 					>
-						{ displayName ? (
-							<Text
-								className="weather-search-location-control__preview-name"
-								weight="500"
-								truncate
-							>
-								{ displayName }
-							</Text>
-						) : (
-							<Text
-								className="weather-search-location-control__preview-name"
-								weight="500"
-								truncate
-							>
+						<span className="weather-search-location-control__preview-name">
+							{ displayName || locationCoordinatesText }
+						</span>
+						{ displayName && locationCoordinatesText && (
+							<span className="weather-search-location-control__preview-coordinates">
 								{ locationCoordinatesText }
-							</Text>
-						) }
-						{ locationCoordinatesText && (
-							<Text
-								className="weather-search-location-control__preview-coordinates"
-								variant="muted"
-							>
-								{ locationCoordinatesText }
-							</Text>
+							</span>
 						) }
 					</VStack>
-					<Button
-						className="weather-search-location-control__edit-button"
-						label={ __( 'Edit location', 'elio-blocks' ) }
-						icon={ pencil }
-						size="small"
-						onClick={ handleOpenModal }
-					/>
-				</HStack>
+				</Button>
 			) }
 
 			<SearchLocationModal

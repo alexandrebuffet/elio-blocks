@@ -8,58 +8,42 @@
 		width: 100%;
 	}
 
+	// As the color and background items of the inspector: one bordered button,
+	// its text in the admin color on hover (the Button default).
 	.weather-search-location-control__preview-button {
 		width: 100%;
-		padding: $grid-unit * 1.25 $grid-unit-20;
-		border: 1px solid $gray-300;
+		height: auto;
+		padding-top: $grid-unit * 1.25;
+		padding-bottom: $grid-unit * 1.25;
+		border: $border-width solid $gray-300;
 		border-radius: $radius-small;
-		background-color: $white;
-
-		.weather-search-location-control__preview-content {
-			flex: 1;
-			min-width: 0;
-		}
-
-		.weather-search-location-control__edit-button {
-			opacity: 0;
-			flex-shrink: 0;
-
-			@media not (prefers-reduced-motion) {
-				transition: opacity 0.1s ease-in-out;
-			}
-		}
-
-		&:hover .weather-search-location-control__edit-button,
-		.weather-search-location-control__edit-button:focus,
-		.weather-search-location-control__edit-button:hover {
-			opacity: 1;
-		}
-
-		@media (hover: none) {
-			// Show edit button on devices that do not support hover.
-			.weather-search-location-control__edit-button {
-				opacity: 1;
-			}
-		}
+		gap: $grid-unit;
+		text-align: start;
 	}
-}
 
-// modal
-.weather-search-location-control-modal {
+	// Where the items show their color or image, in the color of the border.
+	.weather-search-location-control__preview-icon {
+		flex-shrink: 0;
+		color: $gray-300;
+	}
 
-	.weather-search-location-control-result__name {
+	.weather-search-location-control__preview-content {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.weather-search-location-control__preview-name,
+	.weather-search-location-control__preview-coordinates {
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.weather-search-location-control__preview-name {
 		font-weight: 500;
-		color: inherit;
 	}
 
-	.weather-search-location-control-modal__actions {
-		background-color: $white;
-		border-top: $border-width solid $gray-300;
-		bottom: -1 * $grid-unit-40;
-		left: 0;
-		margin: 0 (-1 * $grid-unit-40) (-1 * $grid-unit-40);
-		padding: $grid-unit-20 $grid-unit-40;
-		position: sticky;
-		z-index: 1;
+	.weather-search-location-control__preview-coordinates {
+		color: $gray-700;
 	}
 }
