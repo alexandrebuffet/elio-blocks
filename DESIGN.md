@@ -106,19 +106,17 @@ typography:
     fontWeight: 400
     lineHeight: 1.6
   wordmark-elio:
-    fontFamily: Geologica
-    fontSize: 22.4px
+    fontFamily: Instrument Sans
+    fontSize: 21.8px
     fontWeight: 700
     lineHeight: 1
     letterSpacing: -0.01em
-    fontVariation: "'CRSV' 0, 'SHRP' 0"
   wordmark-blocks:
-    fontFamily: Geologica
-    fontSize: 22.4px
-    fontWeight: 300
+    fontFamily: Instrument Sans
+    fontSize: 21.8px
+    fontWeight: 400
     lineHeight: 1
     letterSpacing: -0.01em
-    fontVariation: "'CRSV' 0, 'SHRP' 0"
 rounded:
   none: 0px
   control: 6px
@@ -314,11 +312,11 @@ components:
   wordmark:
     textColor: "{colors.ink}"
     typography: "{typography.wordmark-elio}"
-    height: 17.5px
+    height: 16.3px
   wordmark-light:
     textColor: "{colors.on-night}"
     typography: "{typography.wordmark-elio}"
-    height: 17.5px
+    height: 16.3px
   condition-icon:
     size: 24px
 ---
@@ -433,10 +431,10 @@ in `docs/site/assets/fonts/` (woff2, `font-display: swap`).
 - **Instrument Sans** (variable, 400 to 700), the sans of the same family,
   for everything else: body 400, buttons, menu and tabs 500, the titles of
   the footer columns 500 in capitals tracked 0.04em, the `+` of the FAQ 400.
+  The name in the logo is Instrument Sans too, but outlined: never live text.
+  See Logo.
 - **Martian Mono 400** for code only, at 0.8em of the text around it: its
   x-height is larger than the sans one.
-- **Geologica** exists only inside the logo, outlined. It is never loaded as a
-  web font nor used for live text. See Logo.
 
 One fluid scale, from phone to desktop. The tokens give the desktop size:
 
@@ -586,21 +584,21 @@ The tile and the sun, then the name.
   `src/icons/brand/svg/elio-logo.svg`, the editor's block collection icon and
   the WordPress.org icon. The admin menu has a monochrome version
   (`MENU_ICON`), the sun cut out of the tile, which WordPress tints.
-- **Name.** "ELIO BLOCKS" in capitals of Geologica, its axes at their defaults
-  (CRSV 0, SHRP 0, upright), "Elio" 700 and "Blocks" 300, tracked −0.01em,
+- **Name.** "Elio Blocks" in Instrument Sans, upright at its full width
+  (wdth 100), "Elio" 700 and "Blocks" 400 (its lightest), tracked −0.01em,
   the space between the words 0.15em. Outlined into
   `docs/brand/elio-blocks-wordmark.svg` (`currentColor`), so no font ships
   with it.
 - **Lockup.** The capitals are 56% of the height of the tile and centered on
-  it; the name starts a quarter of the tile (0.26) after it. The master is
-  668 × 128: `docs/brand/elio-blocks-logo.svg` (name in ink, light grounds)
+  it; the E starts a third of the tile (0.33) after it. The master is
+  645 × 128: `docs/brand/elio-blocks-logo.svg` (name in ink, light grounds)
   and `elio-blocks-logo-light.svg` (name in white, dark grounds). In the site
-  header: a 28px tile, the name 17.5px high, 8px between them.
+  header: a 28px tile, the name 16.3px high, 8px between them.
 - **Behavior.** On hover, the sun turns 90° in its tile (0.6s).
 
 The tile is never recolored, outlined, shadowed or set without its gradient.
 The name is never typed in live text or redrawn from another typeface: a new
-size is a scale of the SVG, a new version a new outline of Geologica.
+size is a scale of the SVG, a new version a new outline of Instrument Sans.
 
 ## Iconography
 
@@ -633,6 +631,5 @@ One collection, Elio, is every icon of the plugin.
 - Don't round a button or a card, and don't add a shadow anywhere but the
   demo window.
 - Don't use the sky blue for UI, or pure black and white for a surface.
-- Don't load Geologica for text, and don't use Chillax: its license forbids
-  redistribution.
+- Don't use Chillax: its license forbids redistribution.
 - Don't recolor the logo tile or set the name in live text.
