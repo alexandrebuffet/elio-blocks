@@ -21,10 +21,15 @@
 		text-align: start;
 	}
 
-	// Where the items show their color or image, in the color of the border.
-	.weather-search-location-control__preview-icon {
+	// The color indicator of the color items, a marker in place of a color, in
+	// the color of its ring.
+	.weather-search-location-control__preview-indicator {
+		display: inline-flex;
 		flex-shrink: 0;
-		color: $gray-300;
+		align-items: center;
+		justify-content: center;
+		background: $white;
+		color: rgba($black, 0.2);
 	}
 
 	.weather-search-location-control__preview-content {
@@ -45,5 +50,7 @@
 
 	.weather-search-location-control__preview-coordinates {
 		color: $gray-700;
+		font-size: $font-size-small;
+		font-weight: var(--wpds-typography-font-weight-default);
 	}
 }
