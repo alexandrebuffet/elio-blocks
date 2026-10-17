@@ -5,7 +5,7 @@ description: >-
   Weather blocks for the WordPress Block Editor. The brand is a sunset sky
   shot on film: warm light, golden blacks, one touch of blue, flat color over
   the photo and film grain over everything, Instrument Serif for display and
-  Geist for the rest. The blocks themselves have no look of their own: they
+  Instrument Sans for the rest. The blocks themselves have no look of their own: they
   take the theme's.
 colors:
   primary: "#CC6400"
@@ -65,45 +65,45 @@ typography:
     fontWeight: 400
     lineHeight: 1.15
   body-lg:
-    fontFamily: Geist
+    fontFamily: Instrument Sans
     fontSize: 1.25rem
     fontWeight: 400
     lineHeight: 1.5
   body-md:
-    fontFamily: Geist
+    fontFamily: Instrument Sans
     fontSize: 1.0625rem
     fontWeight: 400
     lineHeight: 1.6
   body-sm:
-    fontFamily: Geist
+    fontFamily: Instrument Sans
     fontSize: 0.9375rem
     fontWeight: 400
     lineHeight: 1.6
   caption:
-    fontFamily: Geist
+    fontFamily: Instrument Sans
     fontSize: 0.8125rem
     fontWeight: 400
     lineHeight: 1.6
   label-md:
-    fontFamily: Geist
+    fontFamily: Instrument Sans
     fontSize: 1.0625rem
     fontWeight: 500
     lineHeight: 1
   label-sm:
-    fontFamily: Geist
+    fontFamily: Instrument Sans
     fontSize: 0.9375rem
     fontWeight: 500
     lineHeight: 1
   label-caps:
-    fontFamily: Geist
+    fontFamily: Instrument Sans
     fontSize: 0.8125rem
     fontWeight: 500
     lineHeight: 1.6
     letterSpacing: 0.04em
   code:
-    fontFamily: Geist Mono
-    fontSize: 0.875em
-    fontWeight: 450
+    fontFamily: Martian Mono
+    fontSize: 0.8em
+    fontWeight: 400
     lineHeight: 1.6
   wordmark-elio:
     fontFamily: Instrument Sans
@@ -168,7 +168,7 @@ components:
     textColor: "{colors.primary-dark}"
     typography: "{typography.display-md}"
   lead:
-    textColor: "{colors.ink-2}"
+    textColor: "{colors.ink}"
     typography: "{typography.body-lg}"
   eyebrow:
     textColor: "{colors.ink-2}"
@@ -428,12 +428,13 @@ in `docs/site/assets/fonts/` (woff2, `font-display: swap`).
   never below `--text-xl`. Titles are tight (line height 0.88 to 0.95,
   tracking −0.02em) and balanced (`text-wrap: balance`). The `<em>` of a
   title is the italic, in primary.
-- **Geist** (variable) for everything else: body 400, buttons, menu and tabs
-  500, the titles of the footer columns 500 in capitals tracked 0.04em, the
-  `+` of the FAQ 300.
-- **Geist Mono 450** for code only, at 0.875em of the text around it.
-- **Instrument Sans** exists only inside the logo, outlined. It is never
-  loaded as a web font nor used for live text. See Logo.
+- **Instrument Sans** (variable, 400 to 700), the sans of the same family,
+  for everything else: body 400, buttons, menu and tabs 500, the titles of
+  the footer columns 500 in capitals tracked 0.04em, the `+` of the FAQ 400.
+  The name in the logo is Instrument Sans too, but outlined: never live text.
+  See Logo.
+- **Martian Mono 400** for code only, at 0.8em of the text around it: its
+  x-height is larger than the sans one.
 
 One fluid scale, from phone to desktop. The tokens give the desktop size:
 
@@ -522,7 +523,7 @@ Icons are drawn with a 1.5px line (see Iconography).
 
 ## Components
 
-- **Buttons.** Flat and square, 52px high (40px small), a label in Geist 500,
+- **Buttons.** Flat and square, 52px high (40px small), a label in Instrument Sans 500,
   an arrow that moves on hover. Primary: ink with paper text. Secondary: a
   1px ink frame, no fill. On night, light (on night with night text) and
   secondary light (an on night frame). Hovered, any button lights up like the
@@ -536,7 +537,7 @@ Icons are drawn with a 1.5px line (see Iconography).
   `--text-s` and ink 2.
 - **Display title.** Instrument Serif, the statement in ink and the italic
   turn in primary, balanced.
-- **Menu link.** Geist 500 `--text-s` in ink; a 2px underline 0.4em below,
+- **Menu link.** Instrument Sans 500 `--text-s` in ink; a 2px underline 0.4em below,
   line strong on hover, primary strong for the section on screen
   (`aria-current`), the text keeping its color.
 - **Feature card.** A 1px frame of line, 32px of padding, a 48px icon in
@@ -554,7 +555,7 @@ Icons are drawn with a 1.5px line (see Iconography).
   a sun rising behind it. The footer: the logo and one line, three lists of
   links (titles in capitals, links underlined on hover only), then the
   licenses and the author in `--text-xs`, under rules of on night at 12%.
-- **Code.** Geist Mono on a 7% tint of the text color in a 16% frame, so it
+- **Code.** Martian Mono on a 7% tint of the text color in a 16% frame, so it
   reads on paper, ember and night alike. A block of code adds a 2px bar of
   primary on its left and scrolls sideways (`tabindex="0"`).
 - **Demo window.** A browser drawn in the colors of the page (`--browser-*`):
