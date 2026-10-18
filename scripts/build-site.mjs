@@ -127,7 +127,7 @@ const logoSymbols =
 	`<symbol id="elio-logo-sun" viewBox="0 0 128 128" fill="none">${ logoSun[ 0 ] }</symbol>`;
 
 // The name of the plugin as the logo writes it (docs/brand/), outlined from
-// Geologica, in currentColor.
+// Elio Sans, in currentColor.
 const wordmark = readFileSync(
 	join( root, 'docs/brand/elio-blocks-wordmark.svg' ),
 	'utf8'
