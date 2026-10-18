@@ -12,6 +12,9 @@ if (! defined('ABSPATH')) {
  * One of the adapters a provider is registered with
  * (elio_blocks_register_provider()): the provider holds the name, the
  * credentials and the attribution, this fetches its weather forecast.
+ *
+ * @since 0.4.0 Replaces WeatherForecastProviderInterface, which
+ *              elio_blocks_register_weather_forecast_provider() registered.
  */
 interface WeatherForecastAdapterInterface
 {

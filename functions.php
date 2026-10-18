@@ -56,6 +56,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @param Provider $provider The provider, with its credentials, attribution and adapters.
  * @return bool True if the provider was registered, false otherwise.
+ * @since 0.1.0
+ * @since 0.4.0 Takes a Provider, which holds its credentials, attribution and
+ *              adapters, in place of a slug and an array.
+ *              elio_blocks_register_weather_forecast_provider() is gone: an
+ *              adapter is one of the adapters of its provider.
  */
 function elio_blocks_register_provider( Provider $provider ): bool {
 	return Plugin::instance()->container()->get( ProviderRegistry::class )->register( $provider );
@@ -68,10 +73,14 @@ function elio_blocks_register_provider( Provider $provider ): bool {
  *
  * @param string               $slug Collection slug: lowercase letters, digits, hyphens, underscores.
  * @param array<string, mixed> $args {
- *     @type string $label       Required. Human-readable label, shown in the editor.
- *     @type string $description Optional. Human-readable description.
+ *     @type string $label        Required. Human-readable label, shown in the editor.
+ *     @type string $description  Optional. Human-readable description.
+ *     @type float  $stroke_width Optional. Stroke width the stroke icons are drawn with, what the condition icon
+ *                                block applies unless set on the block. Default 2.
  * }
  * @return bool True if the collection was registered, false otherwise.
+ * @since 0.1.0
+ * @since 0.2.0 Takes a stroke_width.
  */
 function elio_blocks_register_condition_icon_collection( string $slug, array $args ): bool {
 	return Plugin::instance()->container()->get( ConditionIconsRegistry::class )->registerCollection( $slug, $args );
@@ -84,6 +93,7 @@ function elio_blocks_register_condition_icon_collection( string $slug, array $ar
  *
  * @param string $slug Collection slug.
  * @return bool True if the collection was unregistered, false otherwise.
+ * @since 0.1.0
  */
 function elio_blocks_unregister_condition_icon_collection( string $slug ): bool {
 	return Plugin::instance()->container()->get( ConditionIconsRegistry::class )->unregisterCollection( $slug );
@@ -105,6 +115,7 @@ function elio_blocks_unregister_condition_icon_collection( string $slug ): bool 
  *                              for a condition its collection does not represent.
  * }
  * @return bool True if the icon was registered, false otherwise.
+ * @since 0.1.0
  */
 function elio_blocks_register_condition_icon( string $name, array $args ): bool {
 	return Plugin::instance()->container()->get( ConditionIconsRegistry::class )->registerIcon( $name, $args );
@@ -117,6 +128,7 @@ function elio_blocks_register_condition_icon( string $name, array $args ): bool 
  *
  * @param string $name Qualified icon name.
  * @return bool True if the icon was unregistered, false otherwise.
+ * @since 0.1.0
  */
 function elio_blocks_unregister_condition_icon( string $name ): bool {
 	return Plugin::instance()->container()->get( ConditionIconsRegistry::class )->unregisterIcon( $name );
@@ -132,6 +144,7 @@ function elio_blocks_unregister_condition_icon( string $name ): bool {
  * @param string $name Qualified icon name.
  * @param string $svg  Sanitized SVG markup, the content of elio_blocks_get_condition_icon().
  * @return void
+ * @since 0.1.0
  */
 function elio_blocks_add_icon_to_sprite( string $name, string $svg ): void {
 	Plugin::instance()->container()->get( IconSprite::class )->add( $name, $svg );
@@ -144,6 +157,7 @@ function elio_blocks_add_icon_to_sprite( string $name, string $svg ): void {
  * the symbols reach the browser before the icons using them.
  *
  * @return string Hidden <svg> holding one <symbol> per icon, empty when there is none.
+ * @since 0.1.0
  */
 function elio_blocks_render_icon_sprite(): string {
 	return Plugin::instance()->container()->get( IconSprite::class )->render();
@@ -157,6 +171,7 @@ function elio_blocks_render_icon_sprite(): string {
  * print.
  *
  * @return array<string, mixed>
+ * @since 0.1.0
  */
 function elio_blocks_get_weather_report_interactivity_state(): array {
 	return Plugin::instance()->container()->get( DirectivesHelper::class )->getState();
@@ -171,6 +186,7 @@ function elio_blocks_get_weather_report_interactivity_state(): array {
  *
  * @param WP_Block $block Weather report block being rendered.
  * @return array<string, mixed>
+ * @since 0.1.0
  */
 function elio_blocks_get_weather_report_interactivity_context( WP_Block $block ): array {
 	return Plugin::instance()->container()->get( DirectivesHelper::class )->getContext( $block );
@@ -183,6 +199,7 @@ function elio_blocks_get_weather_report_interactivity_context( WP_Block $block )
  * condition_icons…); null when the report has no weather forecast.
  *
  * @return array<string, mixed>|null
+ * @since 0.1.0
  */
 function elio_blocks_get_current_conditions(): ?array {
 	return Plugin::instance()->container()->get( ReportContext::class )->getCurrentItem();
@@ -197,6 +214,7 @@ function elio_blocks_get_current_conditions(): ?array {
  * @param string $type  'daily' or 'hourly'.
  * @param int    $count Number of rows.
  * @return list<array<string, mixed>>
+ * @since 0.1.0
  */
 function elio_blocks_get_forecast_items( string $type, int $count ): array {
 	return Plugin::instance()->container()->get( ReportContext::class )->getForecastItems( $type, $count );
@@ -210,6 +228,7 @@ function elio_blocks_get_forecast_items( string $type, int $count ): array {
  *
  * @param string $name Qualified icon name ("elio/sun").
  * @return array{content: string, style: string}|null Sanitized SVG markup, and 'fill' or 'stroke'.
+ * @since 0.1.0
  */
 function elio_blocks_get_condition_icon( string $name ): ?array {
 	return Plugin::instance()->container()->get( ReportContext::class )->getIcon( $name );
@@ -224,6 +243,7 @@ function elio_blocks_get_condition_icon( string $name ): ?array {
  * @param string|null $block_collection  The iconCollection attribute of the block.
  * @param string|null $report_collection The elio/reportIconCollection block context.
  * @return string Collection slug.
+ * @since 0.1.0
  */
 function elio_blocks_get_condition_icon_collection( ?string $block_collection, ?string $report_collection ): string {
 	return Plugin::instance()->container()->get( ConditionIconCollectionResolver::class )->resolve( $block_collection, $report_collection );
@@ -238,6 +258,7 @@ function elio_blocks_get_condition_icon_collection( ?string $block_collection, ?
  *
  * @param string $collection Collection slug.
  * @return float Stroke width, in the units of the 24×24 viewBox.
+ * @since 0.2.0
  */
 function elio_blocks_get_condition_icon_stroke_width( string $collection ): float {
 	$registered = Plugin::instance()->container()->get( ConditionIconsRegistry::class )->getRegisteredCollection( $collection );
@@ -254,6 +275,7 @@ function elio_blocks_get_condition_icon_stroke_width( string $collection ): floa
  * @param string $provider Provider slug (the elio/reportProvider block context), empty for the site default.
  * @return array{name: string, url: string, license: string, license_url: string}|null Label of the provider, its site,
  *                                                                                  the license of its data and its page; to escape.
+ * @since 0.2.0
  */
 function elio_blocks_get_weather_forecast_attribution( string $provider ): ?array {
 	$container = Plugin::instance()->container();
