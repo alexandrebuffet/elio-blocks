@@ -1,8 +1,10 @@
 name: Deploy site
 
 # The presentation site on GitHub Pages: docs/site/ assembled by
-# scripts/build-site.mjs, plus the plugin package of main, which the Playground
-# demo of the site installs. Deployed from main only (github-pages environment).
+# scripts/build-site.mjs, the handbook (docs/handbook/) under /docs/, and the
+# plugin package of main, which the Playground demo of the site installs.
+# Deployed from main only (github-pages environment), so the handbook follows
+# each release.
 on:
   push:
     branches:
@@ -37,9 +39,18 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: docs/handbook/package-lock.json
 
       - name: Build site
         run: node scripts/build-site.mjs _site
+
+      - name: Install the handbook dependencies
+        run: npm ci --prefix docs/handbook
+
+      # After the site, which empties _site/ first.
+      - name: Build the handbook
+        run: npm run build:docs -- --out-dir ../../_site/docs
 
       - name: Download the plugin package
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
