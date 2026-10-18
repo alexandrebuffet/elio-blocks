@@ -9,9 +9,9 @@ if (! defined('ABSPATH')) {
 /**
  * How a provider serves the weather forecast.
  *
- * Registered for a provider (elio_blocks_register_provider()) with
- * elio_blocks_register_weather_forecast_adapter(): the provider holds the
- * name and the credentials, this fetches its weather forecast.
+ * One of the adapters a provider is registered with
+ * (elio_blocks_register_provider()): the provider holds the name, the
+ * credentials and the attribution, this fetches its weather forecast.
  */
 interface WeatherForecastAdapterInterface
 {

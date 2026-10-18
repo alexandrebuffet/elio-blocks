@@ -9,14 +9,14 @@ use ElioBlocks\Interactivity\Blocks\Report\ReportContext;
 use ElioBlocks\Plugin;
 use ElioBlocks\Provider\Hooks\RegisterProviders;
 use ElioBlocks\Provider\Provider;
+use ElioBlocks\Provider\ProviderAttribution;
 use ElioBlocks\Provider\ProviderCredential;
 use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Tests\Stub\StubWeatherForecastAdapter;
 use ElioBlocks\Tests\Support\WordPressCore;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 use ElioBlocks\Weather\Condition\Icons\Hooks\RegisterConditionIcons;
-use ElioBlocks\WeatherForecast\Hooks\RegisterWeatherForecastAdapters;
-use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterInterface;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -85,7 +85,6 @@ class PublicApiTest extends TestCase
                 'elio_blocks_register_condition_icon',
                 'elio_blocks_register_condition_icon_collection',
                 'elio_blocks_register_provider',
-                'elio_blocks_register_weather_forecast_adapter',
                 'elio_blocks_render_icon_sprite',
                 'elio_blocks_unregister_condition_icon',
                 'elio_blocks_unregister_condition_icon_collection',
@@ -96,42 +95,41 @@ class PublicApiTest extends TestCase
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_a_provider_and_its_weather_forecast_adapter_registered_on_elio_blocks_init_go_to_the_registries_the_plugin_reads_and_locks(): void
+    public function test_a_provider_registered_on_elio_blocks_init_goes_with_its_adapters_to_the_registry_the_plugin_reads_and_locks(): void
     {
         require_once dirname(__DIR__, 2) . '/functions.php';
         // The slug in the error message is escaped.
         Functions\stubEscapeFunctions();
 
-        $container               = Plugin::instance()->container();
-        $providersHook           = $container->get(RegisterProviders::class);
-        $weatherForecastHook     = $container->get(RegisterWeatherForecastAdapters::class);
+        $container              = Plugin::instance()->container();
+        $providersHook          = $container->get(RegisterProviders::class);
         $weatherForecastAdapter = new StubWeatherForecastAdapter();
+        $provider               = new Provider(
+            'third-party',
+            'Third Party',
+            [new ProviderCredential('api_key', 'API Key', '', true, true)],
+            null,
+            [$weatherForecastAdapter]
+        );
 
         // What a third party does.
         Actions\expectDone('elio_blocks_init')->once()->whenHappen(
-            static function () use ($weatherForecastAdapter): void {
-                elio_blocks_register_provider('third-party', ['label' => 'Third Party', 'credentials' => ['api_key' => ['label' => 'API Key', 'required' => true, 'secret' => true]]]);
-                elio_blocks_register_weather_forecast_adapter('third-party', $weatherForecastAdapter);
+            static function () use ($provider): void {
+                elio_blocks_register_provider($provider);
             }
         );
 
         // What the plugin does on 'init', priorities 25 and 26.
-        $weatherForecastHook->firePublicAction();
+        $providersHook->firePublicAction();
         $providersHook->lockRegistry();
-        $weatherForecastHook->lockRegistry();
 
-        $this->assertEquals(
-            new Provider('third-party', 'Third Party', ['api_key' => new ProviderCredential('api_key', 'API Key', '', true, true)]),
-            $container->get(ProviderRegistry::class)->getBySlug('third-party')
-        );
-        $this->assertSame(
-            $weatherForecastAdapter,
-            $container->get(WeatherForecastAdapterRegistry::class)->getBySlug('third-party')
-        );
+        $registered = $container->get(ProviderRegistry::class)->getBySlug('third-party');
+        $this->assertSame($provider, $registered);
+        $this->assertSame(['api_key'], array_keys($registered->credentials));
+        $this->assertSame($weatherForecastAdapter, $registered->getAdapter(WeatherForecastAdapterInterface::class));
 
-        Functions\expect('_doing_it_wrong')->twice();
-        $this->assertFalse(elio_blocks_register_provider('too-late', ['label' => 'Too Late']));
-        $this->assertFalse(elio_blocks_register_weather_forecast_adapter('third-party', new StubWeatherForecastAdapter()));
+        Functions\expect('_doing_it_wrong')->once();
+        $this->assertFalse(elio_blocks_register_provider(new Provider('too-late', 'Too Late')));
     }
 
     #[RunInSeparateProcess]
@@ -151,7 +149,7 @@ class PublicApiTest extends TestCase
             }
         );
 
-        $container->get(RegisterWeatherForecastAdapters::class)->firePublicAction();
+        $container->get(RegisterProviders::class)->firePublicAction();
         $container->get(RegisterConditionIcons::class)->lockRegistry();
 
         $registry = $container->get(ConditionIconsRegistry::class);
@@ -262,11 +260,12 @@ class PublicApiTest extends TestCase
         Functions\when('get_option')->alias(static fn(string $name, mixed $default = false): mixed => $default);
 
         $container = Plugin::instance()->container();
-        // What the plugin does on 'init', priorities 15 and 20.
+        // What the plugin does on 'init', priority 20.
         $container->get(RegisterProviders::class)->registerBuiltInProviders();
-        $container->get(RegisterWeatherForecastAdapters::class)->registerBuiltInAdapters();
-        $container->get(ProviderRegistry::class)->register('silent', ['label' => 'Silent']);
-        $container->get(WeatherForecastAdapterRegistry::class)->register('silent', new StubWeatherForecastAdapter());
+        $container->get(ProviderRegistry::class)->register(new Provider('silent', 'Silent', [], null, [new StubWeatherForecastAdapter()]));
+        $container->get(ProviderRegistry::class)->register(
+            new Provider('air-only', 'Air Only', [], new ProviderAttribution('https://air-only.test/'))
+        );
 
         $openMeteo = [
             'name'        => 'Open-Meteo',
@@ -277,6 +276,7 @@ class PublicApiTest extends TestCase
         $this->assertSame($openMeteo, elio_blocks_get_weather_forecast_attribution('open-meteo'));
         $this->assertSame($openMeteo, elio_blocks_get_weather_forecast_attribution(''), 'Open-Meteo is the default provider.');
         $this->assertNull(elio_blocks_get_weather_forecast_attribution('silent'), 'It asks for no credit.');
+        $this->assertNull(elio_blocks_get_weather_forecast_attribution('air-only'), 'It serves no weather forecast.');
         $this->assertNull(elio_blocks_get_weather_forecast_attribution('uninstalled'));
     }
 

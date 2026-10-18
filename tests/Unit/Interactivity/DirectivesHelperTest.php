@@ -6,6 +6,7 @@ use Brain\Monkey;
 use Brain\Monkey\Functions;
 use ElioBlocks\Interactivity\Blocks\Report\DerivedState;
 use ElioBlocks\Interactivity\Blocks\Report\DirectivesHelper;
+use ElioBlocks\Provider\Provider;
 use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\Tests\Stub\ArrayCache;
@@ -17,7 +18,6 @@ use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 use ElioBlocks\Weather\Coordinates;
 use ElioBlocks\WeatherForecast\WeatherForecastAdapterInterface;
 use ElioBlocks\WeatherForecast\WeatherForecastPresenter;
-use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use ElioBlocks\WeatherForecast\WeatherForecastRequestSigner;
 use ElioBlocks\WeatherForecast\WeatherForecastService;
 use ElioBlocks\Weather\Units\UnitsConversionService;
@@ -26,7 +26,7 @@ use WP_Block;
 
 class DirectivesHelperTest extends TestCase
 {
-    private WeatherForecastAdapterRegistry $adapters;
+    private ProviderRegistry $providers;
     private WeatherForecastRequestSigner $signer;
 
     protected function setUp(): void
@@ -38,10 +38,7 @@ class DirectivesHelperTest extends TestCase
         Functions\when('rest_url')->alias(static fn(string $path = ''): string => 'https://example.test/wp-json/' . $path);
         Functions\stubEscapeFunctions();
 
-        $providers = new ProviderRegistry();
-        $providers->register('stub', array( 'label' => 'Stub' ));
-
-        $this->adapters = new WeatherForecastAdapterRegistry($providers);
+        $this->providers = new ProviderRegistry();
         $this->signer    = new WeatherForecastRequestSigner(new FixedSecret('s3cret'));
     }
 
@@ -49,6 +46,12 @@ class DirectivesHelperTest extends TestCase
     {
         Monkey\tearDown();
         parent::tearDown();
+    }
+
+    /** Registers a provider that serves the weather forecast through this adapter. */
+    private function serve(string $slug, WeatherForecastAdapterInterface $adapter): void
+    {
+        $this->providers->register(new Provider($slug, $slug, array(), null, array( $adapter )));
     }
 
     private function makeHelper(?ConditionIconsRegistry $icons = null): DirectivesHelper
@@ -65,7 +68,7 @@ class DirectivesHelperTest extends TestCase
         $settings->method('getConditionIconCollection')->willReturn('elio');
 
         $service = new WeatherForecastService(
-            $this->adapters,
+            $this->providers,
             new ArrayCache(),
             new WeatherForecastPresenter($icons, new UnitsConversionService()),
             $settings,
@@ -89,7 +92,7 @@ class DirectivesHelperTest extends TestCase
 
     public function test_context_carries_the_signature_of_the_request_the_client_will_send(): void
     {
-        $this->adapters->register('stub', new StubWeatherForecastAdapter(array( 'current' => array( 'temperature' => 20.0 ) )));
+        $this->serve('stub', new StubWeatherForecastAdapter(array( 'current' => array( 'temperature' => 20.0 ) )));
 
         $context = $this->makeHelper()->getContext($this->blockAt(48.8566, 2.3522));
 
@@ -105,7 +108,7 @@ class DirectivesHelperTest extends TestCase
 
     public function test_context_carries_the_server_fetched_weather_forecast_with_unit_overrides_applied(): void
     {
-        $this->adapters->register(
+        $this->serve(
             'stub',
             new StubWeatherForecastAdapter(array( 'current' => array( 'temperature' => 20.0, 'wind_speed' => 36.0 ) ))
         );
@@ -119,7 +122,7 @@ class DirectivesHelperTest extends TestCase
 
     public function test_page_context_leaves_out_the_hourly_and_daily_sections_the_server_already_rendered(): void
     {
-        $this->adapters->register(
+        $this->serve(
             'stub',
             new StubWeatherForecastAdapter(
                 array(
@@ -144,7 +147,7 @@ class DirectivesHelperTest extends TestCase
         $icons = new ConditionIconsRegistry();
         $icons->registerCollection('elio', ['label' => 'Elio']);
         $icons->registerIcon('elio/sun', ['content' => '<svg id="sun"></svg>', 'style' => 'stroke', 'conditions' => [['clear-sky', 'day']]]);
-        $this->adapters->register('stub', new StubWeatherForecastAdapter(['current' => ['condition_code' => 0, 'is_day' => 1]]));
+        $this->serve('stub', new StubWeatherForecastAdapter(['current' => ['condition_code' => 0, 'is_day' => 1]]));
 
         $context = $this->makeHelper($icons)->getContext($this->blockAt(48.8566, 2.3522));
 
@@ -159,7 +162,7 @@ class DirectivesHelperTest extends TestCase
         $icons = new ConditionIconsRegistry();
         $icons->registerCollection('elio', ['label' => 'Elio']);
         $icons->registerCollection('theme', ['label' => 'Theme']);
-        $this->adapters->register('stub', new StubWeatherForecastAdapter(['current' => ['condition_code' => 0]]));
+        $this->serve('stub', new StubWeatherForecastAdapter(['current' => ['condition_code' => 0]]));
         $block = new WP_Block(
             ['location' => ['latitude' => 48.8566, 'longitude' => 2.3522]],
             [],
@@ -187,7 +190,7 @@ class DirectivesHelperTest extends TestCase
     public function test_a_location_on_the_equator_and_prime_meridian_is_fetched(): void
     {
         $adapter = new StubWeatherForecastAdapter(array( 'current' => array( 'temperature' => 28.0 ) ));
-        $this->adapters->register('stub', $adapter);
+        $this->serve('stub', $adapter);
 
         $context = $this->makeHelper()->getContext($this->blockAt(0, 0.0));
 
@@ -198,7 +201,7 @@ class DirectivesHelperTest extends TestCase
     public function test_a_block_without_location_does_not_fetch_and_has_no_signature(): void
     {
         $adapter = new StubWeatherForecastAdapter(array());
-        $this->adapters->register('stub', $adapter);
+        $this->serve('stub', $adapter);
 
         $context = $this->makeHelper()->getContext(new WP_Block(array()));
 
@@ -211,7 +214,7 @@ class DirectivesHelperTest extends TestCase
     {
         $failing = $this->createMock(WeatherForecastAdapterInterface::class);
         $failing->method('fetch')->willThrowException(new \RuntimeException('cURL error 28: resolving api.internal timed out'));
-        $this->adapters->register('stub', $failing);
+        $this->serve('stub', $failing);
 
         $context = $this->makeHelper()->getContext($this->blockAt(48.8566, 2.3522));
 
@@ -224,7 +227,7 @@ class DirectivesHelperTest extends TestCase
     {
         $failing = $this->createMock(WeatherForecastAdapterInterface::class);
         $failing->method('fetch')->willThrowException(new \RuntimeException('timeout'));
-        $this->adapters->register('stub', $failing);
+        $this->serve('stub', $failing);
         $before = (int) ( microtime(true) * 1000 );
 
         $query = $this->makeHelper()->getContext($this->blockAt(48.8566, 2.3522))['query'];

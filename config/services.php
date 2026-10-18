@@ -32,10 +32,8 @@ use ElioBlocks\Settings\Hooks\RegisterGlobalSettings;
 use ElioBlocks\Settings\Hooks\RegisterOptionsPage;
 use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\WeatherForecast\WeatherForecastPresenter;
-use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use ElioBlocks\WeatherForecast\WeatherForecastRequestSigner;
 use ElioBlocks\WeatherForecast\WeatherForecastService;
-use ElioBlocks\WeatherForecast\Hooks\RegisterWeatherForecastAdapters;
 use ElioBlocks\WeatherForecast\OpenMeteoWeatherForecastAdapter;
 use ElioBlocks\WeatherForecast\OpenMeteoWeatherForecastResponseNormalizer;
 use ElioBlocks\Weather\Units\UnitsConversionService;
@@ -126,7 +124,12 @@ return static function ( ContainerBuilder $container ): void {
 		->setPublic( true );
 
 	$container->register( RegisterProviders::class )
-		->setArguments( array( new Reference( ProviderRegistry::class ) ) )
+		->setArguments(
+			array(
+				new Reference( ProviderRegistry::class ),
+				new Reference( OpenMeteoWeatherForecastAdapter::class ),
+			)
+		)
 		->addTag( 'elio_blocks.hookable' )
 		->setPublic( true );
 
@@ -142,20 +145,6 @@ return static function ( ContainerBuilder $container ): void {
 		->setArguments( array( new Reference( HttpClientInterface::class ), new Reference( OpenMeteoWeatherForecastResponseNormalizer::class ) ) )
 		->setPublic( true );
 
-	$container->register( WeatherForecastAdapterRegistry::class )
-		->setArguments( array( new Reference( ProviderRegistry::class ) ) )
-		->setPublic( true );
-
-	$container->register( RegisterWeatherForecastAdapters::class )
-		->setArguments(
-			array(
-				new Reference( WeatherForecastAdapterRegistry::class ),
-				new Reference( OpenMeteoWeatherForecastAdapter::class ),
-			)
-		)
-		->addTag( 'elio_blocks.hookable' )
-		->setPublic( true );
-
 	$container->register( WeatherForecastPresenter::class )
 		->setArguments(
 			array(
@@ -167,7 +156,7 @@ return static function ( ContainerBuilder $container ): void {
 	$container->register( WeatherForecastService::class )
 		->setArguments(
 			array(
-				new Reference( WeatherForecastAdapterRegistry::class ),
+				new Reference( ProviderRegistry::class ),
 				new Reference( CacheInterface::class ),
 				new Reference( WeatherForecastPresenter::class ),
 				new Reference( PluginSettings::class ),
@@ -215,7 +204,7 @@ return static function ( ContainerBuilder $container ): void {
 		->setPublic( true );
 
 	$container->register( WeatherForecastProvidersController::class )
-		->setArguments( array( new Reference( WeatherForecastAdapterRegistry::class ), new Reference( PluginSettings::class ) ) )
+		->setArguments( array( new Reference( ProviderRegistry::class ), new Reference( PluginSettings::class ) ) )
 		->setPublic( true );
 
 	$container->register( RegisterRestApiRoutes::class )

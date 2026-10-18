@@ -10,41 +10,13 @@ if (! defined('ABSPATH')) {
 }
 
 /**
- * Registry of the providers, indexed by slug.
+ * Registry of the providers, indexed by slug, and through them of what they
+ * serve: each domain asks a provider for its adapter (Provider::getAdapter()).
  *
- * Locked after build(), like the registries of what they serve: third parties
- * register on elio_blocks_init.
+ * Locked after build(): third parties register on elio_blocks_init.
  */
 final class ProviderRegistry
 {
-    /**
-     * Arguments a provider is registered with, and their defaults.
-     */
-    private const DEFAULT_ARGS = array(
-        'label'       => '',
-        'credentials' => array(),
-        'attribution' => null,
-    );
-
-    /**
-     * Arguments an attribution is declared with, and their defaults.
-     */
-    private const DEFAULT_ATTRIBUTION_ARGS = array(
-        'url'         => '',
-        'license'     => '',
-        'license_url' => '',
-    );
-
-    /**
-     * Arguments a credential is declared with, and their defaults.
-     */
-    private const DEFAULT_CREDENTIAL_ARGS = array(
-        'label'       => '',
-        'description' => '',
-        'required'    => false,
-        'secret'      => false,
-    );
-
     /**
      * Registered providers, indexed by slug.
      *
@@ -72,25 +44,16 @@ final class ProviderRegistry
      * So is an attribution: http(s) URLs and a license name, printed escaped in
      * a sentence of the provider-attribution block.
      *
-     * @param string               $slug Unique identifier: lowercase letters, digits and hyphens. It
-     *                                   names the constants of its credentials (ELIO_BLOCKS_{SLUG}_{NAME}).
-     * @param array<string, mixed> $args {
-     *     @type string $label       Name shown to people. Required.
-     *     @type array  $credentials What identifies the site to it, by name (lowercase letters, digits
-     *                               and underscores), each an array of:
-     *                               'label' (string, required), 'description' (string, plain text),
-     *                               'required' (bool, default false: the provider answers without it),
-     *                               'secret' (bool, default false: typed hidden, never sent back to the
-     *                               browser). Default none.
-     *     @type array  $attribution The credit its license asks for wherever its data is shown: its label
-     *                               linked to its site. An array of: 'url' (string, http(s) URL of its
-     *                               site, required), 'license' (string, name of the license of its data),
-     *                               'license_url' (string, http(s) URL of that license). Default none.
-     * }
+     * @param Provider $provider Slug (lowercase letters, digits and hyphens, naming the constants of its
+     *                           credentials, ELIO_BLOCKS_{SLUG}_{NAME}), label, credentials (each named with
+     *                           lowercase letters, digits and underscores, with a label), attribution (the
+     *                           http(s) URL of its site, that of its license) and adapters.
      * @return bool True if the provider was registered, false otherwise.
      */
-    public function register(string $slug, array $args): bool
+    public function register(Provider $provider): bool
     {
+        $slug = $provider->slug;
+
         if ($this->built) {
             return $this->refuse(
                 sprintf('Cannot register provider "%s": the provider registry is already built.', $slug)
@@ -107,135 +70,78 @@ final class ProviderRegistry
             return $this->refuse(sprintf('A provider with slug "%s" is already registered.', $slug));
         }
 
-        $unknown = array_diff(array_keys($args), array_keys(self::DEFAULT_ARGS));
-        if (array() !== $unknown) {
-            return $this->refuse(
-                sprintf('Provider "%s" has unknown arguments: %s.', $slug, implode(', ', $unknown))
-            );
-        }
-
-        $args = array_merge(self::DEFAULT_ARGS, $args);
-
-        if (! is_string($args['label']) || '' === trim($args['label'])) {
+        if ('' === trim($provider->label)) {
             return $this->refuse(sprintf('Provider "%s" needs a label.', $slug));
         }
 
-        if (! is_array($args['credentials'])) {
-            return $this->refuse(sprintf('The credentials of provider "%s" must be an array.', $slug));
-        }
-
-        $credentials = array();
-        foreach ($args['credentials'] as $name => $credentialArgs) {
-            $credential = $this->makeCredential($slug, $name, $credentialArgs);
-            if (is_string($credential)) {
-                return $this->refuse($credential);
-            }
-            $credentials[ $credential->name ] = $credential;
-        }
-
-        $attribution = null;
-        if (null !== $args['attribution']) {
-            $attribution = $this->makeAttribution($slug, $args['attribution']);
-            if (is_string($attribution)) {
-                return $this->refuse($attribution);
+        foreach ($provider->credentials as $name => $credential) {
+            $refusal = $this->checkCredential($slug, $name, $credential);
+            if (null !== $refusal) {
+                return $this->refuse($refusal);
             }
         }
 
-        $this->providers[ $slug ] = new Provider($slug, $args['label'], $credentials, $attribution);
+        if (null !== $provider->attribution) {
+            $refusal = $this->checkAttribution($slug, $provider->attribution);
+            if (null !== $refusal) {
+                return $this->refuse($refusal);
+            }
+        }
+
+        $this->providers[ $slug ] = $provider;
 
         return true;
     }
 
     /**
-     * Makes a declared credential, or tells why it is refused.
+     * Tells why a declared credential is refused, or null when it is valid.
      *
-     * @param string $slug Slug of its provider.
-     * @param mixed  $name Its name, as declared.
-     * @param mixed  $args Its arguments, as declared.
-     * @return ProviderCredential|string
+     * @param string $slug       Slug of its provider.
+     * @param string $name       Its name, as its provider holds it.
+     * @param mixed  $credential The credential, as declared.
+     * @return string|null
      */
-    private function makeCredential(string $slug, mixed $name, mixed $args): ProviderCredential|string
+    private function checkCredential(string $slug, string $name, mixed $credential): ?string
     {
-        if (! is_string($name) || 1 !== preg_match('/^[a-z0-9]+(?:_[a-z0-9]+)*$/', $name)) {
+        if (! $credential instanceof ProviderCredential) {
+            return sprintf('Credential "%s" of provider "%s" must be a ProviderCredential.', $name, $slug);
+        }
+
+        if (1 !== preg_match('/^[a-z0-9]+(?:_[a-z0-9]+)*$/', $name)) {
             return sprintf(
                 'Credential "%s" of provider "%s" must be named with lowercase letters, digits and underscores.',
-                (string) $name,
+                $name,
                 $slug
             );
         }
 
-        if (! is_array($args)) {
-            return sprintf('Credential "%s" of provider "%s" must be an array.', $name, $slug);
-        }
-
-        $unknown = array_diff(array_keys($args), array_keys(self::DEFAULT_CREDENTIAL_ARGS));
-        if (array() !== $unknown) {
-            return sprintf(
-                'Credential "%s" of provider "%s" has unknown arguments: %s.',
-                $name,
-                $slug,
-                implode(', ', $unknown)
-            );
-        }
-
-        $args = array_merge(self::DEFAULT_CREDENTIAL_ARGS, $args);
-
-        if (! is_string($args['label']) || '' === trim($args['label'])) {
+        if ('' === trim($credential->label)) {
             return sprintf('Credential "%s" of provider "%s" needs a label.', $name, $slug);
         }
 
-        if (! is_string($args['description']) || ! is_bool($args['required']) || ! is_bool($args['secret'])) {
-            return sprintf(
-                'Credential "%s" of provider "%s" needs a string description and boolean required and secret.',
-                $name,
-                $slug
-            );
-        }
-
-        return new ProviderCredential($name, $args['label'], $args['description'], $args['required'], $args['secret']);
+        return null;
     }
 
     /**
-     * Makes a declared attribution, or tells why it is refused.
+     * Tells why a declared attribution is refused, or null when it is valid.
      *
-     * @param string $slug Slug of its provider.
-     * @param mixed  $args Its arguments, as declared.
-     * @return ProviderAttribution|string
+     * @param string              $slug        Slug of its provider.
+     * @param ProviderAttribution $attribution The attribution, as declared.
+     * @return string|null
      */
-    private function makeAttribution(string $slug, mixed $args): ProviderAttribution|string
+    private function checkAttribution(string $slug, ProviderAttribution $attribution): ?string
     {
-        if (! is_array($args)) {
-            return sprintf('The attribution of provider "%s" must be an array.', $slug);
-        }
-
-        $unknown = array_diff(array_keys($args), array_keys(self::DEFAULT_ATTRIBUTION_ARGS));
-        if (array() !== $unknown) {
-            return sprintf(
-                'The attribution of provider "%s" has unknown arguments: %s.',
-                $slug,
-                implode(', ', $unknown)
-            );
-        }
-
-        $args = array_merge(self::DEFAULT_ATTRIBUTION_ARGS, $args);
-
-        foreach ($args as $name => $value) {
-            if (! is_string($value)) {
-                return sprintf('The attribution of provider "%s" needs a string %s.', $slug, $name);
-            }
-        }
-
-        if ('' === $args['url']) {
+        if ('' === $attribution->url) {
             return sprintf('The attribution of provider "%s" needs the url of its site.', $slug);
         }
 
-        foreach (array( 'url', 'license_url' ) as $name) {
-            if ('' !== $args[ $name ] && ! self::isHttpUrl($args[ $name ])) {
+        foreach (array( 'url' => $attribution->url, 'license_url' => $attribution->licenseUrl ) as $name => $url) {
+            if ('' !== $url && ! self::isHttpUrl($url)) {
                 return sprintf('The %s of the attribution of provider "%s" must be an http(s) URL.', $name, $slug);
             }
         }
 
-        return new ProviderAttribution($args['url'], $args['license'], $args['license_url']);
+        return null;
     }
 
     /**
@@ -275,6 +181,22 @@ final class ProviderRegistry
     public function getAll(): array
     {
         return array_values($this->providers);
+    }
+
+    /**
+     * Returns the providers that serve a domain, in registration order.
+     *
+     * @param class-string $interface Interface of the adapters of the domain (WeatherForecastAdapterInterface).
+     * @return list<Provider>
+     */
+    public function getServing(string $interface): array
+    {
+        return array_values(
+            array_filter(
+                $this->providers,
+                static fn(Provider $provider): bool => null !== $provider->getAdapter($interface)
+            )
+        );
     }
 
     /**

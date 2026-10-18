@@ -8,13 +8,13 @@
  */
 
 use ElioBlocks\Plugin;
+use ElioBlocks\Provider\Provider;
 use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Interactivity\Blocks\Report\DirectivesHelper;
 use ElioBlocks\Interactivity\Blocks\Report\IconSprite;
 use ElioBlocks\Interactivity\Blocks\Report\ReportContext;
 use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\WeatherForecast\WeatherForecastAdapterInterface;
-use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconCollectionResolver;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 
@@ -23,60 +23,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Registers a provider: an organization the data comes from.
+ * Registers a provider: an organization the data comes from, and what it serves.
  *
- * Must be called on the 'elio_blocks_init' action, before what it serves is
- * registered (elio_blocks_register_weather_forecast_adapter()). A provider
- * the registry refuses (malformed slug or arguments, duplicate slug, registry
- * already locked) gets a _doing_it_wrong() notice, as register_block_type()
- * does.
+ * Must be called on the 'elio_blocks_init' action. A provider the registry
+ * refuses (malformed slug, label or credential name, attribution URL not
+ * http(s), duplicate slug, registry already locked) gets a _doing_it_wrong()
+ * notice, as register_block_type() does.
  *
  * A provider that needs to identify the site (an API key, an account, a
  * contact address) declares its credentials: the settings page gives it a card
  * with their fields, and its adapters get their values in fetch(). One whose
  * license asks for a credit wherever its data is shown declares its
- * attribution: the provider-attribution block prints it in the reports.
+ * attribution: the provider-attribution block prints it in the reports. What
+ * it serves are its adapters, one per domain: a WeatherForecastAdapterInterface
+ * for the weather forecast.
  *
- * @param string               $slug Unique identifier: lowercase letters, digits and hyphens.
- * @param array<string, mixed> $args {
- *     @type string $label       Name shown to people. Required.
- *     @type array  $credentials What identifies the site to it, by name (lowercase letters, digits and
- *                               underscores; each can also be set with the constant
- *                               ELIO_BLOCKS_{SLUG}_{NAME}, uppercased, hyphens as underscores). Each is
- *                               an array of:
- *                               'label' (string, required),
- *                               'description' (string, plain text shown under the field),
- *                               'required' (bool, default false: the provider is not asked while it
- *                               is not set),
- *                               'secret' (bool, default false: typed hidden, never sent back to the
- *                               browser). Default none.
- *     @type array  $attribution The credit its license asks for: its label linked to its site, in the
- *                               sentence of the provider-attribution block. An array of:
- *                               'url' (string, http(s) URL of its site, required),
- *                               'license' (string, name of the license of the data),
- *                               'license_url' (string, http(s) URL of that license). Default none.
- * }
+ *   use ElioBlocks\Provider\Provider;
+ *   use ElioBlocks\Provider\ProviderAttribution;
+ *   use ElioBlocks\Provider\ProviderCredential;
+ *
+ *   elio_blocks_register_provider( new Provider(
+ *       'my-provider',
+ *       'My Provider',
+ *       array( new ProviderCredential( 'api_key', __( 'API Key', 'my-plugin' ), required: true, secret: true ) ),
+ *       new ProviderAttribution( 'https://my-provider.example/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/' ),
+ *       array( new MyWeatherForecastAdapter() ),
+ *   ) );
+ *
+ * or with a class of its own extending Provider, as the built-in OpenMeteo.
+ * Each credential can also be set with the constant ELIO_BLOCKS_{SLUG}_{NAME}
+ * (uppercased, hyphens as underscores).
+ *
+ * @param Provider $provider The provider, with its credentials, attribution and adapters.
  * @return bool True if the provider was registered, false otherwise.
  */
-function elio_blocks_register_provider( string $slug, array $args ): bool {
-	return Plugin::instance()->container()->get( ProviderRegistry::class )->register( $slug, $args );
-}
-
-/**
- * Registers how a provider serves the weather forecast.
- *
- * Must be called on the 'elio_blocks_init' action, once the provider is
- * registered (elio_blocks_register_provider()). A registration the registry
- * refuses (provider not registered, already serving the weather forecast,
- * registry already locked) gets a _doing_it_wrong() notice, as
- * register_block_type() does.
- *
- * @param string                          $provider                 Slug of the provider.
- * @param WeatherForecastAdapterInterface $weather_forecast_adapter Fetches its weather forecast.
- * @return bool True if the weather forecast adapter was registered, false otherwise.
- */
-function elio_blocks_register_weather_forecast_adapter( string $provider, WeatherForecastAdapterInterface $weather_forecast_adapter ): bool {
-	return Plugin::instance()->container()->get( WeatherForecastAdapterRegistry::class )->register( $provider, $weather_forecast_adapter );
+function elio_blocks_register_provider( Provider $provider ): bool {
+	return Plugin::instance()->container()->get( ProviderRegistry::class )->register( $provider );
 }
 
 /**
@@ -279,9 +261,9 @@ function elio_blocks_get_weather_forecast_attribution( string $provider ): ?arra
 		$provider = $container->get( PluginSettings::class )->getDefaultWeatherForecastProvider();
 	}
 
-	$provider    = $container->get( WeatherForecastAdapterRegistry::class )->getProvider( $provider );
+	$provider    = $container->get( ProviderRegistry::class )->getBySlug( $provider );
 	$attribution = $provider?->attribution;
-	if ( null === $attribution ) {
+	if ( null === $attribution || null === $provider->getAdapter( WeatherForecastAdapterInterface::class ) ) {
 		return null;
 	}
 

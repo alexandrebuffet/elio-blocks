@@ -4,6 +4,8 @@ namespace ElioBlocks\Tests\Unit\RestApi;
 
 use Brain\Monkey;
 use Brain\Monkey\Functions;
+use ElioBlocks\Provider\Provider;
+use ElioBlocks\Provider\ProviderCredential;
 use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\RestApi\Endpoints\ProvidersController;
 use ElioBlocks\Settings\PluginSettings;
@@ -30,16 +32,16 @@ class ProvidersControllerTest extends TestCase
 
         // The built-in provider, then one a third party registered on elio_blocks_init.
         $this->providers = new ProviderRegistry();
-        $this->providers->register('open-meteo', ['label' => 'Open-Meteo']);
+        $this->providers->register(new Provider('open-meteo', 'Open-Meteo'));
         $this->providers->register(
-            'third-party',
-            [
-                'label'       => 'Third Party',
-                'credentials' => [
-                    'username' => ['label' => 'Username', 'required' => true],
-                    'password' => ['label' => 'Password', 'description' => 'Of the account.', 'required' => true, 'secret' => true],
-                ],
-            ]
+            new Provider(
+                'third-party',
+                'Third Party',
+                [
+                    new ProviderCredential('username', 'Username', '', true),
+                    new ProviderCredential('password', 'Password', 'Of the account.', true, true),
+                ]
+            )
         );
 
         $this->options = [];

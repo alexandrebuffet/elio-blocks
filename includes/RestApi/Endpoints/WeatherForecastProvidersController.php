@@ -6,8 +6,9 @@ use WP_REST_Controller;
 use WP_REST_Request;
 use WP_REST_Response;
 use ElioBlocks\Provider\Provider;
+use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Settings\PluginSettings;
-use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterInterface;
 
 if (!defined('ABSPATH')) {
     die;
@@ -27,7 +28,7 @@ class WeatherForecastProvidersController extends WP_REST_Controller
     protected $rest_base = 'weather-forecast/providers';
 
     public function __construct(
-        private WeatherForecastAdapterRegistry $weatherForecastAdapters,
+        private ProviderRegistry $providers,
         private PluginSettings $settings,
     ) {
     }
@@ -80,7 +81,7 @@ class WeatherForecastProvidersController extends WP_REST_Controller
                         'licenseUrl' => $provider->attribution->licenseUrl,
                     ] : null,
                 ],
-                $this->weatherForecastAdapters->getProviders()
+                $this->providers->getServing(WeatherForecastAdapterInterface::class)
             )
         );
     }

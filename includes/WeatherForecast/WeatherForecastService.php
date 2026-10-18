@@ -3,6 +3,8 @@
 namespace ElioBlocks\WeatherForecast;
 
 use ElioBlocks\Contracts\Cache\CacheInterface;
+use ElioBlocks\Provider\Provider;
+use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\Weather\Coordinates;
 use ElioBlocks\WeatherForecast\Exception\WeatherForecastException;
@@ -52,14 +54,14 @@ class WeatherForecastService
     /**
      * Constructor.
      *
-     * @param WeatherForecastAdapterRegistry $registry  Weather forecast adapters, by provider slug.
-     * @param CacheInterface                 $cache     Cache instance.
-     * @param WeatherForecastPresenter       $presenter Adds what depends on the site and the request.
-     * @param PluginSettings                 $settings  Holds the credentials of the providers.
-     * @param (callable(): int)|null         $clock     Returns the current Unix timestamp. Defaults to time().
+     * @param ProviderRegistry         $providers Providers, which hold their weather forecast adapter.
+     * @param CacheInterface           $cache     Cache instance.
+     * @param WeatherForecastPresenter $presenter Adds what depends on the site and the request.
+     * @param PluginSettings           $settings  Holds the credentials of the providers.
+     * @param (callable(): int)|null   $clock     Returns the current Unix timestamp. Defaults to time().
      */
     public function __construct(
-        private WeatherForecastAdapterRegistry $registry,
+        private ProviderRegistry $providers,
         private CacheInterface $cache,
         private WeatherForecastPresenter $presenter,
         private PluginSettings $settings,
@@ -85,8 +87,9 @@ class WeatherForecastService
      */
     public function getWeatherForecast(Coordinates $coordinates, string $provider, string $units, array $unitSettings = array(), array $iconCollections = array()): array
     {
-        $adapter = $this->registry->getBySlug($provider);
-        if (null === $adapter) {
+        $registered = $this->providers->getBySlug($provider);
+        $adapter    = $registered?->getAdapter(WeatherForecastAdapterInterface::class);
+        if (null === $registered || null === $adapter) {
             throw ProviderNotFound::forSlug(esc_html($provider));
         }
 
@@ -94,7 +97,7 @@ class WeatherForecastService
         $cacheKey = $this->cache->key(self::CACHE_NAMESPACE, $coordinates->latitude, $coordinates->longitude, $provider, $units);
 
         $this->loaded[ $cacheKey ] ??= $this->fromCache($cacheKey)
-            ?? $this->fromProvider($provider, $adapter, $coordinates, $units, $cacheKey);
+            ?? $this->fromProvider($registered, $adapter, $coordinates, $units, $cacheKey);
 
         return $this->presenter->present($this->loaded[ $cacheKey ], $units, $unitSettings, $iconCollections);
     }
@@ -127,7 +130,7 @@ class WeatherForecastService
      * @throws WeatherForecastException If the provider fails to deliver a weather forecast.
      */
     private function fromProvider(
-        string $provider,
+        Provider $provider,
         WeatherForecastAdapterInterface $adapter,
         Coordinates $coordinates,
         string $units,
@@ -150,13 +153,8 @@ class WeatherForecastService
      *
      * @throws ProviderNotConfigured If a credential it needs is not set.
      */
-    private function getCredentials(string $slug): array
+    private function getCredentials(Provider $provider): array
     {
-        $provider = $this->registry->getProvider($slug);
-        if (null === $provider) {
-            return array();
-        }
-
         $credentials = $this->settings->getProviderCredentials($provider);
 
         $missing = array();
@@ -167,7 +165,7 @@ class WeatherForecastService
         }
 
         if (array() !== $missing) {
-            throw ProviderNotConfigured::forCredentials(esc_html($slug), array_map('esc_html', $missing));
+            throw ProviderNotConfigured::forCredentials(esc_html($provider->slug), array_map('esc_html', $missing));
         }
 
         return $credentials;
