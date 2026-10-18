@@ -8,13 +8,16 @@
  * - classes.md: the classes a provider is registered with, from their docblocks.
  *
  * A public function or a hook without a docblock fails the build: what is not
- * documented would be missing from the handbook. The pages are generated, not
- * committed (docs/handbook/.gitignore). `npm run build:docs` runs this, then
+ * documented would be missing from the handbook. It also copies the logos of
+ * docs/brand into docs/handbook/static/, and nothing else of that folder (the
+ * sources of Elio Sans). Neither is committed (docs/handbook/.gitignore).
+ * `npm run build:docs` runs this, then
  * builds the handbook into docs/handbook/build/ (`npm run build:docs --
  * --out-dir <dir>` for another directory, relative to docs/handbook/).
  */
 
 import {
+	copyFileSync,
 	existsSync,
 	mkdirSync,
 	readdirSync,
@@ -578,3 +581,9 @@ writePage(
 	'The classes a provider is registered with, and the interface its weather forecast adapter implements.',
 	classesPage()
 );
+
+const statics = join( root, 'docs/handbook/static' );
+mkdirSync( statics, { recursive: true } );
+for ( const logo of [ 'elio-blocks-logo.svg', 'elio-blocks-logo-light.svg' ] ) {
+	copyFileSync( join( root, 'docs/brand', logo ), join( statics, logo ) );
+}

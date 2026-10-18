@@ -1,7 +1,8 @@
 /**
  * The documentation of Elio Blocks, served under /docs/ of the presentation
  * site (deploy-site.yml). Pages written by hand in docs/, the reference pages
- * in docs/reference/ written by scripts/build-docs.mjs from the code.
+ * in docs/reference/ written by scripts/build-docs.mjs from the code, which
+ * copies the logos of docs/brand into static/.
  */
 import { themes } from 'prism-react-renderer';
 
@@ -17,8 +18,6 @@ export default {
 	trailingSlash: false,
 	onBrokenLinks: 'throw',
 	onBrokenAnchors: 'throw',
-	// The logos of docs/brand, served next to the pages.
-	staticDirectories: [ '../brand' ],
 	presets: [
 		[
 			'classic',
