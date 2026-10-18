@@ -3,5 +3,7 @@
 /build
 /.docusaurus
 
-# The reference pages, written by scripts/build-docs.mjs from the code.
+# Written by scripts/build-docs.mjs: the reference pages, from the code, and
+# the logos of docs/brand.
 /docs/reference
+/static
