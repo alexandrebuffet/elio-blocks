@@ -377,7 +377,7 @@ pre code {
 	gap: var(--space-xs);
 	min-height: 52px;
 	padding: 0 var(--space-l);
-	border: 1px solid var(--ink);
+	border: 1px solid var(--line);
 	background: var(--ink);
 	color: var(--paper);
 	font-family: var(--sans);
@@ -467,14 +467,18 @@ pre code {
 	height: 18px;
 }
 
+/* On the night of the closing, the line of the dark color scheme. */
+.button--light,
+.button--secondary-light {
+	border-color: rgb(238 231 219 / 14%);
+}
+
 .button--light {
-	border-color: var(--on-night);
 	background: var(--on-night);
 	color: var(--night);
 }
 
 .button--secondary-light {
-	border-color: var(--on-night);
 	background: transparent;
 	color: var(--on-night);
 }
