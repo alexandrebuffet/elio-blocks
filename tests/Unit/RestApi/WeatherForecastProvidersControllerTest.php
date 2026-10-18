@@ -4,11 +4,13 @@ namespace ElioBlocks\Tests\Unit\RestApi;
 
 use Brain\Monkey;
 use Brain\Monkey\Functions;
+use ElioBlocks\Provider\Provider;
+use ElioBlocks\Provider\ProviderAttribution;
+use ElioBlocks\Provider\ProviderCredential;
 use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\RestApi\Endpoints\WeatherForecastProvidersController;
 use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\Tests\Stub\StubWeatherForecastAdapter;
-use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +25,7 @@ class WeatherForecastProvidersControllerTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    private WeatherForecastAdapterRegistry $weatherForecastAdapters;
+    private ProviderRegistry $providers;
 
     protected function setUp(): void
     {
@@ -34,14 +36,10 @@ class WeatherForecastProvidersControllerTest extends TestCase
 
         // The built-in provider, one a third party registered on elio_blocks_init,
         // and one that serves something else than the weather forecast.
-        $providers = new ProviderRegistry();
-        $providers->register('open-meteo', ['label' => 'Open-Meteo', 'attribution' => ['url' => 'https://open-meteo.com/', 'license' => 'CC BY 4.0', 'license_url' => 'https://creativecommons.org/licenses/by/4.0/']]);
-        $providers->register('air-only', ['label' => 'Air Only']);
-        $providers->register('third-party', ['label' => 'Third Party', 'credentials' => ['api_key' => ['label' => 'API Key', 'required' => true]]]);
-
-        $this->weatherForecastAdapters = new WeatherForecastAdapterRegistry($providers);
-        $this->weatherForecastAdapters->register('open-meteo', new StubWeatherForecastAdapter());
-        $this->weatherForecastAdapters->register('third-party', new StubWeatherForecastAdapter());
+        $this->providers = new ProviderRegistry();
+        $this->providers->register(new Provider('open-meteo', 'Open-Meteo', [], new ProviderAttribution('https://open-meteo.com/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/'), [new StubWeatherForecastAdapter()]));
+        $this->providers->register(new Provider('air-only', 'Air Only'));
+        $this->providers->register(new Provider('third-party', 'Third Party', [new ProviderCredential('api_key', 'API Key', '', true)], null, [new StubWeatherForecastAdapter()]));
     }
 
     protected function tearDown(): void
@@ -55,7 +53,7 @@ class WeatherForecastProvidersControllerTest extends TestCase
         $settings = $this->createMock(PluginSettings::class);
         $settings->method('getDefaultWeatherForecastProvider')->willReturn($defaultProvider);
 
-        return new WeatherForecastProvidersController($this->weatherForecastAdapters, $settings);
+        return new WeatherForecastProvidersController($this->providers, $settings);
     }
 
     public function test_is_the_providers_route_of_the_weather_forecast(): void

@@ -2,6 +2,8 @@
 
 Status: decided on 2026-10-14, the recommendation below (adapter), renamed on branch fix/provider-naming. Written 2026-10-10 for the open question of the tides plan (`docs/plans/tides.md` on branch `feat/tides`).
 
+Update 2026-10-18: one registration. The two calls below still read as two providers, and no weather app or plugin checked (Breezy Weather, Home Assistant, libgweather, KDE, MagicMirror, Simple Location, Live Weather Station, wp-forecast…) registers the per-domain level apart: Breezy Weather, the closest to Elio, has one object per source declaring its features. So a `Provider` now holds its adapters, and `elio_blocks_register_provider( new OpenMeteo( … ) )` is the only registration; the adapter registry and `elio_blocks_register_weather_forecast_adapter()` are gone. The word adapter stays, for the classes only. "Endpoint" was ruled out: a REST route in WordPress, and the tide adapter of the tides plan computes on the site, with no URL to name.
+
 ## The problem
 
 Elio registers two things with the same word:

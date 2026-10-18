@@ -50,6 +50,15 @@ final class ConditionDescriptions
             'thunderstorm-with-heavy-hail'  => __('Thunderstorm with heavy hail', 'elio-blocks'),
         );
 
+        /**
+         * Filters the descriptions of the weather conditions: the text the
+         * condition description block prints, and the label of the condition
+         * icons.
+         *
+         * @param array<string, string> $descriptions Translated description of each condition, by condition slug
+         *                                            ('clear-sky', 'overcast'…).
+         * @since 0.1.0
+         */
         return (array) apply_filters('elio_blocks/condition_descriptions', $descriptions);
     }
 }

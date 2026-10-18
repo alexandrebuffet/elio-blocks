@@ -8,14 +8,12 @@ use ElioBlocks\Provider\Provider;
 use ElioBlocks\Provider\ProviderAttribution;
 use ElioBlocks\Provider\ProviderCredential;
 use ElioBlocks\Provider\ProviderRegistry;
+use ElioBlocks\Tests\Stub\StubWeatherForecastAdapter;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterInterface;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * The providers: the organizations Elio gets data from, registered once
- * whatever they serve.
- */
 class ProviderRegistryTest extends TestCase
 {
     private ProviderRegistry $registry;
@@ -24,7 +22,6 @@ class ProviderRegistryTest extends TestCase
     {
         parent::setUp();
         Monkey\setUp();
-        // The slugs in error messages are escaped.
         Functions\stubEscapeFunctions();
 
         $this->registry = new ProviderRegistry();
@@ -38,125 +35,73 @@ class ProviderRegistryTest extends TestCase
 
     public function test_a_provider_is_known_by_its_slug(): void
     {
-        $this->registry->register('acme-weather', ['label' => 'Acme Weather']);
+        $provider = new Provider('acme-weather', 'Acme Weather');
 
-        $this->assertEquals(new Provider('acme-weather', 'Acme Weather'), $this->registry->getBySlug('acme-weather'));
+        $this->assertTrue($this->registry->register($provider));
+        $this->assertSame($provider, $this->registry->getBySlug('acme-weather'));
         $this->assertNull($this->registry->getBySlug('unknown'));
     }
 
-    public function test_a_provider_declares_no_credentials_unless_it_says_so(): void
-    {
-        $this->registry->register('open-meteo', ['label' => 'Open-Meteo']);
-
-        $this->assertSame([], $this->registry->getBySlug('open-meteo')->credentials);
-    }
-
-    public function test_a_provider_declares_its_credentials_in_order_with_their_defaults(): void
+    public function test_a_provider_declaring_credentials_and_its_attribution_is_registered(): void
     {
         $this->assertTrue(
             $this->registry->register(
-                'acme-weather',
-                [
-                    'label'       => 'Acme Weather',
-                    'credentials' => [
-                        'username' => ['label' => 'Username', 'required' => true],
-                        'password' => ['label' => 'Password', 'required' => true, 'secret' => true],
-                        'contact'  => ['label' => 'Contact', 'description' => 'Who they write to.'],
+                new Provider(
+                    'acme-weather',
+                    'Acme Weather',
+                    [
+                        new ProviderCredential('username', 'Username', '', true),
+                        new ProviderCredential('password', 'Password', '', true, true),
                     ],
-                ]
+                    new ProviderAttribution('https://acme.test/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/')
+                )
             )
         );
-
-        $this->assertEquals(
-            [
-                'username' => new ProviderCredential('username', 'Username', '', true, false),
-                'password' => new ProviderCredential('password', 'Password', '', true, true),
-                'contact'  => new ProviderCredential('contact', 'Contact', 'Who they write to.', false, false),
-            ],
-            $this->registry->getBySlug('acme-weather')->credentials
-        );
+        $this->assertTrue($this->registry->register(new Provider('plain-weather', 'Plain Weather', [], new ProviderAttribution('https://plain.test/'))));
     }
 
     #[DataProvider('invalidCredentials')]
-    public function test_an_invalid_credential_refuses_the_provider(mixed $credentials, string $pattern): void
+    public function test_an_invalid_credential_refuses_the_provider(array $credentials, string $pattern): void
     {
         $this->expectDoingItWrong($pattern);
 
-        $this->assertFalse(
-            $this->registry->register('acme-weather', ['label' => 'Acme Weather', 'credentials' => $credentials])
-        );
+        $this->assertFalse($this->registry->register(new Provider('acme-weather', 'Acme Weather', $credentials)));
         $this->assertNull($this->registry->getBySlug('acme-weather'));
     }
 
     public static function invalidCredentials(): array
     {
         return [
-            'not an array'       => ['api_key', '/credentials of provider &quot;acme-weather&quot; must be an array/'],
-            'list, not named'    => [[['label' => 'Key']], '/must be named with lowercase letters, digits and underscores/'],
-            'hyphenated name'    => [['api-key' => ['label' => 'Key']], '/must be named with lowercase letters/'],
-            'uppercase name'     => [['API_KEY' => ['label' => 'Key']], '/must be named with lowercase letters/'],
-            'arguments a string' => [['api_key' => 'Key'], '/&quot;api_key&quot; of provider &quot;acme-weather&quot; must be an array/'],
-            'no label'           => [['api_key' => ['secret' => true]], '/needs a label/'],
-            'unknown argument'   => [['api_key' => ['label' => 'Key', 'render_callback' => 'x']], '/unknown arguments: render_callback/'],
-            'required not bool'  => [['api_key' => ['label' => 'Key', 'required' => 'yes']], '/boolean required and secret/'],
-            'description markup' => [['api_key' => ['label' => 'Key', 'description' => ['<b>']]], '/string description/'],
+            'declared as an array' => [['api_key' => ['label' => 'Key']], '/&quot;api_key&quot; of provider &quot;acme-weather&quot; must be a ProviderCredential/'],
+            'hyphenated name'      => [[new ProviderCredential('api-key', 'Key')], '/must be named with lowercase letters, digits and underscores/'],
+            'uppercase name'       => [[new ProviderCredential('API_KEY', 'Key')], '/must be named with lowercase letters/'],
+            'no label'             => [[new ProviderCredential('api_key', ' ')], '/needs a label/'],
         ];
     }
 
-    public function test_a_provider_declares_the_credit_its_license_asks_for(): void
-    {
-        $this->assertTrue(
-            $this->registry->register(
-                'acme-weather',
-                [
-                    'label'       => 'Acme Weather',
-                    'attribution' => [
-                        'url'         => 'https://acme.test/',
-                        'license'     => 'CC BY 4.0',
-                        'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
-                    ],
-                ]
-            )
-        );
-        $this->registry->register('plain-weather', ['label' => 'Plain Weather', 'attribution' => ['url' => 'https://plain.test/']]);
-        $this->registry->register('open-weather', ['label' => 'Open Weather']);
-
-        $this->assertEquals(
-            new ProviderAttribution('https://acme.test/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/'),
-            $this->registry->getBySlug('acme-weather')->attribution
-        );
-        $this->assertEquals(new ProviderAttribution('https://plain.test/'), $this->registry->getBySlug('plain-weather')->attribution);
-        $this->assertNull($this->registry->getBySlug('open-weather')->attribution, 'It asks for no credit.');
-    }
-
     #[DataProvider('invalidAttributions')]
-    public function test_an_invalid_attribution_refuses_the_provider(mixed $attribution, string $pattern): void
+    public function test_an_invalid_attribution_refuses_the_provider(ProviderAttribution $attribution, string $pattern): void
     {
         $this->expectDoingItWrong($pattern);
 
-        $this->assertFalse(
-            $this->registry->register('acme-weather', ['label' => 'Acme Weather', 'attribution' => $attribution])
-        );
+        $this->assertFalse($this->registry->register(new Provider('acme-weather', 'Acme Weather', [], $attribution)));
         $this->assertNull($this->registry->getBySlug('acme-weather'));
     }
 
     public static function invalidAttributions(): array
     {
         return [
-            'not an array'        => ['https://acme.test/', '/attribution of provider &quot;acme-weather&quot; must be an array/'],
-            'no site'             => [['license' => 'CC BY 4.0'], '/needs the url of its site/'],
-            'license markup'      => [['url' => 'https://acme.test/', 'license' => ['<b>CC</b>']], '/needs a string license/'],
-            'sentence of its own' => [['url' => 'https://acme.test/', 'text' => 'Data by Acme'], '/unknown arguments: text/'],
-            'script URL'          => [['url' => 'javascript:alert(1)'], '/url of the attribution .* must be an http\(s\) URL/'],
-            'relative URL'        => [['url' => '/credits'], '/url of the attribution/'],
-            'license URL no URL'  => [['url' => 'https://acme.test/', 'license_url' => 'CC BY 4.0'], '/license_url of the attribution/'],
+            'no site'            => [new ProviderAttribution('', 'CC BY 4.0'), '/needs the url of its site/'],
+            'script URL'         => [new ProviderAttribution('javascript:alert(1)'), '/url of the attribution .* must be an http\(s\) URL/'],
+            'relative URL'       => [new ProviderAttribution('/credits'), '/url of the attribution/'],
+            'license URL no URL' => [new ProviderAttribution('https://acme.test/', 'CC BY 4.0', 'CC BY 4.0'), '/license_url of the attribution/'],
         ];
     }
 
     public function test_lists_the_providers_in_the_order_they_were_registered(): void
     {
-        $this->registry->register('open-meteo', ['label' => 'Open-Meteo']);
-        $this->registry->register('acme-weather', ['label' => 'Acme Weather']);
+        $this->registry->register(new Provider('open-meteo', 'Open-Meteo'));
+        $this->registry->register(new Provider('acme-weather', 'Acme Weather'));
 
         $this->assertSame(
             ['open-meteo', 'acme-weather'],
@@ -164,40 +109,39 @@ class ProviderRegistryTest extends TestCase
         );
     }
 
-    public function test_register_returns_true_for_a_valid_provider(): void
+    public function test_lists_the_providers_that_serve_a_domain(): void
     {
-        $this->assertTrue($this->registry->register('open-meteo', ['label' => 'Open-Meteo']));
+        $this->registry->register(new Provider('open-meteo', 'Open-Meteo', [], null, [new StubWeatherForecastAdapter()]));
+        $this->registry->register(new Provider('air-only', 'Air Only', [], null, [new \stdClass()]));
+        $this->registry->register(new Provider('acme-weather', 'Acme Weather', [], null, [new StubWeatherForecastAdapter()]));
+
+        $this->assertSame(
+            ['open-meteo', 'acme-weather'],
+            array_map(
+                static fn(Provider $provider): string => $provider->slug,
+                $this->registry->getServing(WeatherForecastAdapterInterface::class)
+            )
+        );
     }
 
     public function test_a_slug_is_registered_once_and_the_first_provider_kept(): void
     {
-        $this->registry->register('open-meteo', ['label' => 'Open-Meteo']);
+        $this->registry->register(new Provider('open-meteo', 'Open-Meteo'));
         $this->expectDoingItWrong('/&quot;open-meteo&quot; is already registered/');
 
-        $this->assertFalse($this->registry->register('open-meteo', ['label' => 'Another Open-Meteo']));
+        $this->assertFalse($this->registry->register(new Provider('open-meteo', 'Another Open-Meteo')));
         $this->assertSame('Open-Meteo', $this->registry->getBySlug('open-meteo')?->label);
     }
 
-    /**
-     * Checks that a slug is lowercase letters, digits and hyphens.
-     *
-     * The slug names the API key constant, ELIO_BLOCKS_{SLUG}_API_KEY, and the
-     * /providers/{slug}/api-key route.
-     */
     #[DataProvider('invalidSlugs')]
     public function test_a_slug_is_lowercase_letters_digits_and_hyphens(string $slug): void
     {
         $this->expectDoingItWrong('/must be lowercase letters, digits and hyphens/');
 
-        $this->assertFalse($this->registry->register($slug, ['label' => 'Acme Weather']));
+        $this->assertFalse($this->registry->register(new Provider($slug, 'Acme Weather')));
         $this->assertSame([], $this->registry->getAll());
     }
 
-    /**
-     * Provides slugs the registry refuses.
-     *
-     * @return array<string, array{string}>
-     */
     public static function invalidSlugs(): array
     {
         return [
@@ -212,17 +156,7 @@ class ProviderRegistryTest extends TestCase
     {
         $this->expectDoingItWrong('/needs a label/');
 
-        $this->assertFalse($this->registry->register('acme-weather', ['label' => '']));
-        $this->assertNull($this->registry->getBySlug('acme-weather'));
-    }
-
-    public function test_an_unknown_argument_is_refused_rather_than_ignored(): void
-    {
-        $this->expectDoingItWrong('/unknown arguments: requires_api_key/');
-
-        $this->assertFalse(
-            $this->registry->register('acme-weather', ['label' => 'Acme Weather', 'requires_api_key' => true])
-        );
+        $this->assertFalse($this->registry->register(new Provider('acme-weather', ' ')));
         $this->assertNull($this->registry->getBySlug('acme-weather'));
     }
 
@@ -234,15 +168,10 @@ class ProviderRegistryTest extends TestCase
 
         $this->expectDoingItWrong('/already built/');
 
-        $this->assertFalse($this->registry->register('too-late', ['label' => 'Too late']));
+        $this->assertFalse($this->registry->register(new Provider('too-late', 'Too late')));
         $this->assertNull($this->registry->getBySlug('too-late'));
     }
 
-    /**
-     * Expects the registration to be refused with one _doing_it_wrong() notice.
-     *
-     * @param string $pattern Pattern of the (escaped) message.
-     */
     private function expectDoingItWrong(string $pattern): void
     {
         Functions\expect('_doing_it_wrong')->once()->with(

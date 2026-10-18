@@ -17,6 +17,9 @@ const IDLE = { results: [], isSearching: false, error: null };
  * Each term gets its own AbortController: when the term changes, or the search
  * is disabled or unmounted, the pending request is cancelled and whatever it
  * still answers is ignored. Results on screen always belong to the last term.
+ * A term counts as searching from the moment it is typed, while its search
+ * waits for typing to pause, so nothing reports "no results" for a term never
+ * searched.
  *
  * @param {string}  query           Search term.
  * @param {Object}  options         Options.
@@ -33,16 +36,16 @@ export function useLocationSearch( query, { enabled = true } = {} ) {
 			return;
 		}
 
+		setState( ( previous ) => ( {
+			...previous,
+			isSearching: true,
+			error: null,
+		} ) );
+
 		const controller = new AbortController();
 		const { signal } = controller;
 
 		const timeoutId = setTimeout( async () => {
-			setState( ( previous ) => ( {
-				...previous,
-				isSearching: true,
-				error: null,
-			} ) );
-
 			try {
 				const response = await apiFetch( {
 					path: addQueryArgs( '/elio/v1/geocoding', {

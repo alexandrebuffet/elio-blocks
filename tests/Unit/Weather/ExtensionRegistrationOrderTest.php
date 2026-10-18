@@ -7,12 +7,12 @@ use Brain\Monkey\Actions;
 use Brain\Monkey\Functions;
 use ElioBlocks\Contracts\HookInterface;
 use ElioBlocks\Provider\Hooks\RegisterProviders;
+use ElioBlocks\Provider\Provider;
 use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Tests\Stub\StubWeatherForecastAdapter;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 use ElioBlocks\Weather\Condition\Icons\Hooks\RegisterConditionIcons;
-use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
-use ElioBlocks\WeatherForecast\Hooks\RegisterWeatherForecastAdapters;
+use ElioBlocks\WeatherForecast\WeatherForecastAdapterInterface;
 use ElioBlocks\WeatherForecast\OpenMeteoWeatherForecastAdapter;
 use ElioBlocks\Tests\Support\WordPressCore;
 use PHPUnit\Framework\TestCase;
@@ -30,8 +30,6 @@ class ExtensionRegistrationOrderTest extends TestCase
 
     private ProviderRegistry $providers;
 
-    private WeatherForecastAdapterRegistry $weatherForecastAdapters;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -41,9 +39,8 @@ class ExtensionRegistrationOrderTest extends TestCase
 
         Functions\when('__')->returnArg();
 
-        $this->icons                    = new ConditionIconsRegistry();
-        $this->providers                = new ProviderRegistry();
-        $this->weatherForecastAdapters = new WeatherForecastAdapterRegistry($this->providers);
+        $this->icons     = new ConditionIconsRegistry();
+        $this->providers = new ProviderRegistry();
     }
 
     protected function tearDown(): void
@@ -75,7 +72,7 @@ class ExtensionRegistrationOrderTest extends TestCase
                 $this->assertSame('Open-Meteo', $this->providers->getBySlug('open-meteo')?->label);
                 $this->assertInstanceOf(
                     OpenMeteoWeatherForecastAdapter::class,
-                    $this->weatherForecastAdapters->getBySlug('open-meteo')
+                    $this->providers->getBySlug('open-meteo')?->getAdapter(WeatherForecastAdapterInterface::class)
                 );
             }
         );
@@ -83,23 +80,23 @@ class ExtensionRegistrationOrderTest extends TestCase
         $this->runInitCallbacksInPriorityOrder($this->makeHooks());
     }
 
-    public function test_provider_and_weather_forecast_provider_registered_on_elio_blocks_init_are_accepted(): void
+    public function test_a_provider_and_its_adapters_registered_on_elio_blocks_init_are_accepted(): void
     {
-        $providers                = $this->providers;
-        $weatherForecastAdapters = $this->weatherForecastAdapters;
-        $weatherForecastAdapter  = new StubWeatherForecastAdapter();
+        $providers              = $this->providers;
+        $weatherForecastAdapter = new StubWeatherForecastAdapter();
 
         Actions\expectDone('elio_blocks_init')->once()->whenHappen(
-            static function () use ($providers, $weatherForecastAdapters, $weatherForecastAdapter): void {
-                $providers->register('third-party', array( 'label' => 'Third party' ));
-                $weatherForecastAdapters->register('third-party', $weatherForecastAdapter);
+            static function () use ($providers, $weatherForecastAdapter): void {
+                $providers->register(new Provider('third-party', 'Third party', array(), null, array( $weatherForecastAdapter )));
             }
         );
 
         $this->runInitCallbacksInPriorityOrder($this->makeHooks());
 
-        $this->assertNotNull($providers->getBySlug('third-party'));
-        $this->assertSame($weatherForecastAdapter, $weatherForecastAdapters->getBySlug('third-party'));
+        $this->assertSame(
+            $weatherForecastAdapter,
+            $providers->getBySlug('third-party')?->getAdapter(WeatherForecastAdapterInterface::class)
+        );
     }
 
     public function test_every_registry_is_locked_once_init_is_over(): void
@@ -108,7 +105,6 @@ class ExtensionRegistrationOrderTest extends TestCase
 
         $this->assertTrue($this->icons->isBuilt());
         $this->assertTrue($this->providers->isBuilt());
-        $this->assertTrue($this->weatherForecastAdapters->isBuilt());
     }
 
     /**
@@ -123,8 +119,7 @@ class ExtensionRegistrationOrderTest extends TestCase
 
         return array(
             new RegisterConditionIcons($this->icons, sys_get_temp_dir() . '/elio-blocks-no-icons/'),
-            new RegisterWeatherForecastAdapters($this->weatherForecastAdapters, $openMeteo),
-            new RegisterProviders($this->providers),
+            new RegisterProviders($this->providers, $openMeteo),
         );
     }
 

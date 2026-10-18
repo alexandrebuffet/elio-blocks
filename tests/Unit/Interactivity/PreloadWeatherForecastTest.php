@@ -6,6 +6,7 @@ use Brain\Monkey;
 use Brain\Monkey\Functions;
 use ElioBlocks\Interactivity\Blocks\Report\Hooks\PreloadWeatherForecast;
 use ElioBlocks\Interactivity\Blocks\Report\ReportContext;
+use ElioBlocks\Provider\Provider;
 use ElioBlocks\Provider\ProviderRegistry;
 use ElioBlocks\Settings\PluginSettings;
 use ElioBlocks\Tests\Stub\ArrayCache;
@@ -14,7 +15,6 @@ use ElioBlocks\Tests\Support\WordPressCore;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconCollectionResolver;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconsRegistry;
 use ElioBlocks\WeatherForecast\WeatherForecastPresenter;
-use ElioBlocks\WeatherForecast\WeatherForecastAdapterRegistry;
 use ElioBlocks\WeatherForecast\WeatherForecastService;
 use ElioBlocks\Weather\Units\UnitsConversionService;
 use PHPUnit\Framework\TestCase;
@@ -54,12 +54,10 @@ class PreloadWeatherForecastTest extends TestCase
         $settings->method('getConditionIconCollection')->willReturn('elio');
 
         $providers = new ProviderRegistry();
-        $providers->register('stub', array( 'label' => 'Stub' ));
-        $weatherForecastAdapters = new WeatherForecastAdapterRegistry($providers);
-        $weatherForecastAdapters->register('stub', $this->adapter);
+        $providers->register(new Provider('stub', 'Stub', array(), null, array( $this->adapter )));
 
         $service = new WeatherForecastService(
-            $weatherForecastAdapters,
+            $providers,
             new ArrayCache(),
             new WeatherForecastPresenter($this->icons, new UnitsConversionService()),
             $settings,

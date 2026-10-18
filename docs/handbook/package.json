@@ -1,0 +1,21 @@
+{
+	"name": "elio-blocks-handbook",
+	"private": true,
+	"description": "The documentation of Elio Blocks, built with Docusaurus. Its reference pages come from the code: npm run build:docs at the root of the plugin.",
+	"license": "GPL-2.0-or-later",
+	"scripts": {
+		"start": "docusaurus start",
+		"build": "docusaurus build",
+		"serve": "docusaurus serve"
+	},
+	"dependencies": {
+		"@docusaurus/core": "3.10.2",
+		"@docusaurus/preset-classic": "3.10.2",
+		"prism-react-renderer": "^2.4.1",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0"
+	},
+	"engines": {
+		"node": ">=22.0"
+	}
+}

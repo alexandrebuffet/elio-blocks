@@ -1,0 +1,9 @@
+# Dependencies, build and cache of Docusaurus.
+/node_modules
+/build
+/.docusaurus
+
+# Written by scripts/build-docs.mjs: the reference pages, from the code, and
+# the logos of docs/brand.
+/docs/reference
+/static

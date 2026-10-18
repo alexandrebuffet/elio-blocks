@@ -1,0 +1,6 @@
+// Four results and a half, so the cut one says the list scrolls, where
+// @wordpress/ui lets a popup grow to 480px or 60% of the viewport.
+// Unlayered, this beats the `wp-ui` layer of that rule.
+.weather-location-search-modal__suggestions {
+	max-height: min(var(--available-height), 20rem);
+}
