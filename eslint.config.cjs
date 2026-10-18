@@ -42,6 +42,9 @@ module.exports = [
 			'vendor-prefixed/**',
 			// The presentation site built by npm run build:site.
 			'_site/**',
+			// The handbook built by npm run build:docs, and the cache of Docusaurus.
+			'docs/handbook/build/**',
+			'docs/handbook/.docusaurus/**',
 			// Git worktrees of Claude Code: other checkouts of the plugin, with their own config.
 			'.claude/**',
 		],
@@ -76,6 +79,13 @@ module.exports = [
 		},
 		rules: {
 			'import/no-extraneous-dependencies': 'off',
+		},
+	},
+	{
+		// The handbook has dependencies of its own, which the JavaScript job of the CI does not install.
+		files: [ 'docs/handbook/**/*.js' ],
+		rules: {
+			'import/no-unresolved': 'off',
 		},
 	},
 ];

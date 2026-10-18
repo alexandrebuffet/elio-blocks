@@ -1,0 +1,7 @@
+# Dependencies, build and cache of Docusaurus.
+/node_modules
+/build
+/.docusaurus
+
+# The reference pages, written by scripts/build-docs.mjs from the code.
+/docs/reference

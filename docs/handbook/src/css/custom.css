@@ -1,0 +1,115 @@
+/**
+ * The colors and typefaces of DESIGN.md, on the Infima variables of Docusaurus.
+ * The fonts are the ones of the presentation site (docs/site/assets/fonts).
+ * The primary color is primary-strong in light mode: 4.9:1 on the paper. The
+ * dark mode is on html[data-theme], the selector of Infima.
+ */
+
+@font-face {
+	font-family: "Instrument Sans";
+	font-style: normal;
+	font-weight: 400 700;
+	font-display: swap;
+	src: url(../../../site/assets/fonts/instrument-sans-latin-wght-normal.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "Instrument Serif";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url(../../../site/assets/fonts/instrument-serif-latin-400-normal.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "Martian Mono";
+	font-style: normal;
+	font-weight: 100 800;
+	font-display: swap;
+	src: url(../../../site/assets/fonts/martian-mono-latin-wght-normal.woff2) format("woff2");
+}
+
+:root {
+	--ifm-color-primary: #b35000;
+	--ifm-color-primary-dark: #a14800;
+	--ifm-color-primary-darker: #984400;
+	--ifm-color-primary-darkest: #7d3800;
+	--ifm-color-primary-light: #c55800;
+	--ifm-color-primary-lighter: #ce5c00;
+	--ifm-color-primary-lightest: #e96800;
+	--ifm-background-color: #fdf9f2;
+	--ifm-background-surface-color: #f6efe3;
+	--ifm-font-color-base: #1a1611;
+	--ifm-color-emphasis-600: #5e5446;
+	--ifm-toc-border-color: rgba(26, 22, 17, 0.14);
+	--ifm-hr-border-color: rgba(26, 22, 17, 0.14);
+	--ifm-font-family-base: "Instrument Sans", system-ui, sans-serif;
+	--ifm-heading-font-family: "Instrument Serif", georgia, serif;
+	--ifm-heading-font-weight: 400;
+	--ifm-font-family-monospace: "Martian Mono", ui-monospace, monospace;
+	--ifm-code-font-size: 85%;
+	--docusaurus-highlighted-code-line-bg: rgba(26, 22, 17, 0.08);
+}
+
+html[data-theme="dark"] {
+	--ifm-color-primary: #f0a044;
+	--ifm-color-primary-dark: #ee9227;
+	--ifm-color-primary-darker: #ed8a19;
+	--ifm-color-primary-darkest: #c87210;
+	--ifm-color-primary-light: #f2ae61;
+	--ifm-color-primary-lighter: #f3b66f;
+	--ifm-color-primary-lightest: #f7cb9a;
+	--ifm-background-color: #14110d;
+	--ifm-background-surface-color: #1d1914;
+	--ifm-font-color-base: #eee7db;
+	--ifm-color-emphasis-600: #a39c91;
+	--ifm-toc-border-color: rgba(238, 231, 219, 0.14);
+	--ifm-hr-border-color: rgba(238, 231, 219, 0.14);
+	--docusaurus-highlighted-code-line-bg: rgba(238, 231, 219, 0.1);
+}
+
+/* The serif of the headings, at the sizes of its scale. */
+.markdown h1 {
+	font-size: 2.75rem;
+	line-height: 1.05;
+}
+
+.markdown h2 {
+	font-size: 2.125rem;
+	line-height: 1.05;
+}
+
+.markdown h3 {
+	font-size: 1.75rem;
+	line-height: 1.15;
+}
+
+/* Identifiers in the headings of the reference pages, under the serif size. */
+.markdown h2 code,
+.markdown h3 code {
+	font-family: var(--ifm-font-family-monospace);
+	font-size: 0.7em;
+	vertical-align: middle;
+}
+
+/*
+ * Code blocks on the paper of the page, not on the ground of the Prism theme,
+ * which the container gets as a variable and the <pre> as an inline style.
+ */
+.theme-code-block {
+	--prism-background-color: var(--ifm-background-surface-color) !important;
+}
+
+.theme-code-block pre {
+	background-color: var(--prism-background-color) !important;
+	tab-size: 4;
+}
+
+/* Identifiers in the table of contents, as text: no code chip per line. */
+.table-of-contents code {
+	padding: 0;
+	border: 0;
+	background: none;
+	font-size: 0.75em;
+	overflow-wrap: anywhere;
+}
