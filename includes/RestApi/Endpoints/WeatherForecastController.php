@@ -96,6 +96,7 @@ class WeatherForecastController extends WP_REST_Controller
          * Enable it only for headless setups, behind your own rate limiting.
          *
          * @param bool $isPublic Default false.
+         * @since 0.1.0
          */
         if (true === apply_filters('elio_blocks/weather_forecast_public_access', false)) {
             return true;

@@ -12,6 +12,8 @@ if (! defined('ABSPATH')) {
  * A value a provider needs to identify the site: an API key, an account name
  * and its password, a contact address. The settings page asks for it, in the
  * card of its provider, and the provider gets it when it fetches data.
+ *
+ * @since 0.4.0
  */
 final class ProviderCredential
 {

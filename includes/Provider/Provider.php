@@ -16,6 +16,8 @@ if (! defined('ABSPATH')) {
  *
  * Registered with elio_blocks_register_provider(), as is or through a class of
  * its own that passes all of it to this constructor (OpenMeteo).
+ *
+ * @since 0.4.0
  */
 class Provider
 {

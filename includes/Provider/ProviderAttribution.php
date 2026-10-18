@@ -13,6 +13,8 @@ if (! defined('ABSPATH')) {
  * requires (Open-Meteo: a link to its site and to CC BY 4.0). The
  * provider-attribution block prints it at the bottom of each report: its own
  * sentence, the label of the provider linked to its site.
+ *
+ * @since 0.4.0
  */
 final class ProviderAttribution
 {
