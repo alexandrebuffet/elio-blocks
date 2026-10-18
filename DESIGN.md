@@ -525,9 +525,10 @@ Icons are drawn with a 1.5px line (see Iconography).
 ## Components
 
 - **Buttons.** Flat and square, 52px high (40px small), a label in Instrument Sans 500,
-  an arrow that moves on hover. Primary: ink with paper text. Secondary: a
-  1px ink frame, no fill. On night, light (on night with night text) and
-  secondary light (an on night frame). Hovered, any button lights up like the
+  an arrow that moves on hover, framed by a 1px line as the cards and the
+  FAQ (on night, the line of the dark color scheme). Primary: ink with paper
+  text. Secondary: the frame alone, no fill. On night, light (on night with
+  night text) and secondary light (the frame alone). Hovered, any button lights up like the
   closing sun: ember, amber and gold under night text (5.3:1), a halo of cream
   of 128px radius gliding halfway to the pointer (`--halo-x`, `--halo-y`). The
   light and the moving arrow say hover, not a color alone. A button leading to
