@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elio Sans</title>
+<style>
+	@font-face {
+		font-family: "Elio Sans";
+		src: url(data:font/woff2;base64,{{FONT}}) format("woff2");
+		font-weight: 300 900;
+	}
+	:root {
+		--paper: #f6eddc;
+		--ink: #2a1d10;
+		--muted: #7a6450;
+		--accent: #d9541e;
+	}
+	@media (prefers-color-scheme: dark) {
+		:root { --paper: #1c150c; --ink: #f6eddc; --muted: #b59c80; --accent: #f08a3c; }
+	}
+	body {
+		margin: 0;
+		padding: 32px 16px 64px;
+		background: var(--paper);
+		color: var(--ink);
+		font: 15px/1.5 system-ui, sans-serif;
+	}
+	main { max-width: 1100px; margin: 0 auto; }
+	.hand { font-family: "Elio Sans"; line-height: 1.15; }
+	.logo { font-size: clamp(64px, 14vw, 168px); margin: 0 0 40px; }
+	.logo b { font-weight: 700; }
+	.logo span { font-weight: 300; }
+	.row { display: flex; align-items: baseline; gap: 24px; border-top: 1px solid color-mix(in srgb, var(--ink) 15%, transparent); padding: 8px 0; }
+	.row small { width: 64px; flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+	.row .hand { font-size: clamp(32px, 5vw, 64px); }
+	.row { flex-wrap: wrap; column-gap: 48px; }
+	label { display: flex; gap: 12px; align-items: center; margin: 40px 0 8px; color: var(--muted); }
+	input[type="range"] { flex: 1; accent-color: var(--accent); }
+	.live { font-size: clamp(56px, 12vw, 140px); }
+	.breathe { font-size: clamp(56px, 12vw, 140px); font-weight: 300; transition: font-weight 0.6s ease; cursor: default; }
+	.breathe:hover { font-weight: 900; }
+	@media (prefers-reduced-motion: reduce) { .breathe { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+	<p class="hand logo"><b>Elio</b> <span>Blocks</span></p>
+	<p class="hand logo"><b>ELIO</b> <span>BLOCKS</span></p>
+
+	<div class="row"><small>300</small><span class="hand" style="font-weight: 300">Elio Blocks</span><span class="hand" style="font-weight: 300">ELIO BLOCKS</span></div>
+	<div class="row"><small>400</small><span class="hand" style="font-weight: 400">Elio Blocks</span><span class="hand" style="font-weight: 400">ELIO BLOCKS</span></div>
+	<div class="row"><small>500</small><span class="hand" style="font-weight: 500">Elio Blocks</span><span class="hand" style="font-weight: 500">ELIO BLOCKS</span></div>
+	<div class="row"><small>600</small><span class="hand" style="font-weight: 600">Elio Blocks</span><span class="hand" style="font-weight: 600">ELIO BLOCKS</span></div>
+	<div class="row"><small>700</small><span class="hand" style="font-weight: 700">Elio Blocks</span><span class="hand" style="font-weight: 700">ELIO BLOCKS</span></div>
+	<div class="row"><small>800</small><span class="hand" style="font-weight: 800">Elio Blocks</span><span class="hand" style="font-weight: 800">ELIO BLOCKS</span></div>
+	<div class="row"><small>900</small><span class="hand" style="font-weight: 900">Elio Blocks</span><span class="hand" style="font-weight: 900">ELIO BLOCKS</span></div>
+
+	<label>Graisse <input type="range" min="300" max="900" value="500" id="wght"> <output id="out">500</output></label>
+	<p class="hand live" id="live" style="font-weight: 500">Elio Blocks</p>
+
+	<label>Au survol, de 300 à 900</label>
+	<p class="hand breathe">Elio Blocks</p>
+</main>
+<script>
+	const input = document.getElementById( 'wght' );
+	input.addEventListener( 'input', () => {
+		document.getElementById( 'live' ).style.fontWeight = input.value;
+		document.getElementById( 'out' ).value = input.value;
+	} );
+</script>
+</body>
+</html>
