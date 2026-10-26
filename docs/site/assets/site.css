@@ -837,12 +837,6 @@ a.brand:hover .brand__sun {
 	object-position: top left;
 }
 
-.browser__poster--contain {
-	object-fit: contain;
-	object-position: center;
-	padding: 6%;
-}
-
 /* A desktop page, scaled down to the window. */
 .browser__frame {
 	position: absolute;

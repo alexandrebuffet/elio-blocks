@@ -14,19 +14,22 @@ Easily display the current weather and forecasts for any location on your site, 
 
 Elio Blocks brings the weather to the Block Editor the way WordPress would have built it: with blocks that look, feel and behave like the ones you already use every day.
 
-Insert the Weather block, search for your location, and the live forecast shows up right in the editor. Publish, and see if the sun shines! ☀️
+Insert the Weather block, start typing a city and pick it among the suggestions: the live forecast shows up right in the editor. Publish, and see if the sun shines! ☀️
 
 No coding required. No widgets, no shortcodes, no iframe either.
 
+Try it live on the [Elio Blocks website](https://alexandrebuffet.github.io/elio-blocks/), and read the [handbook](https://alexandrebuffet.github.io/elio-blocks/docs/) to go further: every block, and how to add a weather provider or an icon collection from your own code.
+
 = Feels native, because it is =
 
-* **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon, time of the last update and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
-* **Icons for the rest of your page.** The icons of Elio, weather conditions included, are an icon collection of WordPress 7.1: pick one in the Icon block, anywhere on your site.
-* **Forecasts that work like the Query Loop.** The hourly and daily forecast lists repeat a template you design once, just like the Post Template of the Query Loop block.
+* **Blocks all the way down.** The Weather block works like the Query Loop: it gets the forecast of its location and passes it on to everything nested inside. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon, time of the last update and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
+* **A full set of weather icons.** 92 icons cover every condition, by day and by night, with a line width and a color you set like any other block. Use another collection for the whole site, a single report or one icon, and on WordPress 7.1 find them in the Icon block too.
+* **Forecast lists built like a Post Template.** Lay out one hour or one day with the blocks of your choice: the Forecast Template repeats that row for each hour or day, the way the Post Template repeats a post.
 * **Start from a layout.** Pick one of the ready-made variations (Default, Minimal, Hourly Forecast, Daily Forecast), or start blank and build your own.
 * **Every design tool you expect.** Colors, typography, spacing, borders and layout come from the standard block supports, so they appear in the same panels as those of core blocks, follow your theme's presets, and can be set for the whole site in `theme.json` or the Styles of the Site Editor.
 * **Your site's settings, respected.** Dates and times use your site's language and date formats, in the timezone of the location. Units are metric or imperial, site-wide or per block.
 * **What you see is what you get.** The editor shows the real forecast of your location, styled as it will be on your site.
+* **Open to developers.** Other weather data providers and icon collections can be registered from PHP, with the same functions the plugin uses for its own.
 
 = Fast and up to date on the front end =
 
@@ -76,6 +79,12 @@ The plugin adds its own REST API endpoints: one serves the weather forecast, ano
 = Where can I find the source code? =
 On [GitHub](https://github.com/alexandrebuffet/elio-blocks): see the Source code section of the description.
 
+= Can I use a weather service other than Open-Meteo? =
+Open-Meteo is the only one included for now. The plugin was built so that others can join: a developer can register a new weather data provider in PHP, exactly the way Open-Meteo is registered: the [handbook](https://alexandrebuffet.github.io/elio-blocks/docs/) shows how. ⛅️
+
+= Can I change the weather icons? =
+Yes. Pick the icon collection for the whole site in the plugin settings, or for a single Weather block or icon in its sidebar. Developers can also register a collection of their own. 🌙
+
 = Can I customize the blocks? =
 Yes. Like core blocks, the Weather blocks come with the standard design tools, such as colors, spacing and typography, straight from the Block Editor. Beyond that, you can style them with `theme.json`, block style variations or plain CSS. Clear skies ahead. 🌤️
 
@@ -120,15 +129,17 @@ The free Open-Meteo API, which this plugin uses, is for non-commercial use only 
 
 == Credits ==
 
-The icons of the plugin were drawn for it. The layout illustrations of the Weather block variations include a sun from [Tabler Icons](https://tabler.io/icons), Copyright (c) 2020-2026 Paweł Kuna, released under the [MIT License](https://github.com/tabler/tabler-icons/blob/main/LICENSE), which is compatible with the GPL.
+The Elio icon collection is a rework inspired by [Tabler Icons](https://tabler.io/icons) (MIT License).
 
 == Screenshots ==
 
-1. The Weather block in the Block Editor, with an hourly forecast and its location settings.
-2. A daily forecast on the front end.
-3. Start blank and choose a layout for the Weather block.
-4. Search for a location by name.
-5. The General section of the settings page: units and data refresh.
+1. The Weather block in the Block Editor, its location set in the block sidebar.
+2. A daily forecast on the front end, in the colors of the theme.
+3. Style the block with the design tools you already know: background, font, size.
+4. Start blank and choose a layout for the Weather block.
+5. Locations are suggested as you type.
+6. Three reports side by side, each laid out its own way.
+7. The General section of the settings page: units and data refresh.
 
 == Changelog ==
 
@@ -139,26 +150,3 @@ The icons of the plugin were drawn for it. The layout illustrations of the Weath
 -   Days and times keep the right labels when the browser and the server disagree on the timezone of the location (a Daily Forecast for Marrakech labelled each day with the day before).
 -   For developers: a weather data provider is registered once, with `elio_blocks_register_provider()`, and holds its adapters, credentials and attribution.
 -   The stylesheets of the plugin name no web address, not even the namespace of an inline image.
-
-= 0.3.0 =
-
--   The weather of an open page stays current after the computer sleeps, and a hidden page asks for nothing until it is shown again.
--   The Block Editor refreshes the weather forecast when the front end does, and keeps it shown when a refresh fails.
--   A new logo for Elio: a sun of twelve rays.
--   The description links the source code of the plugin and explains how to build it.
-
-= 0.2.0 =
-
--   New Last Updated block: when the weather data was last fetched.
--   New Provider Attribution block: the credit the license of the weather data asks for, added at the bottom of each Weather block, with an option to open its links in a new tab.
--   Relative dates ("5 minutes ago") in the date format picker.
--   New icons drawn for the plugin, also available to the Icon block of WordPress 7.1.
--   The settings page previews six icons of each condition icon collection.
--   A preview of each block in the inserter, and a description for each block and variation.
--   Daily forecasts start at the day in progress, and a forecast list moves on to the next hour or day on time.
--   The blocks fill in place while the weather forecast loads.
--   Fixes for right-to-left languages, dark backgrounds and the settings page on small screens.
-
-= 0.1.0 =
-
--   Beta release.
