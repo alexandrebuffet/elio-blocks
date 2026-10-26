@@ -11,19 +11,20 @@ Easily display the current weather and forecasts for any location on your site, 
 
 Elio Blocks brings the weather to the Block Editor the way WordPress would have built it: with blocks that look, feel and behave like the ones you already use every day.
 
-Insert the Weather block, search for your location, and the live forecast shows up right in the editor. Publish, and see if the sun shines! ☀️
+Insert the Weather block, start typing a city and pick it among the suggestions: the live forecast shows up right in the editor. Publish, and see if the sun shines! ☀️
 
 No coding required. No widgets, no shortcodes, no iframe either.
 
 ### Feels native, because it is
 
-- **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
-- **Icons for the rest of your page.** The icons of Elio, weather conditions included, are an icon collection of WordPress 7.1: pick one in the Icon block, anywhere on your site.
+- **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon, time of the last update and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
+- **A full set of weather icons.** 92 icons cover every condition, by day and by night, with a line width and a color you set like any other block. Use another collection for the whole site, a single report or one icon, and on WordPress 7.1 find them in the Icon block too.
 - **Forecasts that work like the Query Loop.** The hourly and daily forecast lists repeat a template you design once, just like the Post Template of the Query Loop block.
 - **Start from a layout.** Pick one of the ready-made variations (Default, Minimal, Hourly Forecast, Daily Forecast), or start blank and build your own.
 - **Every design tool you expect.** Colors, typography, spacing, borders and layout come from the standard block supports, so they appear in the same panels as those of core blocks, follow your theme's presets, and can be set for the whole site in `theme.json` or the Styles of the Site Editor.
 - **Your site's settings, respected.** Dates and times use your site's language and date formats, in the timezone of the location. Units are metric or imperial, site-wide or per block.
 - **What you see is what you get.** The editor shows the real forecast of your location, styled as it will be on your site.
+- **Open to developers.** Other weather data providers and icon collections can be registered from PHP, with the same functions the plugin uses for its own.
 
 ### Fast and up to date on the front end
 
@@ -65,6 +66,14 @@ No, this plugin uses the Open-Meteo API, an open-source weather API that needs n
 
 The plugin adds its own REST API endpoints: one serves the weather forecast, another finds locations by name. In the Block Editor, a data store fetches the forecast and passes it to the Weather block and all its inner blocks through block context. On the front end, the blocks are rendered on the server, then the Interactivity API keeps the data up to date in the browser. ⚡️
 
+### Can I use a weather service other than Open-Meteo?
+
+Open-Meteo is the only one included for now. The plugin was built so that others can join: a developer can register a new weather data provider in PHP, exactly the way Open-Meteo is registered. ⛅️
+
+### Can I change the weather icons?
+
+Yes. Pick the icon collection for the whole site in the plugin settings, or for a single Weather block or icon in its sidebar. Developers can also register a collection of their own. 🌙
+
 ### Can I customize the blocks?
 
 Yes. Like core blocks, the Weather blocks come with the standard design tools, such as colors, spacing and typography, straight from the Block Editor. Beyond that, you can style them with `theme.json`, block style variations or plain CSS. Clear skies ahead. 🌤️
@@ -92,7 +101,7 @@ All requests are sent by your WordPress server, through the plugin's REST API. V
 - **Endpoint:** `https://api.open-meteo.com/v1/forecast`, or `https://customer-api.open-meteo.com/v1/forecast` once the API key of an Open-Meteo subscription is set in the plugin settings.
 - **Used for:** the current conditions and the hourly and daily weather forecasts of the location chosen in a Weather block.
 - **Data sent:** the latitude and longitude of that location (rounded to 2 decimals), the unit system (metric or imperial), the list of requested weather variables, the number of forecast days and, with a subscription, its API key. No data about your visitors or your content is sent.
-- **When:** when a page containing a Weather block is displayed, when the block refreshes its data in the visitor's browser, and when the block is edited in the Block Editor. Answers are cached in a transient, 30 minutes by default (see **Elio** in the admin menu), so Open-Meteo is only called again once the cached copy has expired, unless you turn the cache off.
+- **When:** when a page containing a Weather block is displayed, when the block refreshes its data, in the visitor's browser or in the Block Editor while it is open, and when the block is edited in the Block Editor. Answers are cached in a transient, 30 minutes by default (see **Elio** in the admin menu), so Open-Meteo is only called again once the cached copy has expired, unless you turn the cache off.
 
 ### Open-Meteo Geocoding API
 
@@ -103,7 +112,7 @@ All requests are sent by your WordPress server, through the plugin's REST API. V
 
 ### Terms, privacy and licence
 
-The free Open-Meteo API, which this plugin uses, is for non-commercial use only and has daily request limits. Commercial use requires a paid Open-Meteo subscription. Open-Meteo weather data is licensed under CC BY 4.0: credit Open-Meteo where its data is shown, for example with a "Weather data by Open-Meteo.com" link.
+The free Open-Meteo API, which this plugin uses, is for non-commercial use only and has daily request limits. Commercial use requires a paid Open-Meteo subscription. Open-Meteo weather data is licensed under CC BY 4.0: credit Open-Meteo where its data is shown. The Provider Attribution block does it at the bottom of every Weather block ("Weather data by Open-Meteo, licensed under CC BY 4.0", both names linked): keep it, or credit Open-Meteo elsewhere on the page if you remove it.
 
 - Open-Meteo website: [https://open-meteo.com/](https://open-meteo.com/)
 - Terms of use: [https://open-meteo.com/en/terms#terms](https://open-meteo.com/en/terms#terms)
@@ -136,6 +145,8 @@ npm run build
 The WordPress.org package is built by the `build-plugin.yml` GitHub Actions workflow: run it by hand to get a ZIP to test.
 
 The presentation site, [alexandrebuffet.github.io/elio-blocks](https://alexandrebuffet.github.io/elio-blocks/), lives in `docs/site/`: `npm run build:site` assembles it into `_site/`, which any static server can show (the Playground demo needs `elio-blocks.zip` next to it, added by the `deploy-site.yml` workflow).
+
+The [handbook](https://alexandrebuffet.github.io/elio-blocks/docs/), for developers (the blocks, the PHP functions and hooks, how to register a provider or an icon collection), lives in `docs/handbook/`: `npm run build:docs` builds it.
 
 Bug reports and pull requests are welcome on [GitHub](https://github.com/alexandrebuffet/elio-blocks/issues).
 
