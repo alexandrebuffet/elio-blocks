@@ -1,13 +1,16 @@
 /**
- * Fixes what WordPress.org flags in the files `wp-scripts build` writes:
+ * Fixes, or fails on, what WordPress.org flags in the files `wp-scripts build`
+ * writes:
  *
  * - adds the ABSPATH guard asked of every PHP file to build/blocks-manifest.php
  *   and the *.asset.php files (the render.php files and the icon manifests have
  *   theirs);
- * - percent-encodes the SVG namespace of the data: URIs in the stylesheets (the
- *   `@wordpress/components` styles bundled for the DataViews of the settings page
- *   have some). It is an XML namespace, never fetched, but the review flags any
- *   http:// in a stylesheet as a remote file; encoded, the data: URI is the same.
+ * - writes the SVG data: URIs of the stylesheets in base64: the review flags any
+ *   http address in a stylesheet as a remote file, even the XML namespace of an
+ *   SVG percent-encoded, which is never fetched (the `@wordpress/components`
+ *   styles have some, bundled for the copy of the components the DataViews of
+ *   the settings page bring, which the styles WordPress loads do not match);
+ * - fails on a stylesheet still naming an http(s) address.
  */
 
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
@@ -16,7 +19,8 @@ import { fileURLToPath } from 'url';
 
 const BUILD_DIR = fileURLToPath( new URL( '../build', import.meta.url ) );
 const GUARD = "<?php\nif ( ! defined( 'ABSPATH' ) ) {\n\texit;\n}\n";
-const SVG_DATA_URI = /data:image\/svg\+xml[^"')]*/g;
+const SVG_DATA_URI = /url\((["']?)data:image\/svg\+xml[^,]*,([^"')]*)\1\)/g;
+const ADDRESS = /https?(:|%3A)/i;
 
 for ( const file of readdirSync( BUILD_DIR, { recursive: true } ) ) {
 	const path = join( BUILD_DIR, file );
@@ -31,9 +35,17 @@ for ( const file of readdirSync( BUILD_DIR, { recursive: true } ) ) {
 
 	if ( file.endsWith( '.css' ) ) {
 		const css = readFileSync( path, 'utf8' );
-		const encoded = css.replace( SVG_DATA_URI, ( uri ) =>
-			uri.replaceAll( 'http://www.w3.org/', 'http%3A%2F%2Fwww.w3.org%2F' )
+		const encoded = css.replace(
+			SVG_DATA_URI,
+			( uri, quote, svg ) =>
+				`url(${ quote }data:image/svg+xml;base64,${ Buffer.from(
+					decodeURIComponent( svg )
+				).toString( 'base64' ) }${ quote })`
 		);
+
+		if ( ADDRESS.test( encoded ) ) {
+			throw new Error( `build/${ file } names an http(s) address.` );
+		}
 
 		if ( encoded !== css ) {
 			writeFileSync( path, encoded );
