@@ -4,7 +4,7 @@ Tags: weather, forecast, block-editor, blocks, location
 Requires at least: 6.7
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 0.4.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -142,6 +142,11 @@ The Elio icon collection is a rework inspired by [Tabler Icons](https://tabler.i
 7. The General section of the settings page: units and data refresh.
 
 == Changelog ==
+
+= 1.0.0 =
+
+-   The first stable version: the blocks, their attributes and the developer API of 0.4.0, unchanged.
+-   New screenshots, and links to the presentation site and the handbook.
 
 = 0.4.0 =
 
