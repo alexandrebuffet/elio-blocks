@@ -141,7 +141,7 @@ Bug reports and pull requests are welcome on [GitHub](https://github.com/alexand
 
 ## Credits
 
-The icons of the plugin were drawn for it. The layout illustrations of the Weather block variations include a sun from [Tabler Icons](https://tabler.io/icons), Copyright (c) 2020-2026 Paweł Kuna, released under the [MIT License](https://github.com/tabler/tabler-icons/blob/main/LICENSE), which is compatible with the GPL.
+The Elio icon collection is a rework inspired by [Tabler Icons](https://tabler.io/icons) (MIT License).
 
 ## Changelog
 
