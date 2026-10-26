@@ -20,9 +20,9 @@ No coding required. No widgets, no shortcodes, no iframe either.
 
 = Feels native, because it is =
 
-* **Blocks all the way down.** The Weather block is a container, like a Group. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon, time of the last update and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
+* **Blocks all the way down.** The Weather block works like the Query Loop: it gets the forecast of its location and passes it on to everything nested inside. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon, time of the last update and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
 * **A full set of weather icons.** 92 icons cover every condition, by day and by night, with a line width and a color you set like any other block. Use another collection for the whole site, a single report or one icon, and on WordPress 7.1 find them in the Icon block too.
-* **Forecasts that work like the Query Loop.** The hourly and daily forecast lists repeat a template you design once, just like the Post Template of the Query Loop block.
+* **Forecast lists built like a Post Template.** Lay out one hour or one day with the blocks of your choice: the Forecast Template repeats that row for each hour or day, the way the Post Template repeats a post.
 * **Start from a layout.** Pick one of the ready-made variations (Default, Minimal, Hourly Forecast, Daily Forecast), or start blank and build your own.
 * **Every design tool you expect.** Colors, typography, spacing, borders and layout come from the standard block supports, so they appear in the same panels as those of core blocks, follow your theme's presets, and can be set for the whole site in `theme.json` or the Styles of the Site Editor.
 * **Your site's settings, respected.** Dates and times use your site's language and date formats, in the timezone of the location. Units are metric or imperial, site-wide or per block.
