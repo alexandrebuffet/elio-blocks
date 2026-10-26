@@ -11,7 +11,7 @@
  * @wordpress-plugin
  * Plugin Name:       Elio Blocks
  * Version:           0.4.0
- * Plugin URI:        https://github.com/alexandrebuffet/elio-blocks
+ * Plugin URI:        https://alexandrebuffet.github.io/elio-blocks/
  * Description:       Easily display the current weather and forecasts for any location on your site, with blocks that feel native.
  * Author:            Alexandre Buffet
  * Author URI:        https://alexandrebuffet.fr

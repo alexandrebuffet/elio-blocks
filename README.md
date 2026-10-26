@@ -7,6 +7,8 @@
 
 Easily display the current weather and forecasts for any location on your site, with blocks that feel native.
 
+**[Website and live demo](https://alexandrebuffet.github.io/elio-blocks/)** · **[Handbook](https://alexandrebuffet.github.io/elio-blocks/docs/)** · **[WordPress.org](https://wordpress.org/plugins/elio-blocks/)**
+
 ## Description
 
 Elio Blocks brings the weather to the Block Editor the way WordPress would have built it: with blocks that look, feel and behave like the ones you already use every day.
@@ -68,7 +70,7 @@ The plugin adds its own REST API endpoints: one serves the weather forecast, ano
 
 ### Can I use a weather service other than Open-Meteo?
 
-Open-Meteo is the only one included for now. The plugin was built so that others can join: a developer can register a new weather data provider in PHP, exactly the way Open-Meteo is registered. ⛅️
+Open-Meteo is the only one included for now. The plugin was built so that others can join: a developer can register a new weather data provider in PHP, exactly the way Open-Meteo is registered: the [handbook](https://alexandrebuffet.github.io/elio-blocks/docs/) shows how. ⛅️
 
 ### Can I change the weather icons?
 

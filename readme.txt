@@ -18,6 +18,8 @@ Insert the Weather block, start typing a city and pick it among the suggestions:
 
 No coding required. No widgets, no shortcodes, no iframe either.
 
+Try it live on the [Elio Blocks website](https://alexandrebuffet.github.io/elio-blocks/), and read the [handbook](https://alexandrebuffet.github.io/elio-blocks/docs/) to go further: every block, and how to add a weather provider or an icon collection from your own code.
+
 = Feels native, because it is =
 
 * **Blocks all the way down.** The Weather block works like the Query Loop: it gets the forecast of its location and passes it on to everything nested inside. Temperature, humidity, wind, UV index, sunrise and sunset, condition icon, time of the last update and more are each a block of their own: add them, remove them, reorder them, nest them in rows, columns or groups, straight from the canvas or the List View.
@@ -78,7 +80,7 @@ The plugin adds its own REST API endpoints: one serves the weather forecast, ano
 On [GitHub](https://github.com/alexandrebuffet/elio-blocks): see the Source code section of the description.
 
 = Can I use a weather service other than Open-Meteo? =
-Open-Meteo is the only one included for now. The plugin was built so that others can join: a developer can register a new weather data provider in PHP, exactly the way Open-Meteo is registered. ⛅️
+Open-Meteo is the only one included for now. The plugin was built so that others can join: a developer can register a new weather data provider in PHP, exactly the way Open-Meteo is registered: the [handbook](https://alexandrebuffet.github.io/elio-blocks/docs/) shows how. ⛅️
 
 = Can I change the weather icons? =
 Yes. Pick the icon collection for the whole site in the plugin settings, or for a single Weather block or icon in its sidebar. Developers can also register a collection of their own. 🌙
