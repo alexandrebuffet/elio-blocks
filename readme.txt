@@ -146,11 +146,3 @@ The Elio icon collection is a rework inspired by [Tabler Icons](https://tabler.i
 = 1.0.0 =
 
 -   Public release.
-
-= 0.4.0 =
-
--   The location search suggests places as you type: move through them with the arrow keys, pick one with Enter.
--   The location of a Weather block shows as one button in its settings, like the color items, with the WordPress map marker.
--   Days and times keep the right labels when the browser and the server disagree on the timezone of the location (a Daily Forecast for Marrakech labelled each day with the day before).
--   For developers: a weather data provider is registered once, with `elio_blocks_register_provider()`, and holds its adapters, credentials and attribution.
--   The stylesheets of the plugin name no web address, not even the namespace of an inline image.
