@@ -145,8 +145,7 @@ The Elio icon collection is a rework inspired by [Tabler Icons](https://tabler.i
 
 = 1.0.0 =
 
--   The first stable version: the blocks, their attributes and the developer API of 0.4.0, unchanged.
--   New screenshots, and links to the presentation site and the handbook.
+-   Public release.
 
 = 0.4.0 =
 
