@@ -24,7 +24,7 @@ echo "Repository settings"
 gh api -X PATCH "repos/$repo" --silent --input - <<'JSON'
 {
 	"delete_branch_on_merge": true,
-	"allow_auto_merge": false,
+	"allow_auto_merge": true,
 	"security_and_analysis": {
 		"secret_scanning": { "status": "enabled" },
 		"secret_scanning_push_protection": { "status": "enabled" }
@@ -51,7 +51,8 @@ gh api -X PUT "repos/$repo/actions/permissions/selected-actions" --silent --inpu
 		"nick-fields/retry@*",
 		"10up/action-wordpress-plugin-deploy@*",
 		"10up/action-wordpress-plugin-asset-update@*",
-		"softprops/action-gh-release@*"
+		"softprops/action-gh-release@*",
+		"dependabot/fetch-metadata@*"
 	]
 }
 JSON

@@ -1,0 +1,30 @@
+name: Dependabot auto-merge
+
+# Patch and minor updates merge on their own once the checks the develop
+# ruleset requires pass; a major one waits for the maintainer. A grouped pull
+# request counts as its largest update. Squashed: the ruleset gives no merge
+# commit to whoever cannot bypass it.
+on: pull_request
+
+permissions: {}
+
+jobs:
+  auto-merge:
+    name: Auto-merge
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Read the update
+        id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+
+      - name: Merge once the checks pass
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
