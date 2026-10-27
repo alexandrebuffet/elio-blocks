@@ -31,6 +31,11 @@
         <exclude-pattern>*</exclude-pattern>
     </rule>
 
+    <!-- The plugin header starts right after the opening tag, as in the WordPress plugin handbook. -->
+    <rule ref="PSR12.Files.FileHeader.SpacingAfterBlock">
+        <exclude-pattern>elio-blocks.php</exclude-pattern>
+    </rule>
+
     <!-- REST controllers override WP_REST_Controller methods, which are snake_case. -->
     <rule ref="PSR1.Methods.CamelCapsMethodName">
         <exclude-pattern>includes/RestApi/Endpoints/*</exclude-pattern>
