@@ -1,3 +1,3 @@
 import { SVG, Path, Rect, Circle, G } from "@wordpress/primitives";
-const fog = <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><Path fill="currentColor" d="M8 4.25H6v1.5h2zm12 0h-9v1.5h9zM10 8.917H4v1.5h6zm8.222 0H14v1.5h4.222zM8 13.583H6v1.5h2zm12 0h-8v1.5h8zm-7 4.667H4v1.5h9zm5.222 0H16v1.5h2.222z" /></SVG>;
+const fog = <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><Path fill="currentColor" d="M8 4.25v1.5H6v-1.5zm12 0v1.5h-9v-1.5zM10 8.917v1.5H4v-1.5zm8.222 0v1.5H14v-1.5zM8 13.583v1.5H6v-1.5zm12 0v1.5h-8v-1.5zm-7 4.667v1.5H4v-1.5zm5.222 0v1.5H16v-1.5z" /></SVG>;
 export default fog;
