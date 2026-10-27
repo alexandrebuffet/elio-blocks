@@ -4,6 +4,7 @@
 	"name": "elio/provider-attribution",
 	"version": "1.0.0",
 	"title": "Provider Attribution",
+	"icon": "info-outline",
 	"category": "elio-weather",
 	"description": "Credit the provider of the weather data, as its license requires.",
 	"example": {

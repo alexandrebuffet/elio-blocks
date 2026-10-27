@@ -392,7 +392,14 @@ function outline( paths ) {
 	const simplified = ( area.makeSimplified ?? area._makeSimplified ).call(
 		area
 	);
-	const result = simplified ?? area;
+	const simple = simplified ?? area;
+	// Nonzero, the default: the sanitizers that keep only `d` and `fill` (the
+	// block icons of the WordPress.org plugin page) drop fill-rule.
+	const winding = simple.makeAsWinding();
+	if ( winding ) {
+		simple.delete();
+	}
+	const result = winding ?? simple;
 	const outlined = {
 		d: result.toSVGString(),
 		fillRule:
