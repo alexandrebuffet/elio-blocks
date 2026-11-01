@@ -54,6 +54,7 @@ export { default as Geolocation } from "./geolocation";
 export { default as HazeCloud } from "./haze-cloud";
 export { default as HazeMoon } from "./haze-moon";
 export { default as HazeSun } from "./haze-sun";
+export { default as Info } from "./info";
 export { default as Location } from "./location";
 export { default as MapPin } from "./map-pin";
 export { default as MoonCloud } from "./moon-cloud";

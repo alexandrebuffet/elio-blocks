@@ -355,6 +355,128 @@ function unite( a, b ) {
 }
 
 /**
+ * The contours of a path as lists of segments, the end point of each segment
+ * last in its points (a conic keeps its weight apart).
+ *
+ * @param {Object} path CanvasKit path.
+ * @return {{ start: number[], segments: { verb: number, points: number[], weight?: number }[] }[]} Contours.
+ */
+function contoursOf( path ) {
+	const SIZES = {
+		[ CanvasKit.MOVE_VERB ]: 2,
+		[ CanvasKit.LINE_VERB ]: 2,
+		[ CanvasKit.QUAD_VERB ]: 4,
+		[ CanvasKit.CONIC_VERB ]: 5,
+		[ CanvasKit.CUBIC_VERB ]: 6,
+		[ CanvasKit.CLOSE_VERB ]: 0,
+	};
+	const cmds = path.toCmds();
+	const contours = [];
+	for ( let i = 0; i < cmds.length; ) {
+		const verb = cmds[ i ];
+		const args = Array.from( cmds.slice( i + 1, i + 1 + SIZES[ verb ] ) );
+		i += 1 + SIZES[ verb ];
+		if ( verb === CanvasKit.MOVE_VERB ) {
+			contours.push( { start: args, segments: [] } );
+		} else if ( verb === CanvasKit.CONIC_VERB ) {
+			contours.at( -1 ).segments.push( {
+				verb,
+				points: args.slice( 0, 4 ),
+				weight: args[ 4 ],
+			} );
+		} else if ( verb !== CanvasKit.CLOSE_VERB ) {
+			contours.at( -1 ).segments.push( { verb, points: args } );
+		}
+	}
+	return contours.filter( ( contour ) => contour.segments.length );
+}
+
+/**
+ * The commands of a closed contour, drawn forwards or backwards.
+ *
+ * @param {Object}  contour  Contour of contoursOf().
+ * @param {boolean} reversed Whether to draw it backwards.
+ * @return {number[]} Path commands.
+ */
+function contourCmds( contour, reversed ) {
+	const { start, segments } = contour;
+	const cmds = [];
+	if ( ! reversed ) {
+		cmds.push( CanvasKit.MOVE_VERB, ...start );
+		for ( const { verb, points, weight } of segments ) {
+			cmds.push(
+				verb,
+				...points,
+				...( weight === undefined ? [] : [ weight ] )
+			);
+		}
+	} else {
+		cmds.push(
+			CanvasKit.MOVE_VERB,
+			...segments.at( -1 ).points.slice( -2 )
+		);
+		for ( let i = segments.length - 1; i >= 0; i-- ) {
+			const { verb, points, weight } = segments[ i ];
+			const from = i ? segments[ i - 1 ].points.slice( -2 ) : start;
+			const controls = [];
+			for ( let j = points.length - 4; j >= 0; j -= 2 ) {
+				controls.push( points[ j ], points[ j + 1 ] );
+			}
+			cmds.push(
+				verb,
+				...controls,
+				...from,
+				...( weight === undefined ? [] : [ weight ] )
+			);
+		}
+	}
+	cmds.push( CanvasKit.CLOSE_VERB );
+	return cmds;
+}
+
+/**
+ * The path, simplified (no contour crosses another), wound so that nonzero
+ * paints what even-odd paints: a contour inside an odd number of others is a
+ * hole, drawn the other way round.
+ *
+ * @param {Object} path Simplified CanvasKit path.
+ * @return {Object} CanvasKit path, nonzero.
+ */
+function asWinding( path ) {
+	const contours = contoursOf( path );
+	const shapes = contours.map( ( contour ) =>
+		CanvasKit.Path.MakeFromCmds( contourCmds( contour, false ) )
+	);
+	const cmds = contours.flatMap( ( contour, index ) => {
+		// The polygon of its points has the sign of its direction.
+		const points = [
+			...contour.start,
+			...contour.segments.flatMap( ( segment ) => segment.points ),
+		];
+		let area = 0;
+		for ( let i = 0; i < points.length; i += 2 ) {
+			const j = ( i + 2 ) % points.length;
+			area +=
+				points[ i ] * points[ j + 1 ] - points[ j ] * points[ i + 1 ];
+		}
+		// Inside another when most of its points are: one may touch its edge.
+		const ends = contour.segments.map( ( segment ) =>
+			segment.points.slice( -2 )
+		);
+		const depth = shapes.filter(
+			( shape, other ) =>
+				other !== index &&
+				ends.filter( ( [ x, y ] ) => shape.contains( x, y ) ).length *
+					2 >
+					ends.length
+		).length;
+		return contourCmds( contour, area > 0 === ( depth % 2 === 1 ) );
+	} );
+	shapes.forEach( ( shape ) => shape.delete() );
+	return CanvasKit.Path.MakeFromCmds( cmds );
+}
+
+/**
  * Outlines the paths of an icon as one filled path: each stroke becomes the
  * area it paints (its width, caps and joins, as Figma's "Outline stroke"),
  * united with the filled paths, then simplified into non-overlapping contours.
@@ -395,11 +517,9 @@ function outline( paths ) {
 	const simple = simplified ?? area;
 	// Nonzero, the default: the sanitizers that keep only `d` and `fill` (the
 	// block icons of the WordPress.org plugin page) drop fill-rule.
-	const winding = simple.makeAsWinding();
-	if ( winding ) {
-		simple.delete();
-	}
-	const result = winding ?? simple;
+	// makeAsWinding() fills some holes (the sun of sun-cloud): asWinding().
+	const result = asWinding( simple );
+	simple.delete();
 	const outlined = {
 		d: result.toSVGString(),
 		fillRule:

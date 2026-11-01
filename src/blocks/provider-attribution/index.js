@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { registerBlockType } from '@wordpress/blocks';
-import { info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import info from '../../icons/components/info';
 import edit from './edit';
 import save from './save';
 import metadata from './block.json';
