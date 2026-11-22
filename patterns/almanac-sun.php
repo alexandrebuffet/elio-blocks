@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Pattern "Almanac · Sun": the day and the sun, centered: date, sunrise, sunset and UV index.
+ * Pattern "Sun Almanac": the day and the sun, centered: date, sunrise, sunset and UV index.
  *
  * Registered by RegisterBlockPatterns, which gives its title and description.
  * Layout only: no color, border, background nor font family, the theme gives

@@ -56,7 +56,8 @@ class BlockPatternsTest extends TestCase
             $this->assertSame(['elio/weather-report'], $properties['blockTypes']);
             $this->assertSame(['elio-weather'], $properties['categories']);
             $this->assertFileExists($properties['filePath']);
-            $this->assertNotSame('', $properties['title']);
+            // Words only: no separator sign ("·", "—", ":") in a title.
+            $this->assertMatchesRegularExpression('/^\p{L}+( \p{L}+)*$/u', $properties['title']);
         }
     }
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Pattern "Hourly forecast · Strip": the current conditions on one line, then the next twelve hours side by side.
+ * Pattern "Hourly Forecast Strip": the current conditions on one line, then the next twelve hours side by side.
  *
  * Registered by RegisterBlockPatterns, which gives its title and description.
  * Layout only: no color, border, background nor font family, the theme gives

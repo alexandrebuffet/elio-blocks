@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Pattern "Bulletin · Compact": the current conditions on one line, then the next five days in columns.
+ * Pattern "Compact Bulletin": the current conditions on one line, then the next five days in columns.
  *
  * Registered by RegisterBlockPatterns, which gives its title and description.
  * Layout only: no color, border, background nor font family, the theme gives

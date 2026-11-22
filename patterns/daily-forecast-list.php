@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Pattern "Daily forecast · List": the next seven days in rows: day, condition, chance of rain, lowest and highest temperatures.
+ * Pattern "Daily Forecast List": the next seven days in rows: day, condition, chance of rain, lowest and highest temperatures.
  *
  * Registered by RegisterBlockPatterns, which gives its title and description.
  * Layout only: no color, border, background nor font family, the theme gives

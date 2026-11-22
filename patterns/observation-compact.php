@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Pattern "Observation · Compact": the current conditions in a column: location and date, temperature, feels-like temperature, wind, humidity and precipitation.
+ * Pattern "Compact Observation": the current conditions in a column: location and date, temperature, feels-like temperature, wind, humidity and precipitation.
  *
  * Registered by RegisterBlockPatterns, which gives its title and description.
  * Layout only: no color, border, background nor font family, the theme gives

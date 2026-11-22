@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Pattern "Observation · Hero": the current temperature very large, the details stacked beside it. Full width, for the top of a page.
+ * Pattern "Hero Observation": the current temperature very large, the details stacked beside it. Full width, for the top of a page.
  *
  * Registered by RegisterBlockPatterns, which gives its title and description.
  * Layout only: no color, border, background nor font family, the theme gives
