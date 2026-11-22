@@ -2,9 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import {
+	PanelBody,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	SelectControl,
@@ -30,11 +34,12 @@ const HTML_ELEMENT_OPTIONS = [
  * Renders the inspector controls of the Report block.
  *
  * @param {Object}                       props               Component props.
+ * @param {string}                       props.clientId      Block clientId.
  * @param {Object}                       props.attributes    Block attributes.
  * @param {(attributes: Object) => void} props.setAttributes Function to set block attributes.
  * @return {Element} Inspector controls element.
  */
-export default function Inspector( { attributes, setAttributes } ) {
+export default function Inspector( { clientId, attributes, setAttributes } ) {
 	const {
 		provider = '',
 		units = '',
@@ -43,6 +48,22 @@ export default function Inspector( { attributes, setAttributes } ) {
 		iconCollection,
 	} = attributes;
 	const { customName = '' } = location;
+	// Since WordPress 7.0 a report inserted from a pattern is a locked section:
+	// its inner blocks leave the default editing mode and the sidebar only shows
+	// the "content" group, so the location goes there too. "Edit pattern" puts
+	// the inner blocks back in the default mode, and the Settings panel back.
+	const isLockedSection = useSelect(
+		( select ) => {
+			const { getBlockOrder, getBlockEditingMode } =
+				select( blockEditorStore );
+			const [ firstInnerBlock ] = getBlockOrder( clientId );
+			return (
+				!! firstInnerBlock &&
+				getBlockEditingMode( firstInnerBlock ) !== 'default'
+			);
+		},
+		[ clientId ]
+	);
 	const providers = useSelect(
 		( select ) => select( elioDataStore ).getWeatherForecastProviders(),
 		[]
@@ -85,8 +106,24 @@ export default function Inspector( { attributes, setAttributes } ) {
 		} );
 	};
 
+	const locationControl = (
+		<LocationControl
+			location={ location }
+			customName={ customName }
+			onChange={ handleLocationChange }
+			onCustomNameChange={ handleCustomNameChange }
+		/>
+	);
+
 	return (
 		<>
+			{ isLockedSection && (
+				<InspectorControls group="content">
+					<PanelBody title={ __( 'Location', 'elio-blocks' ) }>
+						{ locationControl }
+					</PanelBody>
+				</InspectorControls>
+			) }
 			<InspectorControls group="advanced">
 				<SelectControl
 					__next40pxDefaultSize
@@ -117,12 +154,7 @@ export default function Inspector( { attributes, setAttributes } ) {
 							setAttributes( { location: undefined } )
 						}
 					>
-						<LocationControl
-							location={ location }
-							customName={ customName }
-							onChange={ handleLocationChange }
-							onCustomNameChange={ handleCustomNameChange }
-						/>
+						{ locationControl }
 					</ToolsPanelItem>
 					<ToolsPanelItem
 						label={ __( 'Provider', 'elio-blocks' ) }
