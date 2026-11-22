@@ -10,6 +10,7 @@ const defaultConfig = require( '@wordpress/scripts/config/eslint.config.cjs' );
  */
 const ALLOWED_UNSAFE_APIS = {
 	'@wordpress/block-editor': [
+		'__experimentalBlockPatternsList',
 		'__experimentalBlockVariationPicker',
 		'__experimentalDateFormatPicker',
 		'__experimentalGetSpacingClassesAndStyles',

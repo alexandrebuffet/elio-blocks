@@ -22,6 +22,7 @@ import { useResizeObserver } from '@wordpress/compose';
 import { useReportBlockVariations, REPORT_BLOCK_NAME } from '../utils';
 import sunCloud from '../../../icons/components/sun-cloud';
 import SearchLocationModal from '../../../block-editor/components/search-location-modal';
+import PatternSelectionModal, { useReportPatterns } from './pattern-selection';
 
 /**
  * Renders the variation picker for "Start blank" (same pattern as Query's QueryVariationPicker).
@@ -51,7 +52,9 @@ function ReportVariationPicker( { icon, label, onSelect } ) {
 /**
  * Renders the Report block placeholder when it has no inner blocks (same structure as Query's
  * QueryPlaceholder).
- * Primary "Search a location" opens the location search modal; "Start blank" shows variation picker.
+ * Primary "Search a location" opens the location search modal, then the designs (patterns) to
+ * choose from; "Choose" opens the designs first, the report asking for its location once it has
+ * one (see edit.js); "Start blank" shows the variation picker.
  *
  * @param {Object}                       props               Component props.
  * @param {string}                       props.clientId      Report block clientId.
@@ -68,6 +71,8 @@ export default function ReportPlaceholder( {
 } ) {
 	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
 	const [ isSearchModalOpen, setIsSearchModalOpen ] = useState( false );
+	const [ isPatternModalOpen, setIsPatternModalOpen ] = useState( false );
+	const hasPatterns = useReportPatterns( clientId ).length > 0;
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 
 	const resizeObserverRef = useResizeObserver( ( [ entry ] ) => {
@@ -134,8 +139,13 @@ export default function ReportPlaceholder( {
 			},
 		} );
 		setIsSearchModalOpen( false );
-		// Apply the first (default) variation so the block shows content immediately.
-		applyVariation( defaultVariation );
+		// Then the designs, previewed in that place; without any, the first
+		// (default) variation, so the block shows content immediately.
+		if ( hasPatterns ) {
+			setIsPatternModalOpen( true );
+		} else {
+			applyVariation( defaultVariation );
+		}
 	};
 
 	if ( isStartingBlank ) {
@@ -156,7 +166,15 @@ export default function ReportPlaceholder( {
 				label={ ! isSmallContainer && label }
 				instructions={
 					! isSmallContainer &&
-					__( 'Search a location or start blank.', 'elio-blocks' )
+					( hasPatterns
+						? __(
+								'Search a location, choose a design or start blank.',
+								'elio-blocks'
+							)
+						: __(
+								'Search a location or start blank.',
+								'elio-blocks'
+							) )
 				}
 				withIllustration={ isSmallContainer }
 			>
@@ -169,6 +187,15 @@ export default function ReportPlaceholder( {
 						>
 							{ __( 'Search a location', 'elio-blocks' ) }
 						</Button>
+						{ hasPatterns && (
+							<Button
+								variant="secondary"
+								onClick={ () => setIsPatternModalOpen( true ) }
+								__next40pxDefaultSize
+							>
+								{ __( 'Choose', 'elio-blocks' ) }
+							</Button>
+						) }
 						<Button
 							variant="secondary"
 							onClick={ () => setIsStartingBlank( true ) }
@@ -184,6 +211,13 @@ export default function ReportPlaceholder( {
 				onRequestClose={ () => setIsSearchModalOpen( false ) }
 				onSelect={ handleSelectLocation }
 			/>
+			{ isPatternModalOpen && (
+				<PatternSelectionModal
+					clientId={ clientId }
+					attributes={ attributes }
+					onRequestClose={ () => setIsPatternModalOpen( false ) }
+				/>
+			) }
 		</div>
 	);
 }

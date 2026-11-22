@@ -33,6 +33,7 @@ vi.mock( '../../../block-editor/hooks', () => ( {
 	useWeatherForecastQuery: vi.fn(),
 } ) );
 vi.mock( '../inspector', () => ( { default: () => null } ) );
+vi.mock( '../edit/change-design-toolbar', () => ( { default: () => null } ) );
 vi.mock( '../edit/report-placeholder', () => ( {
 	default: () => <div data-testid="placeholder" />,
 } ) );

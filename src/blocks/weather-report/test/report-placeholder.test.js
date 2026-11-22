@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { act } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * WordPress dependencies
@@ -57,6 +57,14 @@ vi.mock( '../../../block-editor/components/search-location-modal', () => ( {
 				}
 			/>
 		) : null,
+} ) );
+
+// The designs: none unless a test registers some, their modal a button
+// that stands for the one picked.
+const reportPatterns = vi.hoisted( () => ( { list: [] } ) );
+vi.mock( '../edit/pattern-selection', () => ( {
+	useReportPatterns: () => reportPatterns.list,
+	default: () => <div data-testid="pattern-modal" />,
 } ) );
 
 const BLOCK_TYPE = { title: 'Weather' };
@@ -130,6 +138,10 @@ const button = ( container, text ) =>
 	);
 
 describe( 'weather-report placeholder', () => {
+	beforeEach( () => {
+		reportPatterns.list = [];
+	} );
+
 	it( 'gives the report the layout of the variation picked after "Start blank"', () => {
 		const { container, setAttributes, replaceInnerBlocks } =
 			renderPlaceholder();
@@ -167,5 +179,51 @@ describe( 'weather-report placeholder', () => {
 			[ { name: 'elio/location' }, { name: 'elio/temperature' } ],
 			false
 		);
+	} );
+
+	describe( 'with designs registered', () => {
+		beforeEach( () => {
+			reportPatterns.list = [ { name: 'elio/observation-compact' } ];
+		} );
+
+		it( 'offers to choose one before the location', () => {
+			const { container } = renderPlaceholder();
+
+			expect(
+				container.querySelector( '[data-testid="pattern-modal"]' )
+			).toBeNull();
+
+			click( button( container, 'Choose' ) );
+
+			expect(
+				container.querySelector( '[data-testid="pattern-modal"]' )
+			).not.toBeNull();
+		} );
+
+		it( 'offers them once a location is picked, in place of the default variation', () => {
+			const { container, setAttributes, replaceInnerBlocks } =
+				renderPlaceholder();
+
+			click( button( container, 'Search a location' ) );
+			click( container.querySelector( '[data-testid="modal"]' ) );
+
+			expect( setAttributes ).toHaveBeenCalledWith( {
+				location: {
+					latitude: 48.8566,
+					longitude: 2.3522,
+					name: 'Paris',
+				},
+			} );
+			expect( replaceInnerBlocks ).not.toHaveBeenCalled();
+			expect(
+				container.querySelector( '[data-testid="pattern-modal"]' )
+			).not.toBeNull();
+		} );
+	} );
+
+	it( 'offers no "Choose" without designs', () => {
+		const { container } = renderPlaceholder();
+
+		expect( button( container, 'Choose' ) ).toBeUndefined();
 	} );
 } );
