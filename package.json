@@ -14,6 +14,7 @@
 		"build",
 		"config",
 		"includes",
+		"patterns",
 		"vendor",
 		"vendor-prefixed"
 	],

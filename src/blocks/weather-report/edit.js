@@ -2,6 +2,7 @@
  * WordPress dependencies.
  */
 import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { Notice } from '@wordpress/components';
 
@@ -13,6 +14,7 @@ import { useWeatherForecastQuery } from '../../block-editor/hooks';
 import Inspector from './inspector';
 import ReportPlaceholder from './edit/report-placeholder';
 import LocationToolbar from './edit/location-toolbar';
+import ChangeDesignToolbar from './edit/change-design-toolbar';
 import { PROVIDER_ATTRIBUTION_BLOCK } from './variations';
 
 /**
@@ -38,6 +40,12 @@ export default function ReportEdit( props ) {
 
 	const { location = {}, provider = '', units = '' } = attributes;
 	const { latitude = '', longitude = '' } = location;
+	// A report inserted selected with its blocks but no location (a pattern
+	// from the inserter, or one chosen before the place) asks for it at once.
+	// Decided when it mounts only: a report already in the post never does.
+	const [ asksLocation, setAsksLocation ] = useState(
+		() => isSelected && ! ( latitude && longitude )
+	);
 
 	const weatherForecastQuery = useWeatherForecastQuery( {
 		latitude,
@@ -91,6 +99,12 @@ export default function ReportEdit( props ) {
 					<LocationToolbar
 						location={ location }
 						setAttributes={ setAttributes }
+						isInitiallyOpen={ asksLocation }
+						onClose={ () => setAsksLocation( false ) }
+					/>
+					<ChangeDesignToolbar
+						clientId={ clientId }
+						attributes={ attributes }
 					/>
 				</>
 			) }

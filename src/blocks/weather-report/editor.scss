@@ -23,3 +23,29 @@
 		margin-bottom: 1em;
 	}
 }
+
+// Designs of the report, laid out as the Query Loop lays out its patterns.
+.wp-block-elio-weather-report__pattern-selection-modal {
+
+	.block-editor-block-patterns-list {
+		column-count: 2;
+		column-gap: 24px;
+
+		@media (min-width: 1280px) {
+			column-count: 3;
+		}
+	}
+
+	.block-editor-block-patterns-list__list-item {
+		break-inside: avoid-column;
+	}
+}
+
+.wp-block-elio-weather-report__pattern-selection-search {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	margin-bottom: 16px;
+	padding: 16px 0;
+	background: #fff;
+}
