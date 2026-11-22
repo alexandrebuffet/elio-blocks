@@ -5,6 +5,7 @@ use ElioBlocks\Vendor\Symfony\Component\DependencyInjection\Reference;
 use ElioBlocks\BlockEditor\Hooks\EnqueueBlockEditorAssets;
 use ElioBlocks\Blocks\Hooks\RegisterCommonStyleAsset;
 use ElioBlocks\Blocks\Hooks\RegisterBlockCategories;
+use ElioBlocks\Blocks\Hooks\RegisterBlockPatterns;
 use ElioBlocks\Blocks\Hooks\RegisterBlockTypes;
 use ElioBlocks\Blocks\Hooks\StyleHookedProviderAttribution;
 use ElioBlocks\Weather\Condition\Icons\ConditionIconCollectionResolver;
@@ -271,6 +272,11 @@ return static function ( ContainerBuilder $container ): void {
 		->setPublic( true );
 
 	$container->register( RegisterBlockCategories::class )
+		->addTag( 'elio_blocks.hookable' )
+		->setPublic( true );
+
+	$container->register( RegisterBlockPatterns::class )
+		->setArguments( array( ELIO_BLOCKS_PLUGIN_PATH ) )
 		->addTag( 'elio_blocks.hookable' )
 		->setPublic( true );
 

@@ -6,6 +6,7 @@
     <description>Coding standards: PSR-12 for all PHP; WordPress I18n for text domain.</description>
 
     <file>includes</file>
+    <file>patterns</file>
     <file>elio-blocks.php</file>
 
     <exclude-pattern>vendor/*</exclude-pattern>
