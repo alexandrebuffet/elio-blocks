@@ -174,31 +174,21 @@ export default function SearchLocationModal( {
 												handleSelectLocation( result )
 											}
 										>
-											<VStack
-												spacing={ 0 }
-												alignment="left"
-											>
-												<Text weight="500" truncate>
-													{ result.name }
-												</Text>
-												{ formatDetailedAddress(
-													result
-												) && (
-													<Text
-														variant="muted"
-														truncate
-													>
-														{ formatDetailedAddress(
-															result
-														) }
-													</Text>
-												) }
-												<Text variant="muted" truncate>
-													{ formatCoordinates(
+											<Autocomplete.ItemLabel>
+												{ result.name }
+											</Autocomplete.ItemLabel>
+											{ formatDetailedAddress(
+												result
+											) ? (
+												<Autocomplete.ItemDescription>
+													{ formatDetailedAddress(
 														result
 													) }
-												</Text>
-											</VStack>
+												</Autocomplete.ItemDescription>
+											) : null }
+											<Autocomplete.ItemDescription>
+												{ formatCoordinates( result ) }
+											</Autocomplete.ItemDescription>
 										</Autocomplete.Item>
 									) }
 								</Autocomplete.Collection>

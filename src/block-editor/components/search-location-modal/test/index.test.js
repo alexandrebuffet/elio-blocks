@@ -69,6 +69,8 @@ describe( 'SearchLocationModal', () => {
 				onRequestClose={ onRequestClose }
 			/>
 		);
+		// The modal moves the focus once it is open: type after that, as a user would.
+		await act( () => new Promise( ( resolve ) => setTimeout( resolve ) ) );
 		await type( document.querySelector( '[role="combobox"]' ), 'Par' );
 
 		// The endpoint matched the result: "Paris" is suggested for "Par" and
