@@ -1,0 +1,382 @@
+{
+	"slug": "pixel",
+	"label": "Pixel",
+	"description": "Retro pixel art on a 12-pixel grid, sharpest at 24, 36 and 48 pixels.",
+	"icons": [
+		{
+			"slug": "sun",
+			"label": "Sun",
+			"pixels": [
+				"............",
+				".....##.....",
+				"..#......#..",
+				"....####....",
+				"...######...",
+				".#.######.#.",
+				".#.######.#.",
+				"...######...",
+				"....####....",
+				"..#......#..",
+				".....##.....",
+				"............"
+			]
+		},
+		{
+			"slug": "moon",
+			"label": "Moon",
+			"pixels": [
+				"............",
+				".....#......",
+				"...###......",
+				"..###.......",
+				"..###.......",
+				"..####......",
+				"..#####.....",
+				"..######....",
+				"..#########.",
+				"...#######..",
+				".....####...",
+				"............"
+			]
+		},
+		{
+			"slug": "moon-stars",
+			"label": "Moon with stars",
+			"pixels": [
+				"............",
+				"....#.......",
+				"..###...#...",
+				".###...###..",
+				".###....#...",
+				".####.......",
+				".#####....#.",
+				".######.....",
+				".#########..",
+				"..#######...",
+				"....####....",
+				"............"
+			]
+		},
+		{
+			"slug": "sun-cloud",
+			"label": "Sun with cloud",
+			"pixels": [
+				"............",
+				"....##......",
+				"..#....#....",
+				"....##......",
+				".#.####.#...",
+				".#.##.......",
+				"......###...",
+				".....#####..",
+				"...#.######.",
+				"..#########.",
+				"...#######..",
+				"............"
+			]
+		},
+		{
+			"slug": "moon-cloud",
+			"label": "Moon with cloud",
+			"pixels": [
+				"............",
+				"...##.......",
+				"..##........",
+				".###........",
+				".###........",
+				".####.......",
+				"..##..###...",
+				".....#####..",
+				"...#.######.",
+				"..#########.",
+				"...#######..",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud",
+			"label": "Cloud",
+			"pixels": [
+				"............",
+				"............",
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".##########.",
+				"..########..",
+				"............",
+				"............",
+				"............"
+			]
+		},
+		{
+			"slug": "fog",
+			"label": "Fog",
+			"pixels": [
+				"............",
+				"............",
+				"...######...",
+				"............",
+				".#####.####.",
+				"............",
+				"..#.#######.",
+				"............",
+				".######.##..",
+				"............",
+				"............",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-drizzle",
+			"label": "Cloud with drizzle",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".##########.",
+				"..########..",
+				"............",
+				"...#.....#..",
+				"......#.....",
+				"............",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-drizzle-dense",
+			"label": "Cloud with dense drizzle",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".##########.",
+				"..########..",
+				"............",
+				"..#..#..#...",
+				"............",
+				"...#..#..#..",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-rain-light",
+			"label": "Cloud with light rain",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".##########.",
+				"..########..",
+				"............",
+				"....#.......",
+				"....#..#....",
+				".......#....",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-rain",
+			"label": "Cloud with rain",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".##########.",
+				"..########..",
+				"............",
+				"...#.....#..",
+				"...#..#..#..",
+				"......#.....",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-rain-heavy",
+			"label": "Cloud with heavy rain",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".##########.",
+				"..########..",
+				"............",
+				"..#...#...#.",
+				"..#.#.#.#.#.",
+				"....#...#...",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-sleet",
+			"label": "Cloud with sleet",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".##########.",
+				"..########..",
+				"............",
+				"...#...#....",
+				"...#..###.#.",
+				".......#..#.",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-snow-light",
+			"label": "Cloud with light snow",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".##########.",
+				"..########..",
+				"............",
+				".....#......",
+				"....###.....",
+				".....#......",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-snow",
+			"label": "Cloud with snow",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".##########.",
+				"..########..",
+				"............",
+				"...#....#...",
+				"..###..###..",
+				"...#....#...",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-snow-heavy",
+			"label": "Cloud with heavy snow",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".##########.",
+				"..########..",
+				"............",
+				"..#...#..#..",
+				".###.###....",
+				"..#...#...#.",
+				"............"
+			]
+		},
+		{
+			"slug": "snowflake",
+			"label": "Snowflake",
+			"pixels": [
+				"............",
+				".....#......",
+				"..#..#..#...",
+				"...#.#.#....",
+				"............",
+				".###.#.###..",
+				"............",
+				"...#.#.#....",
+				"..#..#..#...",
+				".....#......",
+				"............",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-bolt",
+			"label": "Cloud with lightning",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".######.....",
+				"..####..##..",
+				".......##...",
+				"......####..",
+				"........#...",
+				".......#....",
+				"............"
+			]
+		},
+		{
+			"slug": "cloud-bolt-hail",
+			"label": "Cloud with lightning and hail",
+			"pixels": [
+				"............",
+				".....###....",
+				"....#####...",
+				"..#.######..",
+				".##########.",
+				".######.....",
+				"..####..##..",
+				".......##...",
+				"..##..####..",
+				"..##....#...",
+				".......#....",
+				"............"
+			]
+		}
+	],
+	"conditionMappings": [
+		{ "condition": "clear-sky",                      "dayOrNight": "day",   "iconSlug": "sun" },
+		{ "condition": "clear-sky",                      "dayOrNight": "night", "iconSlug": "moon-stars" },
+		{ "condition": "mainly-clear",                   "dayOrNight": "day",   "iconSlug": "sun" },
+		{ "condition": "mainly-clear",                   "dayOrNight": "night", "iconSlug": "moon" },
+		{ "condition": "partly-cloudy",                  "dayOrNight": "day",   "iconSlug": "sun-cloud" },
+		{ "condition": "partly-cloudy",                  "dayOrNight": "night", "iconSlug": "moon-cloud" },
+		{ "condition": "overcast",                       "dayOrNight": "all",   "iconSlug": "cloud" },
+		{ "condition": "fog",                            "dayOrNight": "all",   "iconSlug": "fog" },
+		{ "condition": "depositing-rime-fog",            "dayOrNight": "all",   "iconSlug": "fog" },
+		{ "condition": "light-drizzle",                  "dayOrNight": "all",   "iconSlug": "cloud-drizzle" },
+		{ "condition": "moderate-drizzle",               "dayOrNight": "all",   "iconSlug": "cloud-drizzle" },
+		{ "condition": "dense-drizzle",                  "dayOrNight": "all",   "iconSlug": "cloud-drizzle-dense" },
+		{ "condition": "light-freezing-drizzle",         "dayOrNight": "all",   "iconSlug": "cloud-drizzle" },
+		{ "condition": "dense-freezing-drizzle",         "dayOrNight": "all",   "iconSlug": "cloud-drizzle-dense" },
+		{ "condition": "slight-rain",                    "dayOrNight": "all",   "iconSlug": "cloud-rain-light" },
+		{ "condition": "moderate-rain",                  "dayOrNight": "all",   "iconSlug": "cloud-rain" },
+		{ "condition": "heavy-rain",                     "dayOrNight": "all",   "iconSlug": "cloud-rain-heavy" },
+		{ "condition": "light-freezing-rain",            "dayOrNight": "all",   "iconSlug": "cloud-sleet" },
+		{ "condition": "heavy-freezing-rain",            "dayOrNight": "all",   "iconSlug": "cloud-sleet" },
+		{ "condition": "slight-snowfall",                "dayOrNight": "all",   "iconSlug": "cloud-snow-light" },
+		{ "condition": "moderate-snowfall",              "dayOrNight": "all",   "iconSlug": "cloud-snow" },
+		{ "condition": "heavy-snowfall",                 "dayOrNight": "all",   "iconSlug": "cloud-snow-heavy" },
+		{ "condition": "snow-grains",                    "dayOrNight": "all",   "iconSlug": "snowflake" },
+		{ "condition": "slight-rain-showers",            "dayOrNight": "all",   "iconSlug": "cloud-rain-light" },
+		{ "condition": "moderate-rain-showers",          "dayOrNight": "all",   "iconSlug": "cloud-rain" },
+		{ "condition": "violent-rain-showers",           "dayOrNight": "all",   "iconSlug": "cloud-rain-heavy" },
+		{ "condition": "slight-snow-showers",            "dayOrNight": "all",   "iconSlug": "cloud-snow-light" },
+		{ "condition": "heavy-snow-showers",             "dayOrNight": "all",   "iconSlug": "cloud-snow-heavy" },
+		{ "condition": "thunderstorm",                   "dayOrNight": "all",   "iconSlug": "cloud-bolt" },
+		{ "condition": "thunderstorm-with-slight-hail",  "dayOrNight": "all",   "iconSlug": "cloud-bolt" },
+		{ "condition": "thunderstorm-with-heavy-hail",   "dayOrNight": "all",   "iconSlug": "cloud-bolt-hail" }
+	]
+}
