@@ -71,6 +71,7 @@ final class ConditionIconsRegistry
         'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'stroke-dasharray', 'stroke-dashoffset',
         'stroke-opacity', 'clip-path', 'clip-rule', 'mask', 'offset', 'stop-color', 'stop-opacity',
         'gradientunits', 'gradienttransform', 'spreadmethod', 'clippathunits', 'maskunits', 'vector-effect',
+        'shape-rendering',
     );
 
     /**

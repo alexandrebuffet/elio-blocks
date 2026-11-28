@@ -21,6 +21,10 @@
  *   into src/icons/components/ (npm run build:icons). The components of icons
  *   that are gone are removed.
  *
+ * The Pixel collection of condition icons (src/icons/pixel/manifest.json, one
+ * bitmap per icon) is built by scripts/pixel-icons.mjs into
+ * build/weather-condition-icons/pixel/ and added to the same manifest.
+ *
  * The export is checked, not fixed: a viewBox other than 0 0 24 24, an element
  * other than <path> (the clipPath Figma adds for the frame is ignored), a color
  * other than black, a transform, a file the manifest does not list or an icon
@@ -41,6 +45,7 @@ import { createRequire } from 'module';
 import { basename, dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { optimize } from 'svgo';
+import { buildPixelCollection } from './pixel-icons.mjs';
 
 const require = createRequire( import.meta.url );
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
@@ -634,6 +639,42 @@ conditionLines.push(
 	"            'conditionMappings' => array("
 );
 for ( const { condition, dayOrNight, iconSlug } of conditionMappings ) {
+	conditionLines.push(
+		'                array(',
+		`                    'condition'  => '${ escapeSingleQuote( condition ) }',`,
+		`                    'dayOrNight' => '${ dayOrNight }',`,
+		`                    'iconSlug'   => '${ iconSlug }',`,
+		'                ),'
+	);
+}
+conditionLines.push( '            ),', '        ),' );
+
+// The Pixel collection: bitmaps, filled (scripts/pixel-icons.mjs).
+const pixel = buildPixelCollection( CONDITION_BUILD_DIR );
+const pixelKey = ( iconSlug ) =>
+	`'${ iconSlug }'`.padEnd(
+		Math.max( ...pixel.icons.map( ( icon ) => icon.slug.length ) ) + 3
+	);
+conditionLines.push(
+	`        '${ escapeSingleQuote( pixel.slug ) }' => array(`,
+	`            'label'             => _x( '${ escapeSingleQuote( pixel.label ) }', 'icon collection label', 'elio-blocks' ),`,
+	`            'description'       => __( '${ escapeSingleQuote( pixel.description ) }', 'elio-blocks' ),`,
+	"            'icons'             => array("
+);
+for ( const icon of pixel.icons ) {
+	conditionLines.push(
+		`                ${ pixelKey( icon.slug ) }=> array(`,
+		`                    'label'    => _x( '${ escapeSingleQuote( icon.label ) }', 'icon label', 'elio-blocks' ),`,
+		`                    'filePath' => '${ icon.slug }.svg',`,
+		"                    'style'    => 'fill',",
+		'                ),'
+	);
+}
+conditionLines.push(
+	'            ),',
+	"            'conditionMappings' => array("
+);
+for ( const { condition, dayOrNight, iconSlug } of pixel.conditionMappings ) {
 	conditionLines.push(
 		'                array(',
 		`                    'condition'  => '${ escapeSingleQuote( condition ) }',`,
