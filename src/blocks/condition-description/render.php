@@ -17,7 +17,7 @@ if (! defined('ABSPATH')) {
 $show_prefix = isset($attributes['showPrefix']) ? (bool) $attributes['showPrefix'] : false;
 $prefix      = isset($attributes['prefix']) ? sanitize_text_field($attributes['prefix']) : '';
 ?>
-<p <?php echo wp_kses_data(get_block_wrapper_attributes()); ?>>
+<p <?php echo get_block_wrapper_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() escapes its values. ?>>
     <?php if ($show_prefix && $prefix !== '') : ?>
     <span class="wp-block-elio-condition-description__prefix"><?php echo esc_html($prefix); ?></span>
     <?php endif; ?>

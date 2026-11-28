@@ -37,7 +37,7 @@ $extra_wrapper_attributes = array();
 
 $wrapper_attributes = get_block_wrapper_attributes($extra_wrapper_attributes + $directives);
 ?>
-<<?php echo tag_escape($wrapper_tag); ?> <?php echo wp_kses_data($wrapper_attributes); ?>>
+<<?php echo tag_escape($wrapper_tag); ?> <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() escapes its values. ?>>
     <?php
     // Symbols of the icons the inner blocks show and the page does not have yet (IconSprite).
     // The inner blocks are rendered already: printed first, the symbols reach the browser

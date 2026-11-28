@@ -14,6 +14,6 @@ if (! defined('ABSPATH')) {
     die;
 }
 ?>
-<p <?php echo wp_kses_data(get_block_wrapper_attributes( array( 'class' => 'elio-tabular-nums' ) )); ?>>
+<p <?php echo get_block_wrapper_attributes( array( 'class' => 'elio-tabular-nums' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() escapes its values. ?>>
     <span class="wp-block-elio-precipitation-probability__value" data-wp-text="state.precipitationProbability"></span><span class="wp-block-elio-precipitation-probability__unit" data-wp-text="state.precipitationProbabilityUnit"></span>
 </p>
