@@ -3,7 +3,7 @@
  */
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * Internal dependencies
@@ -11,12 +11,18 @@ import { describe, expect, it, vi } from 'vitest';
 import ConditionIconEdit from '../edit';
 import { useWeatherReport } from '../../../block-editor/hooks';
 
+// WordPress 6.9 and older have no getDimensionsClassesAndStyles().
+const blockEditor = vi.hoisted( () => ( {
+	getDimensionsClassesAndStyles: () => ( {} ),
+} ) );
 vi.mock( '@wordpress/block-editor', () => ( {
 	useBlockProps: ( props ) => props,
 	__experimentalUseColorProps: () => ( {} ),
 	__experimentalUseBorderProps: () => ( {} ),
 	__experimentalGetSpacingClassesAndStyles: () => ( {} ),
-	getDimensionsClassesAndStyles: () => ( {} ),
+	get getDimensionsClassesAndStyles() {
+		return blockEditor.getDimensionsClassesAndStyles;
+	},
 } ) );
 vi.mock( '../../../block-editor/hooks', () => ( {
 	useWeatherReport: vi.fn(),
@@ -118,5 +124,35 @@ describe( 'condition-icon edit', () => {
 		);
 
 		expect( html ).toContain( 'wp-block-elio-condition-icon__placeholder' );
+	} );
+
+	describe( 'on WordPress 6.9 and older', () => {
+		const getDimensionsClassesAndStyles =
+			blockEditor.getDimensionsClassesAndStyles;
+
+		afterEach( () => {
+			blockEditor.getDimensionsClassesAndStyles =
+				getDimensionsClassesAndStyles;
+		} );
+
+		it( 'sizes the icon to the width of the block', () => {
+			blockEditor.getDimensionsClassesAndStyles = undefined;
+			useWeatherReport.mockReturnValue( { data: WEATHER_FORECAST } );
+
+			const style = { dimensions: { width: '48px' } };
+
+			expect( renderEdit( {}, { style } ) ).toContain( 'width: 48px' );
+		} );
+
+		it( 'reads a width preset as its custom property', () => {
+			blockEditor.getDimensionsClassesAndStyles = undefined;
+			useWeatherReport.mockReturnValue( { data: null } );
+
+			const style = { dimensions: { width: 'var:preset|dimension|m' } };
+
+			expect( renderEdit( {}, { style } ) ).toContain(
+				'width: var(--wp--preset--dimension--m)'
+			);
+		} );
 	} );
 } );
