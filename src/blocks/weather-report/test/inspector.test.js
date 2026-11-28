@@ -19,9 +19,13 @@ import { renderWithRegistry } from '../../../test-utils/render-hook';
 
 vi.mock( '@wordpress/api-fetch', () => ( { default: vi.fn() } ) );
 vi.mock( '@wordpress/block-editor', () => ( {
-	InspectorControls: ( { children } ) => <div>{ children }</div>,
+	InspectorControls: ( { group = 'default', children } ) => (
+		<div data-group={ group }>{ children }</div>
+	),
+	store: 'core/block-editor',
 } ) );
 vi.mock( '@wordpress/components', () => ( {
+	PanelBody: ( { children } ) => <div>{ children }</div>,
 	__experimentalToolsPanel: ( { children } ) => <div>{ children }</div>,
 	__experimentalToolsPanelItem: ( { children } ) => <div>{ children }</div>,
 	SelectControl: ( { label, value, options, onChange } ) => (
@@ -39,7 +43,7 @@ vi.mock( '@wordpress/components', () => ( {
 	),
 } ) );
 vi.mock( '../../../block-editor/components/location-control', () => ( {
-	default: () => null,
+	default: () => <div data-testid="location-control" />,
 } ) );
 // The collection buttons, as a select: the control has its own tests.
 vi.mock( '../../../block-editor/components/icon-collection-control', () => ( {
@@ -68,16 +72,33 @@ vi.mock( '../../../block-editor/hooks', () => ( {
 	} ),
 } ) );
 
-function makeRegistry() {
+// The block editor store, as far as the inspector reads it: one inner block,
+// in the editing mode a locked section (contentOnly) or a free report gives it.
+function makeRegistry( innerBlockEditingMode = 'default' ) {
 	const registry = createRegistry();
 	registry.register( elioDataStore );
+	registry.registerStore( 'core/block-editor', {
+		reducer: () => ( {} ),
+		selectors: {
+			getBlockOrder: () => [ 'inner' ],
+			getBlockEditingMode: () => innerBlockEditingMode,
+		},
+	} );
 	return registry;
 }
 
-async function renderInspector( attributes, setAttributes = () => {} ) {
+async function renderInspector(
+	attributes,
+	setAttributes = () => {},
+	innerBlockEditingMode
+) {
 	const { container } = renderWithRegistry(
-		makeRegistry(),
-		<Inspector attributes={ attributes } setAttributes={ setAttributes } />
+		makeRegistry( innerBlockEditingMode ),
+		<Inspector
+			clientId="report"
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+		/>
 	);
 	// The providers resolver starts on the next tick, then its request settles.
 	await act( () => new Promise( ( resolve ) => setTimeout( resolve ) ) );
@@ -186,5 +207,37 @@ describe( 'weather-report inspector: condition icons', () => {
 		);
 
 		expect( select.value ).toBe( 'elio' );
+	} );
+} );
+
+describe( 'weather-report inspector: location', () => {
+	beforeEach( () => {
+		apiFetch.mockReset();
+		apiFetch.mockResolvedValue( [] );
+	} );
+
+	const groupsWithLocation = ( container ) =>
+		Array.from(
+			container.querySelectorAll( '[data-testid="location-control"]' ),
+			( control ) => control.closest( '[data-group]' ).dataset.group
+		);
+
+	it( 'sits in the settings of a report the editor leaves free', async () => {
+		expect( groupsWithLocation( await renderInspector( {} ) ) ).toEqual( [
+			'default',
+		] );
+	} );
+
+	it( 'is also in the content group of a locked pattern, the only one its sidebar shows', async () => {
+		const container = await renderInspector(
+			{ metadata: { patternName: 'elio/observation-compact' } },
+			() => {},
+			'contentOnly'
+		);
+
+		expect( groupsWithLocation( container ) ).toEqual( [
+			'content',
+			'default',
+		] );
 	} );
 } );

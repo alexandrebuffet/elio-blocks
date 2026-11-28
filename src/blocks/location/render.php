@@ -55,6 +55,6 @@ $extra_wrapper_attributes = array(
 // Set the wrapper attributes.
 $wrapper_attributes = get_block_wrapper_attributes($extra_wrapper_attributes);
 ?>
-<<?php echo tag_escape($tag_name); ?> <?php echo wp_kses_data($wrapper_attributes); ?>>
+<<?php echo tag_escape($tag_name); ?> <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() escapes its values. ?>>
     <?php echo esc_html($location_value); ?>
 </<?php echo tag_escape($tag_name); ?>>

@@ -21,10 +21,6 @@ trait RendersBlocks
         WordPressCore::stubDependencies();
         Functions\when('absint')->alias(static fn($value): int => abs((int) $value));
         Functions\when('wp_json_encode')->alias('json_encode');
-        // Real one when WordPress core is loaded (see tests/bootstrap.php): it cannot be stubbed then.
-        if (! WordPressCore::isLoaded()) {
-            Functions\when('wp_kses_data')->returnArg();
-        }
         Functions\when('sanitize_text_field')->returnArg();
         Functions\when('get_block_wrapper_attributes')->alias(
             static function (array $extra = []): string {

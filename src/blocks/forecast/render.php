@@ -18,6 +18,6 @@ if (! defined('ABSPATH')) {
     die;
 }
 ?>
-<div <?php echo wp_kses_data(get_block_wrapper_attributes()); ?>>
+<div <?php echo get_block_wrapper_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() escapes its values. ?>>
     <?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 </div>

@@ -44,7 +44,7 @@ $wrapper_attributes = get_block_wrapper_attributes(
 );
 ?>
 
-<ol <?php echo wp_kses_data($wrapper_attributes); ?>>
+<ol <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() escapes its values. ?>>
     <template data-wp-each--item="context.forecastItems">
         <li class="wp-block-elio-forecast-template__item">
             <?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

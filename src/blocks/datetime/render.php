@@ -47,7 +47,7 @@ if ('human-diff' === $format) {
     $extra_wrapper_attributes['data-wp-watch'] = 'callbacks.startQuarterHourClock';
 }
 ?>
-<p <?php echo wp_kses_data(get_block_wrapper_attributes($extra_wrapper_attributes)); ?>>
+<p <?php echo get_block_wrapper_attributes($extra_wrapper_attributes); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() escapes its values. ?>>
     <?php if ($show_prefix && $prefix !== '') : ?>
     <span class="wp-block-elio-datetime__prefix"><?php echo esc_html($prefix); ?></span>
     <?php endif; ?>

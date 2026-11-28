@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createRoot } from '@wordpress/element';
+import { SlotFillProvider } from '@wordpress/components';
 
 import './style.scss';
 
@@ -13,5 +14,10 @@ import SettingsPage from './page';
 const root = document.getElementById( 'elio-blocks-settings' );
 
 if ( root ) {
-	createRoot( root ).render( <SettingsPage /> );
+	// The header of the admin-ui Page renders a Slot.
+	createRoot( root ).render(
+		<SlotFillProvider>
+			<SettingsPage />
+		</SlotFillProvider>
+	);
 }

@@ -80,4 +80,4 @@ $allowed_html = array(
     ),
 );
 ?>
-<p <?php echo wp_kses_data(get_block_wrapper_attributes()); ?>><?php echo wp_kses($credit, $allowed_html); ?></p>
+<p <?php echo get_block_wrapper_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() escapes its values. ?>><?php echo wp_kses($credit, $allowed_html); ?></p>

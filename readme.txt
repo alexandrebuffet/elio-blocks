@@ -2,9 +2,9 @@
 Contributors: alexandrebuffet
 Tags: weather, forecast, block-editor, blocks, location
 Requires at least: 6.7
-Tested up to: 7.1
+Tested up to: 7.2
 Requires PHP: 8.2
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -142,6 +142,14 @@ The Elio icon collection is a rework inspired by [Tabler Icons](https://tabler.i
 7. The General section of the settings page: units and data refresh.
 
 == Changelog ==
+
+= 1.0.1 =
+
+-   WordPress 7.2: the weather shows again on the front end, where the new HTML sanitizer of WordPress emptied the reports.
+-   WordPress 7.2: the settings page and the location search use the versions of the WordPress packages that WordPress 7.2 asks for.
+-   WordPress 6.7 to 6.9: the Weather and Location blocks are back in the editor, and the Condition Icon block no longer breaks there once the weather is loaded.
+-   WordPress 7.0 and later: in a pattern, the location of a Weather Report and the prefixes of its values can be edited, where WordPress now locks the rest of the pattern.
+-   Block icons: the sun of the Weather block and a few other icons are outlined again instead of filled, and the icons of the plugin page are larger.
 
 = 1.0.0 =
 

@@ -20,7 +20,8 @@
 			"default": true
 		},
 		"prefix": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		}
 	},
 	"usesContext": [

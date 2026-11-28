@@ -146,6 +146,6 @@ $wrapper_attributes = get_block_wrapper_attributes(
     )
 );
 ?>
-<div <?php echo wp_kses_data($wrapper_attributes); ?>>
+<div <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() escapes its values. ?>>
     <svg<?php echo $svg_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above. ?>><use></use></svg>
 </div>

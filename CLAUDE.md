@@ -151,6 +151,7 @@ GitHub Actions build and deploy the WordPress.org package; nothing is packaged b
 
 - **PHP**: PSR-12 everywhere; WordPress I18n rules for text domain `elio-blocks`. Lint with `composer phpcs`. The `elio-blocks.php` bootstrap is excluded from PSR-1 side-effects rule.
 - **JS/CSS**: WordPress coding standards via `@wordpress/scripts` (ESLint + Stylelint).
+- **Wrapper attributes**: a `render.php` echoes `get_block_wrapper_attributes()` as it returns them, escaped already, with a `phpcs:ignore` of `EscapeOutput` saying so (WPCS does not know the function). Never through `wp_kses_data()`: the `wp_kses()` of WordPress 7.2, built on the HTML API, reads an attribute string as text and decodes its `&quot;`, which ends `data-wp-context="{…}"` at its first quote (`WrapperAttributesOutputTest`).
 - **Class names**: written in full where they are used (`'wp-block-elio-humidity__value'`), never built from a slug or through a `className` variable holding a base class: `className` is already a block prop and a block attribute (ESLint `no-restricted-syntax`). The value blocks pass theirs to `WeatherValueEdit` (`prefixClassName`, `valueClassName`, `unitClassName`), and `leaf-edits.test.js` checks they are the ones their `render.php` prints.
 - **Indentation**: Tabs everywhere (spaces only in YAML). See `.editorconfig`.
 - **Namespace**: `ElioBlocks\` (PSR-4). Do not use `WeatherBlock\`.
