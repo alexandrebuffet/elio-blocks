@@ -2,15 +2,20 @@
 # requires-python = ">=3.11"
 # dependencies = ["fonttools>=4.55", "skia-pathops"]
 # ///
-"""The name of the logo, outlined from Elio Sans: "Elio" 900 and "Blocks" 400, of one size.
+"""The name of the logo, outlined from Elio: "Elio" 800 and "Blocks" 400, of one size.
 
 Writes docs/brand/elio-blocks-wordmark.svg (the name alone, its capitals 100 high, in currentColor) and
 the full logo, elio-blocks-logo.svg (name in ink) and elio-blocks-logo-light.svg (name in white): the
 tile of src/icons/brand/svg/elio-logo.svg, the capitals 49% of its height and centered on it.
 
-    uv run docs/brand/elio-sans/logo.py
+    uv run docs/brand/elio/logo.py
 
-after build.py, which writes the font it outlines.
+Elio is the typeface of the plugin, a fork of Allo (https://github.com/alexandrebuffet/elio-font). Elio-logo[wght].ttf
+is its variable font at the settings of the logo, Display size (opsz 32) and Friendly (ROND 50), cut down to the
+letters of the name; after a new version of Elio, from its checkout:
+
+    fonttools varLib.instancer fonts/variable/ElioVariable.ttf opsz=32 ROND=50 -o /tmp/elio.ttf
+    pyftsubset /tmp/elio.ttf --text="Elio Blocks" --output-file=<plugin>/docs/brand/elio/Elio-logo[wght].ttf
 """
 import math
 import re
@@ -18,6 +23,7 @@ from functools import cache
 from pathlib import Path
 
 from fontTools.pens.boundsPen import BoundsPen
+from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
 from fontTools.ttLib import TTFont
@@ -26,12 +32,11 @@ from fontTools.varLib.instancer import OverlapMode, instantiateVariableFont
 HERE = Path(__file__).parent
 BRAND = HERE.parent
 TILE_SOURCE = BRAND.parents[1] / "src/icons/brand/svg/elio-logo.svg"
-FONT = HERE / "ElioSans[wght].ttf"
-CAP = 740
-WORDS = (("Elio", 900), ("Blocks", 400))
-TRACK, WORD_SPACE = -0.01, 0.15  # em
+FONT = HERE / "Elio-logo[wght].ttf"
+WORDS = (("Elio", 800), ("Blocks", 400))
+TRACK, WORD_SPACE = 0, 0.15  # em: Display size is tracked already
 # The capitals 49% of the tile; the name starts 0.2275 of the tile after it (its first side bearing included).
-TILE, RATIO, GAP = 128, 0.49, 0.2275
+TILE, RATIO, GAP = 128, 0.49, 0.2697
 
 
 @cache
@@ -42,8 +47,8 @@ def instance(wght):
 def name(cap, x, baseline):
     """The name with its capitals `cap` high, from x on the baseline (y down): its path, its advance
     end and its ink bounds."""
-    em = cap / CAP * 1000
-    scale = em / 1000
+    scale = cap / instance(WORDS[0][1])["OS/2"].sCapHeight
+    em = scale * instance(WORDS[0][1])["head"].unitsPerEm
     path = SVGPathPen(None, ntos=lambda v: f"{v:.2f}".rstrip("0").rstrip("."))
     bounds = BoundsPen(None)
     for i, (text, wght) in enumerate(WORDS):
@@ -53,8 +58,10 @@ def name(cap, x, baseline):
             x += (WORD_SPACE - TRACK) * em
         for ch in text:
             glyph = cmap[ord(ch)]
+            outline = DecomposingRecordingPen(glyphs)  # the i is a dotless i and a dot
+            glyphs[glyph].draw(outline)
             for pen in (path, bounds):
-                glyphs[glyph].draw(TransformPen(pen, (scale, 0, 0, -scale, x, baseline)))
+                outline.replay(TransformPen(pen, (scale, 0, 0, -scale, x, baseline)))
             x += hmtx[glyph][0] * scale + TRACK * em
     return path.getCommands(), x - TRACK * em, bounds.bounds
 
