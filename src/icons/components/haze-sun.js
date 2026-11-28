@@ -1,3 +1,3 @@
 import { SVG, Path, Rect, Circle, G } from "@wordpress/primitives";
-const hazeSun = <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><Path fill="currentColor" d="M12.755 7V4h-1.5v3zM8.291 8.224 6.17 6.102l-1.06 1.06 2.12 2.122zm8.486 1.067 2.12-2.121-1.06-1.06-2.121 2.12zM8 12.995v.685h1.5v-.685q0-2.5 2.5-2.5t2.5 2.5v.685H16v-.685q0-4-4-4t-4 4m-2-.75H3v1.5h3zm15 0h-3v1.5h3zm0 4.976v-1.5H3v1.5zm0 3.529v-1.5H3v1.5z" /></SVG>;
+const hazeSun = <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><Path fill="currentColor" d="M12.755 7h-1.5V4h1.5zM8.291 8.224l-1.06 1.06-2.122-2.121 1.06-1.06zm8.486 1.067-1.061-1.06 2.121-2.122 1.06 1.06zM8 12.995q0-4 4-4t4 4v.685h-1.5v-.685q0-2.5-2.5-2.5t-2.5 2.5v.685H8zm-2-.75v1.5H3v-1.5zm15 0v1.5h-3v-1.5zm0 4.976H3v-1.5h18zm0 3.529H3v-1.5h18z" /></SVG>;
 export default hazeSun;
