@@ -15,12 +15,21 @@
  *   icon its index.js gives registerBlockType() (src/icons/components/<name>,
  *   built from build/icons/block-editor/<name>.svg): the plugin page reads the
  *   block icons from block.json and runs no JavaScript, so it would show the
- *   dashicon the source declares. The editor keeps the one of index.js.
+ *   dashicon the source declares. The editor keeps the one of index.js. Its
+ *   viewBox is cropped to the square around the drawing: the plugin page fits
+ *   a block icon SVG in 16px, where a dashicon draws at 20px.
  */
 
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { createRequire } from 'module';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+
+const require = createRequire( import.meta.url );
+const canvasKitPath = require.resolve( 'canvaskit-wasm/bin/canvaskit.js' );
+const CanvasKit = await require( canvasKitPath )( {
+	locateFile: ( file ) => join( dirname( canvasKitPath ), file ),
+} );
 
 const BUILD_DIR = fileURLToPath( new URL( '../build', import.meta.url ) );
 const SRC_BLOCKS_DIR = fileURLToPath(
@@ -78,9 +87,31 @@ for ( const block of readdirSync( SRC_BLOCKS_DIR ) ) {
 
 	const path = join( BUILD_DIR, 'blocks', block, 'block.json' );
 	const metadata = JSON.parse( readFileSync( path, 'utf8' ) );
-	metadata.icon = readFileSync(
+	const svg = readFileSync(
 		join( BUILD_DIR, 'icons/block-editor', `${ name }.svg` ),
 		'utf8'
 	).trim();
+	const [ left, top, right, bottom ] = [ ...svg.matchAll( / d="([^"]+)"/g ) ]
+		.map( ( [ , d ] ) =>
+			CanvasKit.Path.MakeFromSVGString( d ).computeTightBounds()
+		)
+		.reduce( ( a, b ) => [
+			Math.min( a[ 0 ], b[ 0 ] ),
+			Math.min( a[ 1 ], b[ 1 ] ),
+			Math.max( a[ 2 ], b[ 2 ] ),
+			Math.max( a[ 3 ], b[ 3 ] ),
+		] );
+	// A quarter unit of margin, or the antialiasing of the edges is cut.
+	const size = Math.max( right - left, bottom - top ) + 0.5;
+	const viewBox = [
+		( left + right - size ) / 2,
+		( top + bottom - size ) / 2,
+		size,
+		size,
+	].map( ( value ) => +value.toFixed( 2 ) );
+	metadata.icon = svg.replace(
+		'viewBox="0 0 24 24"',
+		`viewBox="${ viewBox.join( ' ' ) }"`
+	);
 	writeFileSync( path, JSON.stringify( metadata, null, '\t' ) + '\n' );
 }

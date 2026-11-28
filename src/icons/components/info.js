@@ -1,0 +1,3 @@
+import { SVG, Path, Rect, Circle, G } from "@wordpress/primitives";
+const info = <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><Path fill="currentColor" d="M17.657 17.657Q15.314 20 12 20t-5.657-2.343T4 12t2.343-5.657T12 4t5.657 2.343T20 12t-2.343 5.657m-1.06-10.253Q14.691 5.5 12 5.5T7.404 7.404 5.5 12t1.904 4.596T12 18.5t4.596-1.904T18.5 12t-1.904-4.596M11.25 8h1.5v1.5h-1.5zm0 3h1.5v5h-1.5z" /></SVG>;
+export default info;
