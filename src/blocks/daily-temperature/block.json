@@ -20,7 +20,7 @@
 		"showUnit": { "type": "boolean", "default": true },
 		"unitFormat": { "type": "string" },
 		"showPrefix": { "type": "boolean", "default": false },
-		"prefix": { "type": "string" }
+		"prefix": { "type": "string", "role": "content" }
 	},
 	"usesContext": [
 		"elio/reportLocation",
