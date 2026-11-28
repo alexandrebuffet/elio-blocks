@@ -337,6 +337,167 @@ const JOINS = {
 	bevel: CanvasKit.StrokeJoin.Bevel,
 };
 
+// Number of coordinates after each verb of Path.toCmds(): conics end with
+// their weight.
+const VERB_ARGS = {
+	[ CanvasKit.MOVE_VERB ]: 2,
+	[ CanvasKit.LINE_VERB ]: 2,
+	[ CanvasKit.QUAD_VERB ]: 4,
+	[ CanvasKit.CONIC_VERB ]: 5,
+	[ CanvasKit.CUBIC_VERB ]: 6,
+	[ CanvasKit.CLOSE_VERB ]: 0,
+};
+
+/**
+ * The end point of a segment: the last two coordinates, before a conic's
+ * weight.
+ *
+ * @param {Object}   segment      Segment.
+ * @param {number}   segment.verb Its verb.
+ * @param {number[]} segment.args Its coordinates.
+ * @return {number[]} Its end point.
+ */
+function segmentEnd( { verb, args } ) {
+	const at = verb === CanvasKit.CONIC_VERB ? 1 : 0;
+	return args.slice( args.length - 2 - at, args.length - at );
+}
+
+/**
+ * The point of a segment at t = 0.5.
+ *
+ * @param {number[]} from         Start point of the segment.
+ * @param {Object}   segment      Segment.
+ * @param {number}   segment.verb Its verb.
+ * @param {number[]} segment.args Its coordinates.
+ * @return {number[]} Its middle.
+ */
+function segmentMiddle( from, { verb, args } ) {
+	const [ x, y ] = from;
+	const a = args;
+	if ( verb === CanvasKit.CUBIC_VERB ) {
+		return [
+			( x + 3 * a[ 0 ] + 3 * a[ 2 ] + a[ 4 ] ) / 8,
+			( y + 3 * a[ 1 ] + 3 * a[ 3 ] + a[ 5 ] ) / 8,
+		];
+	}
+	if ( verb === CanvasKit.QUAD_VERB || verb === CanvasKit.CONIC_VERB ) {
+		const w = verb === CanvasKit.CONIC_VERB ? a[ 4 ] : 1;
+		return [
+			( x + 2 * w * a[ 0 ] + a[ 2 ] ) / ( 2 + 2 * w ),
+			( y + 2 * w * a[ 1 ] + a[ 3 ] ) / ( 2 + 2 * w ),
+		];
+	}
+	return [ ( x + a[ 0 ] ) / 2, ( y + a[ 1 ] ) / 2 ];
+}
+
+/**
+ * The same area in nonzero, each contour drawn clockwise when an even number
+ * of others hold it, counterclockwise when an odd number does, so the winding
+ * numbers alternate 1, 0, 1, as the even-odd rule paints. Skia's
+ * makeAsWinding() gets some holes wrong (the sun of sun-cloud filled); the
+ * contours of a simplified path never cross, so their nesting is enough.
+ *
+ * @param {Object} path A simplified path, in any fill type.
+ * @return {Object} A new path, in nonzero.
+ */
+function asWinding( path ) {
+	const contours = [];
+	const cmds = path.toCmds();
+	for ( let i = 0; i < cmds.length; ) {
+		const verb = cmds[ i ];
+		const args = Array.from(
+			cmds.slice( i + 1, i + 1 + VERB_ARGS[ verb ] )
+		);
+		i += 1 + VERB_ARGS[ verb ];
+		if ( verb === CanvasKit.MOVE_VERB ) {
+			contours.push( { start: args, segments: [] } );
+		} else if ( verb !== CanvasKit.CLOSE_VERB ) {
+			contours.at( -1 ).segments.push( { verb, args } );
+		}
+	}
+
+	const shapes = contours.map( ( { start, segments } ) => {
+		const end = segments.length ? segmentEnd( segments.at( -1 ) ) : start;
+		// Closed by a line back to the start, so the reversed contour
+		// starts where this one ends.
+		if ( end[ 0 ] !== start[ 0 ] || end[ 1 ] !== start[ 1 ] ) {
+			segments.push( { verb: CanvasKit.LINE_VERB, args: start } );
+		}
+		// Shoelace over the end and control points: the sign of the
+		// orientation, not the exact area.
+		let area = 0;
+		let previous = start;
+		for ( const { verb, args } of segments ) {
+			const count = verb === CanvasKit.CONIC_VERB ? 4 : args.length;
+			for ( let k = 0; k < count; k += 2 ) {
+				area +=
+					previous[ 0 ] * args[ k + 1 ] - args[ k ] * previous[ 1 ];
+				previous = [ args[ k ], args[ k + 1 ] ];
+			}
+		}
+		const single = CanvasKit.Path.MakeFromCmds( [
+			CanvasKit.MOVE_VERB,
+			...start,
+			...segments.flatMap( ( { verb, args } ) => [ verb, ...args ] ),
+			CanvasKit.CLOSE_VERB,
+		] );
+		return { start, segments, clockwise: area > 0, single };
+	} );
+
+	const result = [];
+	for ( const shape of shapes ) {
+		// The middle of the first segment, away from the corners other
+		// contours may touch.
+		const point = segmentMiddle( shape.start, shape.segments[ 0 ] );
+		const depth = shapes.filter(
+			( other ) =>
+				other !== shape &&
+				other.single.contains( point[ 0 ], point[ 1 ] )
+		).length;
+		const { start, segments } = shape;
+		if ( shape.clockwise === ( depth % 2 === 0 ) ) {
+			result.push(
+				CanvasKit.MOVE_VERB,
+				...start,
+				...segments.flatMap( ( { verb, args } ) => [ verb, ...args ] )
+			);
+		} else {
+			// Each segment from its end to its start, controls swapped.
+			const points = [ start, ...segments.map( segmentEnd ) ];
+			result.push( CanvasKit.MOVE_VERB, ...start );
+			for ( let k = segments.length - 1; k >= 0; k-- ) {
+				const { verb, args } = segments[ k ];
+				const to = points[ k ];
+				if ( verb === CanvasKit.CUBIC_VERB ) {
+					result.push(
+						verb,
+						...args.slice( 2, 4 ),
+						...args.slice( 0, 2 ),
+						...to
+					);
+				} else if ( verb === CanvasKit.CONIC_VERB ) {
+					result.push(
+						verb,
+						...args.slice( 0, 2 ),
+						...to,
+						args[ 4 ]
+					);
+				} else if ( verb === CanvasKit.QUAD_VERB ) {
+					result.push( verb, ...args.slice( 0, 2 ), ...to );
+				} else {
+					result.push( verb, ...to );
+				}
+			}
+		}
+		result.push( CanvasKit.CLOSE_VERB );
+	}
+	for ( const shape of shapes ) {
+		shape.single.delete();
+	}
+
+	return CanvasKit.Path.MakeFromCmds( result );
+}
+
 /**
  * Unites two paths, freeing them.
  *
@@ -360,7 +521,7 @@ function unite( a, b ) {
  * united with the filled paths, then simplified into non-overlapping contours.
  *
  * @param {IconPath[]} paths Paths of the icon.
- * @return {{ d: string, fillRule: string }} Path data and its fill rule.
+ * @return {string} Path data, in nonzero.
  */
 function outline( paths ) {
 	let area = null;
@@ -395,21 +556,12 @@ function outline( paths ) {
 	const simple = simplified ?? area;
 	// Nonzero, the default: the sanitizers that keep only `d` and `fill` (the
 	// block icons of the WordPress.org plugin page) drop fill-rule.
-	const winding = simple.makeAsWinding();
-	if ( winding ) {
-		simple.delete();
-	}
-	const result = winding ?? simple;
-	const outlined = {
-		d: result.toSVGString(),
-		fillRule:
-			result.getFillType() === CanvasKit.FillType.EvenOdd
-				? 'evenodd'
-				: 'nonzero',
-	};
+	const result = asWinding( simple );
+	simple.delete();
+	const d = result.toSVGString();
 	result.delete();
 
-	return outlined;
+	return d;
 }
 
 // -----------------------------------------------------------------------------
@@ -464,11 +616,10 @@ function strokedSvg( paths ) {
  * @return {string} Optimised SVG.
  */
 function outlinedSvg( paths ) {
-	const { d, fillRule } = outline( paths );
-	const rule = fillRule === 'evenodd' ? ' fill-rule="evenodd"' : '';
+	const d = outline( paths );
 
 	return optimize(
-		`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${ VIEW_BOX }"><path fill="currentColor"${ rule } d="${ d }"/></svg>`,
+		`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${ VIEW_BOX }"><path fill="currentColor" d="${ d }"/></svg>`,
 		SVGO_CONFIG
 	).data;
 }
