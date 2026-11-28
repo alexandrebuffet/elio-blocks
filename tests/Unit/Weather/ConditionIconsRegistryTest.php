@@ -428,7 +428,7 @@ class ConditionIconsRegistryTest extends TestCase
     public function test_what_icons_are_made_of_goes_through(): void
     {
         $this->requireKses();
-        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" shape-rendering="crispEdges">'
             . '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fc0" stop-opacity=".5"></stop></linearGradient><clipPath id="c"><rect x="0" y="0" width="24" height="24" rx="2"></rect></clipPath></defs>'
             . '<g clip-path="url(#c)" transform="translate(1 1)" opacity=".9"><circle cx="12" cy="12" r="4" fill="url(#g)"></circle>'
             . '<path d="M12 2v2" fill-rule="evenodd" clip-rule="evenodd"></path><line x1="1" y1="1" x2="2" y2="2"></line>'
