@@ -34,7 +34,8 @@
 			"default": false
 		},
 		"prefix": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		}
 	},
 	"usesContext": [
