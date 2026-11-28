@@ -11,7 +11,7 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	getDimensionsClassesAndStyles as useDimensionsProps,
+	getDimensionsClassesAndStyles,
 } from '@wordpress/block-editor';
 import { Path, Rect, SVG } from '@wordpress/primitives';
 
@@ -28,6 +28,26 @@ import {
 } from '../../block-editor/utils';
 import HtmlRenderer from '../../block-editor/components/html-renderer';
 import Inspector from './inspector';
+
+/**
+ * What getDimensionsClassesAndStyles() returns for the one dimension of the
+ * block, its width: WordPress 6.9 and older have no such function.
+ *
+ * @param {Object} attributes       Block attributes.
+ * @param {Object} attributes.style Style attribute of the block.
+ * @return {Object} Inline style of the width.
+ */
+const getWidthClassesAndStyles = ( { style } ) => {
+	const width = style?.dimensions?.width;
+
+	return {
+		style: {
+			width: width?.startsWith( 'var:' )
+				? `var(--wp--${ width.slice( 4 ).replaceAll( '|', '--' ) })`
+				: width,
+		},
+	};
+};
 
 /**
  * Renders the placeholder displayed when no weather data is available yet.
@@ -65,7 +85,7 @@ const WeatherIconPlaceholder = ( { className, style } ) => (
  *
  * Follows the same pattern as core/icon (Gutenberg):
  * – HtmlRenderer for safe SVG rendering in the editor
- * – useColorProps / useDimensionsProps merged as wrapperProps so styles land
+ * – useColorProps / getDimensionsClassesAndStyles merged as wrapperProps so styles land
  *   directly on the SVG element rather than on an extra wrapper
  * – WeatherIconPlaceholder when no weather data is available
  *
@@ -110,7 +130,9 @@ export default function ConditionIconEdit( {
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
-	const dimensionsProps = useDimensionsProps( attributes );
+	const dimensionsProps = (
+		getDimensionsClassesAndStyles ?? getWidthClassesAndStyles
+	)( attributes );
 
 	const strokeStyle = isStroke
 		? {
